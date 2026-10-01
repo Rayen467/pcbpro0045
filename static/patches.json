@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.5.0",
+    "date": "2026-10-02",
+    "title": {"id": "KiCad-Style End-to-End PCB Workflow", "en": "KiCad-Style End-to-End PCB Workflow"},
+    "changes": {
+      "id": [
+        "Tambah Workflow Center 16 tahap dari project, schematic capture, annotation, footprint, ERC, transfer ke PCB, Edge.Cuts, placement, routing, copper zone, DRC/preflight, Gerber/drill, CAM check, sampai handoff manufaktur.",
+        "Status tiap tahap dihitung dari project aktif; langkah tidak boleh ditandai selesai bila data/geometri yang diperlukan belum benar-benar tersedia.",
+        "Tambah Basic ERC yang memeriksa duplicate/invalid reference, GND, floating two-pin parts, dan footprint yang belum ditentukan.",
+        "Tambah export workflow/project snapshot JSON untuk audit dan debugging.",
+        "Copilot sekarang menerima workflow state sebagai context sehingga bisa menjawab 'langkah berikutnya apa', ERC, routing, Gerber, drill, dan manufacturing readiness berdasarkan kondisi project aktual.",
+        "Gerber, drill, CAM, routing geometry, copper zone, dan JLCPCB handoff tetap diblokir bila board geometry source-of-truth belum ada; tidak ada manufacturing output palsu."
+      ],
+      "en": [
+        "Added a 16-stage Workflow Center from project setup, schematic capture, annotation, footprints, ERC, PCB transfer, Edge.Cuts, placement, routing, copper zones, DRC/preflight, Gerber/drill, CAM inspection, through manufacturing handoff.",
+        "Each stage is computed from the active project; a step cannot be marked complete when required data or geometry is not actually available.",
+        "Added Basic ERC checks for duplicate/invalid references, GND, floating two-pin parts, and missing footprints.",
+        "Added workflow/project snapshot JSON export for audit and debugging.",
+        "Copilot now receives workflow state so it can answer next-step, ERC, routing, Gerber, drill, and manufacturing-readiness questions from the actual project state.",
+        "Gerber, drill, CAM, routing geometry, copper zones, and JLCPCB handoff remain blocked until a real board-geometry source of truth exists; no fake manufacturing output is produced."
+      ]
+    }
+  },
+  {
     "version": "1.4.0",
     "date": "2026-10-01",
     "title": {"id": "LLM Brain + Live Simulation", "en": "LLM Brain + Live Simulation"},
