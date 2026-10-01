@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.9.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.10.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -45,6 +45,7 @@
     // Editing engines first: schematic connectivity, KiCad-like behavior, then PCB geometry.
     await load('/wire-engine.js?v=2.0.0');
     await load('/ux-engine.js');
+    await load('/patch-v110.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
@@ -70,6 +71,7 @@
       window.PCBProBoardModel?.refresh?.();
       window.PCBProAdvancedBoard?.refresh?.();
       window.PCBProBoardWorkflowBridge?.install?.();
+      window.PCBProPatchV110?.inject?.();
     }, 850);
 
     document.addEventListener('click', (event) => {
