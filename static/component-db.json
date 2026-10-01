@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0.0",
+  "verified_at": "2026-10-01",
+  "policy": {
+    "exact_part_only": true,
+    "generic_parts_have_no_assumed_field_ratings": true,
+    "description": "Exact limits are stored only when a manufacturer part number or an explicitly named vendor reference is known. Generic symbols must remain unresolved for field sign-off."
+  },
+  "parts": [
+    {
+      "mpn": "1N4148",
+      "manufacturer": "Nexperia reference",
+      "status": "vendor_verified",
+      "category": "diode",
+      "package": "SOD27 / DO-35 axial leaded glass",
+      "ratings": {
+        "continuous_reverse_voltage_v": 100,
+        "repetitive_peak_reverse_voltage_v": 100,
+        "continuous_forward_current_a": 0.2,
+        "repetitive_peak_forward_current_a": 0.45,
+        "max_switching_time_s": 4e-9
+      },
+      "warnings": [
+        "450 mA is repetitive peak forward current, not the continuous operating current.",
+        "A project footprint such as SOD-123 does not identify this exact Nexperia axial reference; lock an exact SMD MPN before fabrication."
+      ],
+      "sources": [
+        {"type":"manufacturer_product","url":"https://www.nexperia.com/product/1N4148"},
+        {"type":"manufacturer_datasheet","url":"https://assets.nexperia.com/documents/data-sheet/1N4148_1N4448.pdf"}
+      ]
+    },
+    {
+      "mpn": "2N7002",
+      "manufacturer": "Nexperia",
+      "status": "vendor_verified",
+      "category": "mosfet_n",
+      "package": "SOT23 / TO-236AB",
+      "ratings": {
+        "vds_max_v": 60,
+        "family_current_rating_a": 0.3
+      },
+      "features": ["logic-level gate drive compatible", "very fast switching", "surface-mount package"],
+      "warnings": [
+        "Do not use VGS(th) as the voltage that guarantees low RDS(on). Verify the exact datasheet operating point and thermal conditions before sign-off."
+      ],
+      "sources": [
+        {"type":"manufacturer_product","url":"https://www.nexperia.com/product/2N7002"},
+        {"type":"manufacturer_datasheet","url":"https://assets.nexperia.com/documents/data-sheet/2N7002.pdf"}
+      ]
+    },
+    {
+      "mpn": "LM358",
+      "manufacturer": "Texas Instruments",
+      "status": "vendor_verified",
+      "category": "op_amp_dual",
+      "ratings": {
+        "supply_min_v": 3,
+        "supply_max_v": 30,
+        "gbw_typ_hz": 700000,
+        "slew_rate_typ_v_per_us": 0.3,
+        "operating_temp_min_c": 0,
+        "operating_temp_max_c": 70,
+        "output_headroom_to_positive_supply_typ_v": -2
+      },
+      "warnings": [
+        "LM358 is not rail-to-rail to the positive supply. Package/orderable variant must be locked before footprint sign-off."
+      ],
+      "sources": [
+        {"type":"manufacturer_product","url":"https://www.ti.com/product/LM358"}
+      ]
+    },
+    {
+      "mpn": "LM358B",
+      "manufacturer": "Texas Instruments",
+      "status": "vendor_verified",
+      "category": "op_amp_dual",
+      "ratings": {
+        "supply_min_v": 3,
+        "supply_max_v": 36,
+        "gbw_typ_hz": 1200000,
+        "slew_rate_typ_v_per_us": 0.5,
+        "operating_temp_min_c": -40,
+        "operating_temp_max_c": 85,
+        "output_headroom_to_positive_supply_typ_v": -1.4
+      },
+      "warnings": [
+        "LM358B and legacy LM358 are not interchangeable as a simulation model without checking the exact device and package."
+      ],
+      "sources": [
+        {"type":"manufacturer_product","url":"https://www.ti.com/product/LM358B"}
+      ]
+    }
+  ],
+  "generic_requirements": {
+    "R": ["manufacturer series/MPN", "power rating", "tolerance", "TCR", "working voltage", "pulse rating", "package"],
+    "C": ["manufacturer MPN", "dielectric", "rated voltage", "DC-bias derating", "ESR", "ripple current", "tolerance", "temperature rating", "package"],
+    "L": ["manufacturer MPN", "DCR", "saturation current", "RMS current", "core loss", "SRF", "tolerance", "thermal data", "package"],
+    "LED": ["manufacturer MPN", "IF max", "Vf distribution", "thermal resistance", "luminous characteristics", "temperature derating", "package"],
+    "V": ["exact supply model", "current limit", "source impedance", "ripple", "transient response", "protection behavior"],
+    "SW": ["manufacturer MPN", "contact resistance", "rated current/voltage", "bounce", "mechanical life", "package"],
+    "J": ["manufacturer MPN", "current per pin", "voltage rating", "contact resistance", "temperature rise", "mating cycles", "pitch/series"],
+    "Q": ["manufacturer MPN", "exact pinout/package", "RDS(on) conditions", "SOA", "thermal impedance", "gate charge", "SPICE model"],
+    "U": ["manufacturer MPN", "exact package/pinout", "supply range", "I/O limits", "thermal limits", "vendor SPICE model"]
+  }
+}
