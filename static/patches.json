@@ -1,0 +1,52 @@
+[
+  {
+    "version": "1.2.0",
+    "date": "2026-10-01",
+    "title": {"id": "Readable UI, Bahasa, dan Component Intelligence", "en": "Readable UI, Language, and Component Intelligence"},
+    "changes": {
+      "id": [
+        "Comfort UI menjadi default: teks, tombol, tab, inspector, library, simulator, dan chat diperbesar agar tidak membuat mata cepat lelah.",
+        "Tambah pilihan Bahasa Indonesia / English yang tersimpan di browser.",
+        "Tambah kontrol ukuran antarmuka dan kontras yang lebih nyaman.",
+        "Tambah Component Intelligence: status model, capability, limit, package/variant warning, dan confidence untuk komponen yang dipilih.",
+        "Tambah Patch Updates di dalam aplikasi agar setiap perkembangan terlihat jelas.",
+        "Sumber komponen spesifik mulai dikunci ke referensi vendor; entri generik tidak lagi dianggap mempunyai rating pasti tanpa MPN/datasheet."
+      ],
+      "en": [
+        "Comfort UI is now the default: larger text, controls, tabs, inspector, library, simulator, and assistant chat.",
+        "Added persistent Indonesian / English language selection.",
+        "Added UI size controls and a more comfortable contrast profile.",
+        "Added Component Intelligence: model status, capabilities, limits, package/variant warnings, and confidence for the selected part.",
+        "Added in-app Patch Updates so product progress is visible on every release.",
+        "Specific parts begin using vendor-grounded references; generic entries are no longer treated as having exact ratings without an MPN/datasheet."
+      ]
+    }
+  },
+  {
+    "version": "1.1.0",
+    "date": "2026-09-29",
+    "title": {"id": "Smooth Pointer Engine", "en": "Smooth Pointer Engine"},
+    "changes": {
+      "id": ["Pointer Events + requestAnimationFrame untuk drag yang lebih ringan.", "Panel resize, pan/zoom, undo/redo, dan placement yang lebih fleksibel."],
+      "en": ["Pointer Events + requestAnimationFrame for smoother movement.", "Resizable panels, pan/zoom, undo/redo, and more flexible placement."]
+    }
+  },
+  {
+    "version": "0.2.0",
+    "date": "2026-10-01",
+    "title": {"id": "Field Reality Lab", "en": "Field Reality Lab"},
+    "changes": {
+      "id": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, dan fault injection.", "Field envelope menggantikan angka simulasi ideal tunggal."],
+      "en": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, and fault injection.", "Field envelopes replace single idealized simulation numbers."]
+    }
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-10-01",
+    "title": {"id": "PCB Pro Copilot", "en": "PCB Pro Copilot"},
+    "changes": {
+      "id": ["Asisten membaca project aktif, melakukan audit, mengubah nilai, menambah part, membuka workspace, dan menjalankan Reality Lab."],
+      "en": ["Assistant reads the active project, audits it, changes values, adds parts, switches workspaces, and runs Reality Lab."]
+    }
+  }
+]
