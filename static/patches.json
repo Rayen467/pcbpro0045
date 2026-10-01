@@ -1,5 +1,34 @@
 [
   {
+    "version": "1.7.0",
+    "date": "2026-10-02",
+    "title": {"id": "Workspace Interaction + Layout Repair", "en": "Workspace Interaction + Layout Repair"},
+    "changes": {
+      "id": [
+        "Workspace utama sekarang diberi frame/card yang jelas dengan padding, border, dan overflow yang terkontrol agar canvas tidak terlihat terpotong atau menyatu dengan panel lain.",
+        "Inspector dan library mendapat ruang bawah serta scroll gutter supaya konten terakhir tetap bisa dijangkau pada layar laptop pendek.",
+        "Tambah tiga mode layout: Fleksibel, Fokus Canvas, dan Fokus Inspector tanpa menghapus kemampuan panel resize yang sudah ada.",
+        "Kontrol ID/EN, ukuran UI, Comfort, dan Update tidak lagi menutup inspector secara permanen; sekarang dibuka dari tombol UI di top bar.",
+        "Launcher AI dipindah ke top bar sehingga tidak lagi menutupi data komponen/inspector di kanan bawah.",
+        "Berkas/Edit/Tampilan/Tempatkan/Jalur/Periksa/Alat/Produksi sekarang punya aksi/menu yang benar-benar bisa dipakai; tombol fitur yang engine-nya belum nyata diberi status unavailable, bukan dibiarkan terlihat aktif tetapi kosong.",
+        "New sekarang membuat project kosong yang nyata, sedangkan Export mengambil wire graph/netlist aktif, bukan netlist demo hardcoded.",
+        "Angka DRC/routing dan operating-point placeholder yang belum didukung engine nyata tidak lagi dipresentasikan sebagai hasil valid; simulator placeholder disembunyikan saat menunggu Live Circuit Solver.",
+        "Design Checks sekarang mengambil ERC dasar dari workflow state aktual dan DRC PCB ditandai menunggu geometry engine, bukan clean/finding palsu."
+      ],
+      "en": [
+        "The main workspace now has a clear framed/card surface with controlled padding, borders, and overflow so the canvas no longer looks clipped into adjacent panels.",
+        "Inspector and library panels receive bottom breathing room and stable scroll gutters so their final content remains reachable on shorter laptop displays.",
+        "Added three layout modes: Flexible, Canvas Focus, and Inspector Focus while preserving the existing resizable-panel workflow.",
+        "ID/EN, UI size, Comfort, and Updates no longer permanently cover the inspector; they are opened from a UI button in the top bar.",
+        "The AI launcher is moved into the top bar so it no longer covers component data at the bottom-right.",
+        "File/Edit/View/Place/Route/Inspect/Tools/Manufacture now expose usable actions or menus; controls whose real engine is not implemented are explicitly marked unavailable instead of looking active but doing nothing.",
+        "New now creates an actually empty project, while Export uses the active wire graph/netlist instead of demo hardcoded nets.",
+        "Unsupported DRC/routing numbers and operating-point placeholders are no longer presented as valid results; simulator placeholders are hidden while the Live Circuit Solver loads.",
+        "Design Checks now derive Basic ERC from actual workflow state and PCB DRC is marked as waiting for the geometry engine instead of showing fake clean/finding results."
+      ]
+    }
+  },
+  {
     "version": "1.6.0",
     "date": "2026-10-02",
     "title": {"id": "Interactive Pin-to-Pin Wiring", "en": "Interactive Pin-to-Pin Wiring"},
