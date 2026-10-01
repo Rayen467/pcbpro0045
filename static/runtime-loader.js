@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.8.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.9.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -50,10 +50,12 @@
     await load('/workspace-repair.js');
     await load('/kicad-behavior.js?v=1.0.0');
     await load('/pcb-layout-engine.js?v=1.0.0');
+    await load('/board-advanced-engine.js?v=1.0.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProBoardModel?.refresh?.();
+    window.PCBProAdvancedBoard?.refresh?.();
     window.PCBProBoardWorkflowBridge?.install?.();
 
     // Assistant and component intelligence stay deferred so the canvas becomes interactive first.
@@ -66,6 +68,7 @@
       window.PCBProWireEngine?.refresh?.(0);
       window.PCBProKiCadBehavior?.repair?.();
       window.PCBProBoardModel?.refresh?.();
+      window.PCBProAdvancedBoard?.refresh?.();
       window.PCBProBoardWorkflowBridge?.install?.();
     }, 850);
 
@@ -74,7 +77,11 @@
       if (!tab) return;
       const view = tab.dataset.pcbView || tab.textContent || '';
       if (/simulator|simulasi/i.test(view)) setTimeout(maybeLoadLiveSimulation, 0);
-      if (/^pcb$/i.test(String(view).trim())) setTimeout(()=>{window.PCBProBoardModel?.refresh?.();window.PCBProBoardWorkflowBridge?.install?.()},0);
+      if (/^pcb$/i.test(String(view).trim())) setTimeout(()=>{
+        window.PCBProBoardModel?.refresh?.();
+        window.PCBProAdvancedBoard?.refresh?.();
+        window.PCBProBoardWorkflowBridge?.install?.();
+      },0);
     }, { passive: true });
 
     idle(maybeLoadLiveSimulation, 1700);
