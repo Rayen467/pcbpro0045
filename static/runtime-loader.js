@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.12.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.13.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -37,23 +37,26 @@
     await load('/sim-engine.js');
     await load('/live-sim-engine.js');
     window.PCBProWorkspaceRepair?.repair?.();
+    window.PCBProExplain?.refresh?.();
   }
 
   async function maybeLoadDeepLearning() {
     await load('/learning-depth-v112.js?v=1.12.0');
     window.PCBProLearningMergeV112?.merge?.();
     window.PCBProDeepLearning?.merge?.();
+    window.PCBProExplain?.refresh?.();
   }
 
   async function boot() {
     await load('/interaction-bridge.js');
 
-    // Editing engines first: schematic connectivity, learning, KiCad-like behavior, then PCB geometry.
+    // Editing engines first: schematic connectivity, learning, KiCad-like behavior, PCB geometry, then universal explanation.
     await load('/wire-engine.js?v=2.0.0');
     await load('/ux-engine.js');
     await load('/patch-v110.js');
     await load('/patch-v111.js');
     await load('/patch-v112.js');
+    await load('/patch-v113.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
@@ -63,6 +66,7 @@
     await load('/pcb-layout-engine.js?v=1.0.0');
     await load('/board-advanced-engine.js?v=1.0.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
+    await load('/explain-engine-v113.js?v=1.13.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProBoardModel?.refresh?.();
@@ -70,6 +74,7 @@
     window.PCBProBoardWorkflowBridge?.install?.();
     window.PCBProLearningMergeV112?.merge?.();
     window.PCBProLearningCenter?.refresh?.();
+    window.PCBProExplain?.refresh?.();
 
     // Assistant and component intelligence stay deferred so the canvas becomes interactive first.
     idle(async () => {
@@ -86,8 +91,10 @@
       window.PCBProPatchV110?.inject?.();
       window.PCBProPatchV111?.inject?.();
       window.PCBProPatchV112?.inject?.();
+      window.PCBProPatchV113?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
+      window.PCBProExplain?.refresh?.();
     }, 850);
 
     document.addEventListener('click', async (event) => {
@@ -100,6 +107,7 @@
         window.PCBProBoardModel?.refresh?.();
         window.PCBProAdvancedBoard?.refresh?.();
         window.PCBProBoardWorkflowBridge?.install?.();
+        window.PCBProExplain?.refresh?.();
       },0);
     }, { passive: true });
 
