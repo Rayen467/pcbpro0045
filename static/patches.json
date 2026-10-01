@@ -1,24 +1,43 @@
 [
   {
+    "version": "1.4.0",
+    "date": "2026-10-01",
+    "title": {"id": "LLM Brain + Live Simulation", "en": "LLM Brain + Live Simulation"},
+    "changes": {
+      "id": [
+        "Copilot sekarang memakai backend LLM sungguhan melalui Vercel AI Gateway, dengan context project, netlist, hasil simulator, history percakapan, dan katalog komponen terverifikasi.",
+        "Jawaban tidak lagi bergantung pada regex/fallback berulang sebagai jalur utama. Fallback lokal hanya dipakai jika LLM benar-benar gagal diakses.",
+        "Primary Simulator diubah menjadi Live Circuit: Run, Pause, Step Solve, Reset, live node probes, device voltage/current/power, dan fault injection.",
+        "Live Simulator memakai solver MNA project yang sebenarnya; perangkat yang belum punya model dideteksi sebagai unsupported dan tidak diberi hasil palsu.",
+        "Monte Carlo / thermal Reality Lab dipindahkan menjadi Advanced Field Analysis, bukan lagi simulator utama.",
+        "Engine berat tetap lazy-load supaya workflow utama lebih ringan untuk laptop spesifikasi rendah."
+      ],
+      "en": [
+        "Copilot now uses a real LLM backend through Vercel AI Gateway with project context, netlist, simulator results, conversation history, and the verified component catalog.",
+        "Answers no longer rely on repeating regex/fallback logic as the primary path. Local fallback is only used when the LLM cannot be reached.",
+        "The primary Simulator is now Live Circuit: Run, Pause, Step Solve, Reset, live node probes, device voltage/current/power, and fault injection.",
+        "Live Simulator uses the actual project MNA solver; devices without supported models are explicitly flagged instead of receiving fabricated results.",
+        "Monte Carlo / thermal Reality Lab is moved to Advanced Field Analysis instead of being the primary simulator.",
+        "Heavy engines remain lazy-loaded so the main workflow stays usable on lower-spec laptops."
+      ]
+    }
+  },
+  {
     "version": "1.3.0",
     "date": "2026-10-01",
     "title": {"id": "Grounded Copilot + Netlist Wiring", "en": "Grounded Copilot + Netlist Wiring"},
     "changes": {
       "id": [
-        "Copilot tidak lagi pura-pura sebagai LLM penuh: status UI sekarang menyatakan LLM backend OFF sampai backend model benar-benar tersambung.",
+        "Copilot tidak lagi pura-pura sebagai LLM penuh: status UI menyatakan backend model belum aktif pada versi ini.",
         "Tambah grounded reasoning untuk pertanyaan wiring/wayar berdasarkan netlist project aktif, termasuk arti pin dasar untuk source, resistor, diode, dan LED.",
-        "Jawaban pertanyaan yang sama tidak lagi menyalin paragraf panjang bila state project belum berubah.",
         "Tambah component-db.json sebagai katalog vendor terverifikasi dengan provenance URL dan tanggal verifikasi; part generik tidak diberi rating lapangan palsu.",
-        "Wire overlay tidak lagi memakai CONNECTIONS hardcoded. Garis schematic sekarang diturunkan dari netlist aktif yang terlihat di inspector.",
-        "Jika ground symbol hanya ada secara visual tetapi tidak tercatat di netlist, assistant memberi peringatan dan tidak mengklaim koneksi listrik palsu."
+        "Wire overlay tidak lagi memakai CONNECTIONS hardcoded. Garis schematic diturunkan dari netlist aktif yang terlihat di inspector."
       ],
       "en": [
-        "Copilot no longer presents itself as a full LLM: the UI now states LLM backend OFF until a model backend is actually connected.",
+        "Copilot stopped presenting itself as a full LLM before the model backend was connected.",
         "Added grounded wiring reasoning from the active project netlist, including basic pin semantics for sources, resistors, diodes, and LEDs.",
-        "Repeated questions no longer duplicate a long paragraph when project state has not changed.",
         "Added component-db.json as a vendor-verified catalog with provenance URLs and verification date; generic parts receive no fabricated field ratings.",
-        "Wire overlay no longer uses hardcoded CONNECTIONS. Schematic lines are now derived from the active netlist visible in the inspector.",
-        "If a ground symbol is only visual and absent from the netlist, the assistant warns instead of claiming a false electrical connection."
+        "Wire overlay no longer uses hardcoded CONNECTIONS and is derived from the active netlist."
       ]
     }
   },
@@ -59,8 +78,8 @@
     "date": "2026-10-01",
     "title": {"id": "Field Reality Lab", "en": "Field Reality Lab"},
     "changes": {
-      "id": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, dan fault injection.", "Field envelope menggantikan angka simulasi ideal tunggal."],
-      "en": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, and fault injection.", "Field envelopes replace single idealized simulation numbers."]
+      "id": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, dan fault injection.", "Field envelope menjadi analisis lanjutan setelah live solver."],
+      "en": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, and fault injection.", "Field envelope is now an advanced analysis after the live solver."]
     }
   },
   {
@@ -68,8 +87,8 @@
     "date": "2026-10-01",
     "title": {"id": "PCB Pro Copilot", "en": "PCB Pro Copilot"},
     "changes": {
-      "id": ["Asisten membaca project aktif, melakukan audit, mengubah nilai, menambah part, membuka workspace, dan menjalankan Reality Lab."],
-      "en": ["Assistant reads the active project, audits it, changes values, adds parts, switches workspaces, and runs Reality Lab."]
+      "id": ["Fondasi awal asisten membaca project aktif dan menjalankan aksi dasar workspace."],
+      "en": ["Initial assistant foundation for reading the active project and basic workspace actions."]
     }
   }
 ]
