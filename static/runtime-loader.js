@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.4.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.5.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -42,12 +42,13 @@
   async function boot() {
     await load('/interaction-bridge.js');
 
-    // Core editing path: wiring and command identity are loaded before optional assistants.
-    await load('/wire-engine.js');
+    // Core editing path first. Versioned query prevents stale cached wire code after deploy.
+    await load('/wire-engine.js?v=2.0.0');
     await load('/ux-engine.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
+    window.PCBProWireEngine?.refresh?.(0);
 
     // Assistant and component intelligence stay deferred so the canvas becomes interactive first.
     idle(async () => {
@@ -56,6 +57,7 @@
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
       window.PCBProWorkspaceRepair?.repair?.();
+      window.PCBProWireEngine?.refresh?.(0);
     }, 850);
 
     document.addEventListener('click', (event) => {
