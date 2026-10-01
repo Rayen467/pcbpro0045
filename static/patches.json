@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.8.0",
+    "date": "2026-10-02",
+    "title": {"id": "Wire Engine v2 — Stable Pin Layer", "en": "Wire Engine v2 — Stable Pin Layer"},
+    "changes": {
+      "id": [
+        "Wire engine dibangun ulang memakai pin layer terpisah dari DOM komponen supaya klik pin tidak bentrok dengan drag/select komponen Svelte.",
+        "Posisi pin dihitung dari geometri komponen aktual di workspace, lalu wire endpoint mengikuti posisi komponen saat dipindahkan, zoom, pan, atau layout berubah.",
+        "Graph wiring lama dimigrasi ke schema v2, divalidasi terhadap pin yang benar-benar ada, lalu koneksi duplikat, self-loop, dan stale otomatis dibuang.",
+        "Wire mode mendukung preview live, corner orthogonal, klik pin-ke-pin, pilih wire, Delete/Backspace, Esc, dan Reset Wiring.",
+        "Net Inspector disinkronkan dari wire graph v2 dan perubahan netlist langsung dipublikasikan ke simulator serta assistant.",
+        "Runtime loader memakai asset wire versioned supaya browser tidak terus menjalankan wire-engine lama dari cache."
+      ],
+      "en": [
+        "The wire engine was rebuilt around a separate pin layer so pin clicks no longer conflict with Svelte component drag/select handling.",
+        "Pin positions are derived from actual component geometry; wire endpoints follow components through movement, zoom, pan, and layout changes.",
+        "Legacy wiring graphs are migrated to schema v2, validated against pins that actually exist, and stale, duplicate, or self-loop connections are removed.",
+        "Wire mode supports live preview, orthogonal corners, pin-to-pin completion, wire selection, Delete/Backspace, Escape, and Reset Wiring.",
+        "Net Inspector is synchronized from the v2 wire graph and netlist changes are immediately published to the simulator and assistant.",
+        "The runtime loader now requests a versioned wire asset so browsers do not keep running an older cached wire engine."
+      ]
+    }
+  },
+  {
     "version": "1.7.0",
     "date": "2026-10-02",
     "title": {"id": "Workspace Interaction + Layout Repair", "en": "Workspace Interaction + Layout Repair"},
