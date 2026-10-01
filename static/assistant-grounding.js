@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.5.0';
+  const VERSION = '0.6.0';
   let db = null;
   let dbError = null;
   let aiState = 'ready';
@@ -118,16 +118,57 @@
       : `Workflow progress ${snap.done}/${snap.total}. Next step: ${label}. ${detail}`;
   }
 
+  function learningSnapshot() {
+    const atlas = window.PCBProLearningCenter?.curriculum;
+    if (!atlas?.branches?.length) return null;
+    return {
+      version: atlas.version,
+      branches: atlas.branches.map((b) => ({
+        id:b.id,
+        title:b.title,
+        summary:b.summary,
+        topics:(b.topics||[]).map((x)=>({id:x.id,title:x.title,level:x.level,summary:x.summary,concepts:x.concepts,formulas:x.formulas,next:x.next}))
+      }))
+    };
+  }
+
+  function learningAnswer(query) {
+    const atlas = learningSnapshot();
+    if (!atlas) return null;
+    const q = clean(query).toLowerCase();
+    const tokens = q.split(/[^a-z0-9µΩ]+/i).filter((x)=>x.length>2);
+    const scored = [];
+    for (const branch of atlas.branches) {
+      for (const topic of branch.topics || []) {
+        const hay = `${topic.title} ${topic.summary} ${(topic.concepts||[]).join(' ')} ${(topic.formulas||[]).join(' ')}`.toLowerCase();
+        const score = tokens.reduce((n,token)=>n+(hay.includes(token)?1:0),0) + (hay.includes(q)?4:0);
+        if (score > 0) scored.push({score,branch,topic});
+      }
+    }
+    scored.sort((a,b)=>b.score-a.score);
+    const best = scored.slice(0,4);
+    if (!best.length) return null;
+    const l=lang();
+    const lines=best.map(({branch,topic})=>{
+      const formulas=(topic.formulas||[]).slice(0,3).join(' · ');
+      return `• ${topic.title} — ${topic.summary}${formulas?` [${formulas}]`:''} → ${branch.title}`;
+    });
+    return l==='id'
+      ? `Dari Learning Atlas PCB Pro, topik yang paling nyambung:\n${lines.join('\n')}\n\nBuka tombol Belajar untuk lihat cabang konsep, rumus, latihan, dan hubungan ke project aktif.`
+      : `From the PCB Pro Learning Atlas, the most relevant topics are:\n${lines.join('\n')}\n\nOpen Learn to explore concept branches, formulas, practice, and active-project connections.`;
+  }
+
   function localFallback(query, ctx, errorMessage = '') {
     let answer = null;
     if (/(wire|wiring|wayar|kabel|sambung|nyambung|connect|hubung)/i.test(query)) answer = wireGuide(query, ctx?.design);
     if (!answer && /(workflow|kicad|langkah|selanjutnya|next step|gerber|drill|erc|drc|fabrication|fabrikasi)/i.test(query)) answer = workflowAnswer(query);
+    if (!answer && /(ohm|kirchhoff|kcl|kvl|resistor|capacitor|kapasitor|inductor|induktor|transistor|diode|dioda|transformer|tegangan|voltage|arus|current|resistance|resistansi|power|daya|series|parallel|divider|nodal|mesh|thevenin|norton|superposition|phasor|impedance|filter|op.?amp|belajar|learn|jelaskan|explain)/i.test(query)) answer = learningAnswer(query);
     if (!answer) answer = componentAnswer(query, ctx?.design);
     if (!answer) {
       const l = lang();
       answer = l === 'id'
-        ? 'LLM lagi tidak tersedia untuk request ini. Gue masih bisa baca netlist, workflow, data komponen terverifikasi, dan state simulator, tapi gue tidak akan bikin jawaban palsu.'
-        : 'The LLM is unavailable for this request. I can still read the netlist, workflow, verified component data, and simulator state, but I will not fabricate an answer.';
+        ? 'LLM lagi tidak tersedia untuk request ini. Gue masih bisa baca netlist, workflow, Learning Atlas, data komponen terverifikasi, dan state simulator, tapi gue tidak akan bikin jawaban palsu.'
+        : 'The LLM is unavailable for this request. I can still read the netlist, workflow, Learning Atlas, verified component data, and simulator state, but I will not fabricate an answer.';
     }
     return errorMessage ? `${answer}\n\n[LLM fallback: ${errorMessage}]` : answer;
   }
@@ -159,6 +200,7 @@
         simulation: simulationSnapshot(),
         reality: ctx?.reality || null,
         workflow: window.PCBProWorkflow?.snapshot?.() || null,
+        learning: learningSnapshot(),
         catalog: db ? { schema_version:db.schema_version, verified_at:db.verified_at, policy:db.policy, parts:db.parts } : null
       })
     });
@@ -200,7 +242,7 @@
       small.textContent = `PCB ENGINEERING COPILOT · v${VERSION} · ${state}`;
     }
     const foot = root.querySelector('.jarvis-foot');
-    if (foot) foot.innerHTML = `<span>project netlist + workflow + vendor catalog + simulator state</span><span>${aiState === 'fallback' ? 'LLM fallback active' : 'LLM via Vercel AI Gateway'}</span>`;
+    if (foot) foot.innerHTML = `<span>project netlist + workflow + learning atlas + vendor catalog + simulator state</span><span>${aiState === 'fallback' ? 'LLM fallback active' : 'LLM via Vercel AI Gateway'}</span>`;
   }
 
   function boot() {
@@ -219,6 +261,8 @@
     reloadCatalog:loadDb,
     wireGuide,
     workflowAnswer,
+    learningAnswer,
+    learningSnapshot,
     provider,
     get catalog(){return db;},
     get catalogError(){return dbError;},
