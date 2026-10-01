@@ -1,0 +1,143 @@
+{
+  "version": "1.0.0",
+  "title": "PCB Pro Learning Atlas — Engineering Circuit Analysis",
+  "description": "Peta belajar bercabang dari 20 lesson inti menuju analisis rangkaian, komponen, transien, AC, analog, dan hubungan ke PCB nyata.",
+  "coreLessons": [
+    "Voltage, Current, Resistance",
+    "Overview of Circuit Components",
+    "Ohm's Law",
+    "Power Calculations",
+    "Kirchhoff's Current Law",
+    "Kirchhoff's Voltage Law",
+    "Circuit Analysis Using Kirchhoff's Laws — Parts 1–7",
+    "Dependent Current Sources — Parts 1–2",
+    "Resistors in Series and Parallel",
+    "Voltage Divider — Parts 1–2",
+    "Current Divider"
+  ],
+  "branches": [
+    {
+      "id": "foundation",
+      "title": "1. Fondasi Listrik & Rangkaian",
+      "summary": "Bahasa dasar sebelum menghitung: apa itu rangkaian, node, branch, loop, tegangan, arus, resistansi, polaritas, satuan, DC/AC, open dan short.",
+      "topics": [
+        {"id":"circuit-basics","title":"Circuit, node, branch, loop","level":"core","summary":"Rangkaian adalah jaringan elemen yang terhubung. Node adalah titik koneksi, branch adalah lintasan elemen, dan loop adalah lintasan tertutup.","concepts":["closed path","reference node","connectivity","topology"],"formulas":[],"practice":["Tandai node, branch, dan loop pada rangkaian tiga resistor.","Jelaskan kenapa open circuit menghentikan arus steady-state."],"next":["voltage-current-resistance","kcl","kvl"]},
+        {"id":"voltage-current-resistance","title":"Voltage, Current, Resistance","level":"core","summary":"Voltage adalah beda potensial, current adalah laju aliran muatan menurut arah arus konvensional, resistance membatasi arus.","concepts":["potential difference","conventional current","electron flow","resistance","polarity"],"formulas":["I = ΔQ/Δt"],"practice":["Bedakan voltage dan current dengan contoh baterai + resistor.","Tentukan arah arus konvensional untuk sumber DC."],"next":["ohms-law","power","measurement"]},
+        {"id":"units-prefixes","title":"Units & Metric Prefixes","level":"branch","summary":"Normalisasi satuan penting supaya 10 kΩ, 10000 Ω, 5 mA, dan 0.005 A dipahami sebagai nilai fisik yang benar.","concepts":["V","A","Ω","W","milli","micro","kilo","mega"],"formulas":["1 kΩ = 10^3 Ω","1 mA = 10^-3 A","1 µA = 10^-6 A"],"practice":["Ubah 4.7 kΩ ke Ω.","Ubah 2500 µA ke mA."],"next":["ohms-law","power"]},
+        {"id":"dc-ac","title":"DC vs AC","level":"branch","summary":"DC dianalisis sebagai besaran tetap/steady-state; AC berubah terhadap waktu dan kelak dianalisis dengan sinusoid, phasor, impedance, dan frequency response.","concepts":["steady-state","time varying","frequency","phase"],"formulas":["v(t)=Vpk sin(ωt+φ)"],"practice":["Klasifikasikan baterai dan mains sebagai sumber DC/AC.","Sebutkan apa yang berubah pada sinyal AC."],"next":["phasor","impedance","frequency-response"]},
+        {"id":"open-short","title":"Open Circuit & Short Circuit","level":"core","summary":"Open memutus jalur konduksi; short membuat jalur resistansi sangat rendah yang dapat menarik arus besar dan mem-bypass load.","concepts":["fault","zero-current branch","low-resistance path","protection"],"formulas":[],"practice":["Prediksi dampak resistor putus pada rangkaian seri.","Jelaskan kenapa short di sumber berbahaya."],"next":["fault-analysis","power"]},
+        {"id":"measurement","title":"Measurement & Sign Convention","level":"branch","summary":"Voltmeter dipasang paralel, ammeter seri, dan tanda hasil bergantung polaritas referensi serta arah arus yang dipilih.","concepts":["reference polarity","probe loading","ammeter","voltmeter"],"formulas":[],"practice":["Tentukan penempatan voltmeter untuk mengukur resistor.","Jelaskan arti hasil tegangan negatif."],"next":["kcl","kvl","power"]}
+      ]
+    },
+    {
+      "id": "components",
+      "title": "2. Komponen & Model Elektrik",
+      "summary": "Dari simbol sampai model ideal dan keterbatasan nyata: resistor, capacitor, inductor, diode, transistor, transformer, dan sumber.",
+      "topics": [
+        {"id":"resistor","title":"Resistor","level":"core","summary":"Elemen resistif yang menghubungkan voltage dan current melalui Ohm's law serta membuang daya sebagai panas.","concepts":["resistance","tolerance","power rating","temperature coefficient"],"formulas":["V=IR","P=I²R","P=V²/R"],"practice":["Hitung arus 5 V pada 1 kΩ.","Pilih rating daya aman untuk resistor yang membuang 0.3 W."],"next":["series-parallel","divider-voltage","power"]},
+        {"id":"capacitor","title":"Capacitor","level":"core","summary":"Menyimpan energi pada medan listrik; menahan perubahan tegangan secara instan dan penting pada decoupling, timing, filter, dan transient.","concepts":["capacitance","charge","energy","ESR","decoupling"],"formulas":["i=C·dv/dt","E=½CV²"],"practice":["Jelaskan fungsi decoupling capacitor.","Prediksi kondisi capacitor pada DC steady-state ideal."],"next":["rc-transient","filters","power-integrity"]},
+        {"id":"inductor","title":"Inductor","level":"core","summary":"Menyimpan energi pada medan magnet; menahan perubahan arus secara instan dan dipakai pada filter, converter, choke, dan resonansi.","concepts":["inductance","magnetic energy","DCR","saturation"],"formulas":["v=L·di/dt","E=½LI²"],"practice":["Prediksi kondisi inductor pada DC steady-state ideal.","Jelaskan arti saturation current."],"next":["rl-transient","rlc","power-conversion"]},
+        {"id":"diode","title":"Diode","level":"core","summary":"Elemen nonlinear yang terutama mengalirkan arus satu arah dan menjadi dasar rectifier, clamp, ESD, LED, serta proteksi.","concepts":["forward bias","reverse bias","threshold model","breakdown"],"formulas":["Shockley model: I≈Is(e^(Vd/nVt)-1)"],"practice":["Tentukan kondisi forward/reverse bias.","Bandingkan ideal diode dan real diode."],"next":["nonlinear-analysis","rectifier","protection"]},
+        {"id":"transistor","title":"Transistor: BJT & MOSFET","level":"core","summary":"Elemen aktif untuk switching dan amplification. BJT dikendalikan arus/bias junction; MOSFET dikendalikan tegangan gate secara ideal.","concepts":["bias","switch","gain","regions","RDS(on)"],"formulas":[],"practice":["Bedakan fungsi switch dan amplifier.","Jelaskan kenapa gate MOSFET tetap perlu perhatian transien."],"next":["dependent-sources","small-signal","digital"]},
+        {"id":"transformer","title":"Transformer","level":"core","summary":"Kopling magnetik antar lilitan untuk step-up/down tegangan AC, isolasi, matching impedance, dan power transfer.","concepts":["turns ratio","isolation","magnetizing current","core losses"],"formulas":["Vp/Vs≈Np/Ns"],"practice":["Hitung rasio lilitan 230 V ke 12 V ideal.","Jelaskan kenapa transformer ideal tidak bekerja pada DC steady-state."],"next":["ac-analysis","power-conversion"]},
+        {"id":"sources","title":"Independent Sources","level":"branch","summary":"Voltage source dan current source ideal menjadi elemen eksitasi dasar; model nyata memiliki internal resistance dan batas daya.","concepts":["ideal voltage source","ideal current source","internal resistance","source compliance"],"formulas":[],"practice":["Bandingkan sumber tegangan ideal dan nyata.","Jelaskan arti compliance pada current source."],"next":["dependent-sources","source-transform"]}
+      ]
+    },
+    {
+      "id": "core-laws",
+      "title": "3. Hukum Inti Analisis Rangkaian",
+      "summary": "Empat pilar utama untuk rangkaian resistif: Ohm, power, KCL, KVL.",
+      "topics": [
+        {"id":"ohms-law","title":"Ohm's Law","level":"core","summary":"Untuk elemen ohmik, V, I, dan R berhubungan linear. Ini bukan hukum universal untuk semua komponen nonlinear.","concepts":["linear resistor","slope","operating point"],"formulas":["V=IR","I=V/R","R=V/I"],"practice":["Hitung I untuk 12 V dan 2.2 kΩ.","Hitung R bila 5 V menghasilkan 2 mA."],"next":["power","series-parallel","kcl","kvl"]},
+        {"id":"power","title":"Power Calculations","level":"core","summary":"Power positif umumnya berarti elemen menyerap energi; source dapat memasok energi. Power balance adalah alat verifikasi kuat.","concepts":["passive sign convention","dissipation","delivery","power balance"],"formulas":["P=VI","P=I²R","P=V²/R"],"practice":["Hitung power resistor 100 Ω pada 20 mA.","Cek apakah total daya source = total daya load."],"next":["thermal","efficiency"]},
+        {"id":"kcl","title":"Kirchhoff's Current Law (KCL)","level":"core","summary":"Jumlah aljabar arus pada node sama dengan nol. Ini berasal dari konservasi muatan dan menjadi dasar nodal analysis.","concepts":["node","incoming current","outgoing current","charge conservation"],"formulas":["ΣI_node=0"],"practice":["Jika 3 A dan 2 A masuk node, berapa arus keluar agar KCL terpenuhi?","Tulis persamaan node dengan tiga resistor."],"next":["nodal","current-divider","dependent-sources"]},
+        {"id":"kvl","title":"Kirchhoff's Voltage Law (KVL)","level":"core","summary":"Jumlah aljabar perubahan tegangan sepanjang loop tertutup sama dengan nol. Ini berasal dari konservasi energi dan menjadi dasar mesh/loop analysis.","concepts":["loop","rise","drop","energy conservation"],"formulas":["ΣV_loop=0"],"practice":["Tulis KVL untuk source + dua resistor seri.","Jelaskan pengaruh arah loop pada tanda."],"next":["mesh","voltage-divider","kirchhoff-system"]}
+      ]
+    },
+    {
+      "id": "kirchhoff-analysis",
+      "title": "4. Analisis Rangkaian dengan Kirchhoff",
+      "summary": "Cabang Lesson 7–13: membangun persamaan, memilih unknown, memakai KCL/KVL, menyelesaikan sistem persamaan, dan memvalidasi hasil.",
+      "topics": [
+        {"id":"kirchhoff-system","title":"Systematic Multi-loop Analysis","level":"core","summary":"Identifikasi node/branch/loop, pilih arah arus referensi, tulis persamaan independen, selesaikan simultaneous equations, lalu cek KCL/KVL/power.","concepts":["unknown selection","independent equations","sign convention","simultaneous equations"],"formulas":[],"practice":["Susun urutan analisis rangkaian dua loop.","Jelaskan kenapa arus negatif bukan berarti jawaban salah."],"next":["nodal","mesh","validation"]},
+        {"id":"nodal","title":"Nodal Analysis","level":"branch","summary":"Pilih reference node, gunakan node voltages sebagai unknown, lalu KCL untuk membentuk sistem persamaan. Efisien untuk banyak current source.","concepts":["ground reference","node voltage","supernode"],"formulas":["Σ(Vnode−Vneighbor)/R = source currents"],"practice":["Tulis persamaan nodal dua node.","Kapan supernode diperlukan?"],"next":["supernode","dependent-sources"]},
+        {"id":"mesh","title":"Mesh / Loop Analysis","level":"branch","summary":"Gunakan mesh currents sebagai unknown lalu KVL untuk tiap mesh. Efisien untuk planar circuits dengan banyak voltage source.","concepts":["mesh current","shared resistor","supermesh"],"formulas":[],"practice":["Tulis persamaan dua mesh berbagi resistor.","Kapan supermesh diperlukan?"],"next":["supermesh","dependent-sources"]},
+        {"id":"validation","title":"Result Validation","level":"branch","summary":"Jawaban analisis harus lolos KCL, KVL, power balance, unit, order-of-magnitude, dan konsistensi fisik.","concepts":["sanity check","conservation","sign","units"],"formulas":["ΣP≈0 for complete idealized network"],"practice":["Cari minimal tiga cara memvalidasi hasil solver.","Jelaskan kenapa nilai tak masuk akal harus dicurigai."],"next":["measurement","fault-analysis"]}
+      ]
+    },
+    {
+      "id": "dependent",
+      "title": "5. Dependent / Controlled Sources",
+      "summary": "Cabang Lesson 14–15: sumber yang nilainya dikendalikan voltage/current lain dan menjadi model fundamental amplifier/transistor small-signal.",
+      "topics": [
+        {"id":"dependent-sources","title":"Dependent Sources","level":"core","summary":"Empat tipe utama: VCVS, VCCS, CCVS, CCCS. Sumber tetap aktif saat analisis karena nilainya bergantung variabel rangkaian.","concepts":["VCVS","VCCS","CCVS","CCCS","gain"],"formulas":["v=µvx","i=gmvx","v=rmi_x","i=βi_x"],"practice":["Klasifikasikan controlled source dari simbol dan persamaan.","Jelaskan kenapa dependent source tidak dimatikan saat superposition."],"next":["nodal","mesh","small-signal"]},
+        {"id":"supernode","title":"Supernode","level":"branch","summary":"Dipakai pada nodal analysis ketika ideal voltage source berada di antara dua non-reference nodes.","concepts":["constraint equation","enclosed nodes"],"formulas":[],"practice":["Buat KCL supernode dan constraint voltage."],"next":["nodal"]},
+        {"id":"supermesh","title":"Supermesh","level":"branch","summary":"Dipakai pada mesh analysis ketika current source berada pada branch yang dibagi dua mesh.","concepts":["constraint current","outer perimeter"],"formulas":[],"practice":["Tulis persamaan supermesh dua loop."],"next":["mesh"]}
+      ]
+    },
+    {
+      "id": "reduction-divider",
+      "title": "6. Reduksi, Series/Parallel, Divider",
+      "summary": "Cabang Lesson 16–20: menyederhanakan resistive network serta membagi voltage dan current dengan rasio resistansi.",
+      "topics": [
+        {"id":"series-parallel","title":"Resistors in Series & Parallel","level":"core","summary":"Series: arus sama, resistansi menjumlah. Parallel: voltage sama, conductance menjumlah, equivalent resistance lebih kecil dari resistor terkecil.","concepts":["equivalent resistance","same current","same voltage","network reduction"],"formulas":["Req(series)=ΣR","1/Req(parallel)=Σ(1/R)"],"practice":["Reduksi 1 kΩ + 2.2 kΩ seri.","Hitung equivalent 1 kΩ || 1 kΩ."],"next":["divider-voltage","divider-current","thevenin"]},
+        {"id":"divider-voltage","title":"Voltage Divider","level":"core","summary":"Untuk resistor seri tanpa loading signifikan, output adalah fraksi source sesuai rasio resistor.","concepts":["ratio","loading effect","sensor scaling","bias network"],"formulas":["Vout=Vin·R2/(R1+R2)"],"practice":["Rancang divider 12 V menjadi 3 V.","Jelaskan loading error saat output diberi beban."],"next":["thevenin","adc-interface"]},
+        {"id":"divider-current","title":"Current Divider","level":"core","summary":"Arus pada cabang parallel terbagi berbanding terbalik dengan resistance; cabang resistansi lebih rendah membawa arus lebih besar.","concepts":["parallel branches","conductance","shunt"],"formulas":["Ik=Itotal·Req/Rk"],"practice":["Bagi 3 A ke 6 Ω dan 3 Ω parallel.","Jelaskan aplikasi shunt measurement."],"next":["kcl","measurement"]}
+      ]
+    },
+    {
+      "id": "network-theorems",
+      "title": "7. Cabang Lanjutan Analisis Network",
+      "summary": "Perluasan standar setelah KCL/KVL: superposition, source transformation, Thévenin, Norton, dan maximum power transfer.",
+      "topics": [
+        {"id":"superposition","title":"Superposition","level":"extended","summary":"Untuk network linear dengan beberapa independent sources, respons total adalah jumlah respons tiap source yang dianalisis satu per satu; dependent sources tetap aktif.","concepts":["linearity","source deactivation","sum of responses"],"formulas":[],"practice":["Jelaskan cara mematikan ideal voltage/current source.","Kenapa power tidak langsung disuperposisikan?"],"next":["thevenin","norton"]},
+        {"id":"source-transform","title":"Source Transformation","level":"extended","summary":"Voltage source seri R dapat ditukar dengan current source parallel R secara terminal-equivalent.","concepts":["equivalent terminal behavior","Norton form","Thevenin form"],"formulas":["In=Vth/Rth"],"practice":["Transform 10 V seri 2 kΩ menjadi current source."],"next":["thevenin","norton"]},
+        {"id":"thevenin","title":"Thévenin Equivalent","level":"extended","summary":"Network linear dua terminal dapat direduksi menjadi Vth seri Rth untuk memudahkan analisis load.","concepts":["open-circuit voltage","equivalent resistance","load line"],"formulas":[],"practice":["Jelaskan langkah mencari Vth dan Rth.","Gunakan Thévenin untuk mengevaluasi beberapa load."],"next":["norton","max-power"]},
+        {"id":"norton","title":"Norton Equivalent","level":"extended","summary":"Network linear dua terminal dapat direduksi menjadi In parallel Rn, dengan Rn=Rth.","concepts":["short-circuit current","parallel source model"],"formulas":["Vth=In·Rn"],"practice":["Konversi Norton ke Thévenin."],"next":["thevenin","max-power"]},
+        {"id":"max-power","title":"Maximum Power Transfer","level":"extended","summary":"Untuk network resistif linear, load menerima daya maksimum saat RL=Rth. Efisiensi pada kondisi ini bukan maksimum.","concepts":["load matching","power curve","efficiency tradeoff"],"formulas":["RL=Rth"],"practice":["Cari load optimum untuk Rth=50 Ω."],"next":["impedance-matching"]}
+      ]
+    },
+    {
+      "id": "dynamic-ac",
+      "title": "8. Transient, AC, Impedance & Filter",
+      "summary": "Cabang setelah DC resistive analysis: time-domain storage elements, first/second order systems, phasor, impedance, resonance, dan frequency response.",
+      "topics": [
+        {"id":"rc-transient","title":"RC First-Order Transient","level":"extended","summary":"Respons capacitor terhadap step memiliki time constant τ=RC dan berubah eksponensial menuju kondisi akhir.","concepts":["time constant","initial condition","charging","discharging"],"formulas":["τ=RC","vC(t)=Vf+(Vi−Vf)e^(−t/τ)"],"practice":["Hitung τ untuk 10 kΩ dan 100 µF."],"next":["filters","timing"]},
+        {"id":"rl-transient","title":"RL First-Order Transient","level":"extended","summary":"Arus inductor tidak dapat berubah instan; time constant ideal RL adalah L/R dilihat oleh inductor.","concepts":["inductor current continuity","time constant"],"formulas":["τ=L/R"],"practice":["Hitung τ untuk 100 mH dan 10 Ω."],"next":["rlc"]},
+        {"id":"rlc","title":"RLC & Second-Order Systems","level":"extended","summary":"Kombinasi RLC dapat underdamped, critically damped, atau overdamped dan menjadi dasar resonance/filter lebih kompleks.","concepts":["natural frequency","damping","overshoot","resonance"],"formulas":["ω0=1/√(LC)"],"practice":["Jelaskan arti damping ratio."],"next":["phasor","frequency-response"]},
+        {"id":"phasor","title":"Sinusoidal Steady-State & Phasor","level":"extended","summary":"Sinusoid steady-state dapat diubah dari differential equations ke algebra kompleks menggunakan phasor.","concepts":["magnitude","phase","angular frequency","complex number"],"formulas":["ω=2πf"],"practice":["Ubah frekuensi 1 kHz ke rad/s."],"next":["impedance"]},
+        {"id":"impedance","title":"Impedance","level":"extended","summary":"Impedance menggeneralisasi resistance pada AC dan menggabungkan magnitude + phase response elemen.","concepts":["complex resistance","reactance","phase shift"],"formulas":["ZR=R","ZC=1/(jωC)","ZL=jωL"],"practice":["Bandingkan ZC pada frekuensi rendah dan tinggi."],"next":["frequency-response","filters"]},
+        {"id":"frequency-response","title":"Frequency Response & Bode","level":"extended","summary":"Gain dan phase berubah terhadap frekuensi. Bode plot membantu melihat cutoff, bandwidth, poles, zeros, dan stability trends.","concepts":["gain","phase","cutoff","bandwidth","pole","zero"],"formulas":["Gain(dB)=20log10|Vout/Vin|"],"practice":["Apa arti -3 dB point?"],"next":["filters"]},
+        {"id":"filters","title":"Passive & Active Filters","level":"extended","summary":"Low-pass, high-pass, band-pass, dan notch dibangun dari R/C/L atau op-amp untuk membentuk spectrum sinyal.","concepts":["LPF","HPF","BPF","notch","order"],"formulas":["fc≈1/(2πRC) for simple RC"],"practice":["Rancang RC low-pass 1 kHz."],"next":["opamp","signal-integrity"]}
+      ]
+    },
+    {
+      "id": "semiconductor-analog",
+      "title": "9. Nonlinear, Semiconductor & Analog",
+      "summary": "Perluasan dari component overview menuju analisis nonlinear, biasing, small-signal, op-amp, dan amplifier.",
+      "topics": [
+        {"id":"nonlinear-analysis","title":"Nonlinear Analysis","level":"extended","summary":"Diode dan transistor tidak mengikuti V=IR linear global; analisis memakai piecewise model, operating point, iterative solve, atau small-signal linearization.","concepts":["operating point","piecewise linear","Newton iteration","linearization"],"formulas":[],"practice":["Mengapa satu nilai resistance tetap tidak cukup untuk diode?"],"next":["small-signal"]},
+        {"id":"small-signal","title":"Small-Signal Models","level":"extended","summary":"Perilaku nonlinear di sekitar bias point dapat dilinearkan untuk menghitung gain dan impedance sinyal kecil.","concepts":["bias point","incremental resistance","transconductance"],"formulas":[],"practice":["Bedakan large-signal dan small-signal."],"next":["opamp","transistor"]},
+        {"id":"opamp","title":"Operational Amplifier","level":"extended","summary":"Model ideal memakai infinite open-loop gain, high input impedance, low output impedance; feedback menentukan closed-loop function.","concepts":["negative feedback","virtual short","saturation","input common-mode"],"formulas":["Inverting ideal gain = -Rf/Rin"],"practice":["Hitung gain inverting Rf=100k, Rin=10k."],"next":["filters","control"]}
+      ]
+    },
+    {
+      "id": "pcb-bridge",
+      "title": "10. Dari Circuit Analysis ke PCB Nyata",
+      "summary": "Menghubungkan teori rangkaian ke layout: parasitic, return path, grounding, power integrity, signal integrity, thermal, measurement, dan fault diagnosis.",
+      "topics": [
+        {"id":"parasitics","title":"PCB Parasitics","level":"field","summary":"Trace, via, pad, plane, dan package punya R/L/C parasitik. Pada frekuensi tinggi, layout menjadi bagian dari circuit model.","concepts":["trace resistance","via inductance","pad capacitance","package parasitic"],"formulas":[],"practice":["Jelaskan kenapa wire ideal makin tidak valid pada edge rate tinggi."],"next":["signal-integrity","power-integrity"]},
+        {"id":"signal-integrity","title":"Signal Integrity","level":"field","summary":"Rise time, impedance, reflection, crosstalk, return path, termination, dan differential routing menentukan kualitas sinyal digital/analog cepat.","concepts":["characteristic impedance","reflection","crosstalk","differential pair"],"formulas":[],"practice":["Mengapa differential pair perlu spacing dan length control?"],"next":["measurement"]},
+        {"id":"power-integrity","title":"Power Integrity & Decoupling","level":"field","summary":"Supply network bukan sumber ideal: regulator, capacitor, plane, trace, dan load transient membentuk PDN dengan impedance terhadap frekuensi.","concepts":["PDN","decoupling","ground plane","transient current"],"formulas":[],"practice":["Jelaskan kenapa decoupling harus dekat pin supply IC."],"next":["thermal"]},
+        {"id":"thermal","title":"Thermal & Power Density","level":"field","summary":"Power dissipation berubah menjadi panas; copper area, airflow, package, vias, dan ambient menentukan junction temperature.","concepts":["thermal resistance","junction temperature","derating","copper spreading"],"formulas":["Tj≈Ta+P·θJA (simplified)"],"practice":["Apa risiko resistor 0.25 W dipakai terus di 0.3 W?"],"next":["fault-analysis"]},
+        {"id":"fault-analysis","title":"Fault Analysis & Troubleshooting","level":"field","summary":"Open, short, wrong value, reversed polarity, missing ground, undervoltage, thermal drift, dan bad connection harus terlihat sebagai perubahan topology/model, bukan sekadar badge.","concepts":["open","short","brownout","wrong component","measurement-guided debug"],"formulas":[],"practice":["Buat urutan diagnosis LED yang tidak menyala."],"next":["measurement","validation"]}
+      ]
+    }
+  ],
+  "references": [
+    {"name":"MIT OpenCourseWare — 6.002 Circuits and Electronics","url":"https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/"},
+    {"name":"MIT OpenCourseWare — 6.071J Introduction to Electronics, Signals, and Measurement","url":"https://ocw.mit.edu/courses/6-071j-introduction-to-electronics-signals-and-measurement-spring-2006/"},
+    {"name":"OpenStax University Physics Volume 2 — Circuits","url":"https://openstax.org/books/university-physics-volume-2/pages/10-introduction"},
+    {"name":"All About Circuits — DC Textbook","url":"https://www.allaboutcircuits.com/textbook/direct-current/"}
+  ]
+}
