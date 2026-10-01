@@ -4,9 +4,12 @@
   const NativeMutationObserver = window.MutationObserver;
   if (!NativeMutationObserver || window.__PCBPRO_PERF_GUARD__) return;
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const INTERNAL_SELECTOR = [
     '[data-dynamic-wires]',
+    '[data-wire-overlay]',
+    '.pcb-pin',
+    '.pcb-wire-hud',
     '#pcbpro-jarvis',
     '#pcbpro-ux-dock',
     '#pcbpro-patch-modal',
