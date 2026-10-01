@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.3.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.4.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -36,24 +36,26 @@
     if (!simulatorVisible() && !document.querySelector('.panel[data-real-sim-mounted="1"]')) return;
     await load('/sim-engine.js');
     await load('/live-sim-engine.js');
+    window.PCBProWorkspaceRepair?.repair?.();
   }
 
   async function boot() {
-    // Stable command identity must exist before language translation or feature engines.
     await load('/interaction-bridge.js');
 
-    // Core interaction first. Keep startup light for older / integrated-GPU laptops.
+    // Core editing path: wiring and command identity are loaded before optional assistants.
     await load('/wire-engine.js');
     await load('/ux-engine.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
+    await load('/workspace-repair.js');
 
-    // Assistant is loaded after the workspace is interactive. Its actual LLM runs server-side.
+    // Assistant and component intelligence stay deferred so the canvas becomes interactive first.
     idle(async () => {
       await load('/assistant-engine.js');
       await load('/assistant-grounding.js');
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
+      window.PCBProWorkspaceRepair?.repair?.();
     }, 850);
 
     document.addEventListener('click', (event) => {
