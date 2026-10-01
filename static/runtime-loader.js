@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.2.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.3.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -39,9 +39,13 @@
   }
 
   async function boot() {
+    // Stable command identity must exist before language translation or feature engines.
+    await load('/interaction-bridge.js');
+
     // Core interaction first. Keep startup light for older / integrated-GPU laptops.
     await load('/wire-engine.js');
     await load('/ux-engine.js');
+    window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
 
     // Assistant is loaded after the workspace is interactive. Its actual LLM runs server-side.
@@ -49,14 +53,14 @@
       await load('/assistant-engine.js');
       await load('/assistant-grounding.js');
       await load('/component-intel.js');
+      window.PCBProCommand?.stamp?.();
     }, 850);
 
-    // Primary simulation is the live solver. The heavier Monte Carlo Reality Lab is loaded
-    // only from the explicit "Advanced field analysis" button inside live simulation.
     document.addEventListener('click', (event) => {
       const tab = event.target?.closest?.('.tabs button');
       if (!tab) return;
-      if (/Simulator|Simulasi/i.test(tab.textContent || '')) setTimeout(maybeLoadLiveSimulation, 0);
+      const view = tab.dataset.pcbView || tab.textContent || '';
+      if (/simulator|simulasi/i.test(view)) setTimeout(maybeLoadLiveSimulation, 0);
     }, { passive: true });
 
     idle(maybeLoadLiveSimulation, 1700);
