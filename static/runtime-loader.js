@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.1.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.2.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -39,9 +39,10 @@
   }
 
   async function boot() {
-    // First paint stays light on older / integrated-GPU laptops.
+    // Core interaction first. Keep startup light for older / integrated-GPU laptops.
     await load('/wire-engine.js');
     await load('/ux-engine.js');
+    await load('/kicad-workflow.js');
 
     // Assistant is loaded after the workspace is interactive. Its actual LLM runs server-side.
     idle(async () => {
