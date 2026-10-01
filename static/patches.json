@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.3.0",
+    "date": "2026-10-01",
+    "title": {"id": "Grounded Copilot + Netlist Wiring", "en": "Grounded Copilot + Netlist Wiring"},
+    "changes": {
+      "id": [
+        "Copilot tidak lagi pura-pura sebagai LLM penuh: status UI sekarang menyatakan LLM backend OFF sampai backend model benar-benar tersambung.",
+        "Tambah grounded reasoning untuk pertanyaan wiring/wayar berdasarkan netlist project aktif, termasuk arti pin dasar untuk source, resistor, diode, dan LED.",
+        "Jawaban pertanyaan yang sama tidak lagi menyalin paragraf panjang bila state project belum berubah.",
+        "Tambah component-db.json sebagai katalog vendor terverifikasi dengan provenance URL dan tanggal verifikasi; part generik tidak diberi rating lapangan palsu.",
+        "Wire overlay tidak lagi memakai CONNECTIONS hardcoded. Garis schematic sekarang diturunkan dari netlist aktif yang terlihat di inspector.",
+        "Jika ground symbol hanya ada secara visual tetapi tidak tercatat di netlist, assistant memberi peringatan dan tidak mengklaim koneksi listrik palsu."
+      ],
+      "en": [
+        "Copilot no longer presents itself as a full LLM: the UI now states LLM backend OFF until a model backend is actually connected.",
+        "Added grounded wiring reasoning from the active project netlist, including basic pin semantics for sources, resistors, diodes, and LEDs.",
+        "Repeated questions no longer duplicate a long paragraph when project state has not changed.",
+        "Added component-db.json as a vendor-verified catalog with provenance URLs and verification date; generic parts receive no fabricated field ratings.",
+        "Wire overlay no longer uses hardcoded CONNECTIONS. Schematic lines are now derived from the active netlist visible in the inspector.",
+        "If a ground symbol is only visual and absent from the netlist, the assistant warns instead of claiming a false electrical connection."
+      ]
+    }
+  },
+  {
     "version": "1.2.0",
     "date": "2026-10-01",
     "title": {"id": "Readable UI, Bahasa, dan Component Intelligence", "en": "Readable UI, Language, and Component Intelligence"},
@@ -13,7 +36,7 @@
         "Sumber komponen spesifik mulai dikunci ke referensi vendor; entri generik tidak lagi dianggap mempunyai rating pasti tanpa MPN/datasheet."
       ],
       "en": [
-        "Comfort UI is now the default: larger text, controls, tabs, inspector, library, simulator, and assistant chat.",
+        "Comfort UI is now the default: larger text, controls, tabs, inspector, simulator, and assistant chat.",
         "Added persistent Indonesian / English language selection.",
         "Added UI size controls and a more comfortable contrast profile.",
         "Added Component Intelligence: model status, capabilities, limits, package/variant warnings, and confidence for the selected part.",
