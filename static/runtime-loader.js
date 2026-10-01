@@ -42,10 +42,11 @@
   async function boot() {
     await load('/interaction-bridge.js');
 
-    // Editing engines first: schematic connectivity, KiCad-like behavior, then PCB geometry.
+    // Editing engines first: schematic connectivity, learning, KiCad-like behavior, then PCB geometry.
     await load('/wire-engine.js?v=2.0.0');
     await load('/ux-engine.js');
     await load('/patch-v110.js');
+    await load('/patch-v111.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
@@ -74,6 +75,7 @@
       window.PCBProAdvancedBoard?.refresh?.();
       window.PCBProBoardWorkflowBridge?.install?.();
       window.PCBProPatchV110?.inject?.();
+      window.PCBProPatchV111?.inject?.();
       window.PCBProLearningCenter?.refresh?.();
     }, 850);
 
