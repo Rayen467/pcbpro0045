@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.0.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.1.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -24,42 +24,41 @@
   }
 
   function idle(fn, timeout = 1200) {
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => fn(), { timeout });
-    } else {
-      setTimeout(fn, Math.min(600, timeout));
-    }
+    if ('requestIdleCallback' in window) requestIdleCallback(() => fn(), { timeout });
+    else setTimeout(fn, Math.min(600, timeout));
   }
 
   function simulatorVisible() {
     return [...document.querySelectorAll('.panel-title span')].some((el) => /SIMULATION|SIMULASI/i.test(el.textContent || ''));
   }
 
-  function maybeLoadReality() {
-    if (simulatorVisible()) load('/reality-engine.js');
+  async function maybeLoadLiveSimulation() {
+    if (!simulatorVisible() && !document.querySelector('.panel[data-real-sim-mounted="1"]')) return;
+    await load('/sim-engine.js');
+    await load('/live-sim-engine.js');
   }
 
   async function boot() {
-    // Core interaction first. These are intentionally small and delayed until after first paint.
+    // First paint stays light on older / integrated-GPU laptops.
     await load('/wire-engine.js');
     await load('/ux-engine.js');
 
-    // Assistant and component intelligence can wait for an idle slice.
+    // Assistant is loaded after the workspace is interactive. Its actual LLM runs server-side.
     idle(async () => {
       await load('/assistant-engine.js');
       await load('/assistant-grounding.js');
       await load('/component-intel.js');
-    }, 900);
+    }, 850);
 
-    // Heavy field simulation is loaded only when the Simulator workspace is actually opened.
+    // Primary simulation is the live solver. The heavier Monte Carlo Reality Lab is loaded
+    // only from the explicit "Advanced field analysis" button inside live simulation.
     document.addEventListener('click', (event) => {
       const tab = event.target?.closest?.('.tabs button');
       if (!tab) return;
-      if (/Simulator|Simulasi/i.test(tab.textContent || '')) setTimeout(maybeLoadReality, 0);
+      if (/Simulator|Simulasi/i.test(tab.textContent || '')) setTimeout(maybeLoadLiveSimulation, 0);
     }, { passive: true });
 
-    // Handle restored sessions that already start in Simulator.
-    idle(maybeLoadReality, 1800);
+    idle(maybeLoadLiveSimulation, 1700);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
