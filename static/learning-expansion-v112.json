@@ -1,0 +1,374 @@
+{
+  "version": "1.12.0",
+  "title": "PCB Pro Deep Electronics — Source-Grounded Expansion",
+  "basis": "User-supplied electronics course transcript, integrated with the existing PCB Pro Learning Atlas.",
+  "policy": {
+    "source_first": true,
+    "preserve_course_framing": true,
+    "separate_ideal_from_real": true,
+    "do_not_treat_transcript_asr_errors_as_verified_constants": true,
+    "educational_models_are_not_measurements_or_manufacturing_signoff": true
+  },
+  "sourceOutline": [
+    "Introduction to course",
+    "Electric current fundamentals",
+    "Understanding voltage",
+    "Signal and noise basics",
+    "Signal types and periodic signals",
+    "Analog vs digital signals",
+    "Battery operation principles",
+    "Resistors and circuit laws",
+    "Circuit simplification techniques",
+    "Voltage and current dividers",
+    "Superposition principle",
+    "Electrical circuit ports",
+    "Thevenin's theorem",
+    "Resistor types and specifications",
+    "Capacitor fundamentals",
+    "AC current in capacitors",
+    "Capacitor mathematical models",
+    "Solving RC circuits",
+    "Capacitor time constants",
+    "Capacitor series and parallel",
+    "Capacitor types and applications",
+    "Diode basics and IV curves",
+    "Solving circuits with diodes",
+    "Diode applications",
+    "LEDs and Zener diodes"
+  ],
+  "branches": [
+    {
+      "id": "deep-physics-signals",
+      "title": "A. Physics → Voltage/Current → Signals",
+      "summary": "Bedah dari charge dan energy sampai bagaimana voltage/current berubah terhadap waktu dan membawa informasi.",
+      "topics": [
+        {
+          "id": "deep-current-charge",
+          "title": "Charge, Electron Flow & Conventional Current",
+          "level": "deep-core",
+          "summary": "Current adalah laju aliran muatan. Analisis engineering memakai arah arus konvensional, yang berlawanan dengan gerak elektron dalam konduktor logam.",
+          "intuition": "Jangan mulai dari angka ampere. Mulai dari pertanyaan: berapa net charge yang melintasi suatu penampang per satuan waktu dan arah referensinya ke mana?",
+          "concepts": ["atoms", "electron charge", "net charge flow", "conventional current", "reference direction", "sign convention"],
+          "formulas": ["I = dQ/dt", "I_avg = ΔQ/Δt", "1 A = 1 C/s"],
+          "design": ["Arah panah current di schematic adalah referensi; hasil negatif berarti arah nyata berlawanan.", "Current probe harus melaporkan arah referensi dan tanda, bukan hanya magnitudo."],
+          "limitations": ["Model circuit tidak perlu melacak elektron satu per satu; yang digunakan adalah besaran lumped current."],
+          "practice": ["Tentukan net current saat muatan bergerak dua arah pada satu penampang.", "Jelaskan kenapa arah electron flow dan conventional current berbeda."],
+          "next": ["deep-voltage-energy", "kcl"]
+        },
+        {
+          "id": "deep-voltage-energy",
+          "title": "Work, Electric Field, Potential Energy & Voltage",
+          "level": "deep-core",
+          "summary": "Voltage bukan benda yang mengalir; voltage adalah beda electric potential energy per unit charge dan selalu bermakna relatif terhadap titik referensi.",
+          "intuition": "Nilai 3 V pada satu node berarti 3 V relatif terhadap reference node yang dipilih, bukan nilai absolut yang berdiri sendiri.",
+          "concepts": ["work", "potential energy", "Coulomb force", "electric field", "potential difference", "ground reference"],
+          "formulas": ["V = ΔU/Q", "W = F·d for aligned constant force"],
+          "design": ["Setiap voltage probe perlu dua titik atau satu node plus reference ground.", "Ground pada schematic tidak otomatis berarti earth/chassis ground."],
+          "limitations": ["Analogi mekanik membantu intuisi tetapi tidak menggantikan model electromagnetic field pada kondisi high-speed."],
+          "practice": ["Jelaskan arti VA−VB=1.5 V.", "Bedakan circuit ground, chassis ground, dan earth secara konseptual."],
+          "next": ["measurement", "deep-battery-source"]
+        },
+        {
+          "id": "deep-signal-noise",
+          "title": "Signal, Noise & Waveform Vocabulary",
+          "level": "deep-core",
+          "summary": "Voltage/current dapat berubah terhadap waktu. Signal membawa informasi; noise adalah gangguan yang mengurangi kemampuan membaca informasi tersebut.",
+          "intuition": "Schematic memberi topology; waveform memberi cerita terhadap waktu.",
+          "concepts": ["DC", "pulse", "step", "spike", "ramp", "periodic signal", "sine", "square", "triangle", "sawtooth", "noise", "oscilloscope"],
+          "formulas": ["f = 1/T", "Vpp = Vmax − Vmin"],
+          "design": ["Fast edge tetap penting walaupun clock frequency tidak tinggi karena edge mengandung komponen frekuensi lebih tinggi.", "Noise harus dinilai relatif terhadap signal margin dan threshold receiver."],
+          "limitations": ["Istilah signal/noise bergantung pada tujuan sistem; komponen frekuensi yang berguna di satu block bisa menjadi noise di block lain."],
+          "practice": ["Klasifikasikan waveform sebagai pulse/step/spike/ramp/periodic.", "Hitung frequency dari period dan peak-to-peak dari Vmax/Vmin."],
+          "next": ["deep-digital-thresholds", "frequency-response"]
+        },
+        {
+          "id": "deep-digital-thresholds",
+          "title": "Analog Reality of Digital Signals: VIH, VIL & Edges",
+          "level": "deep-field",
+          "summary": "Digital adalah interpretasi dari waveform analog. Tegangan bergerak kontinu, dapat overshoot/ring, dan receiver memutuskan 0/1 melalui threshold VIH/VIL dengan region tak terdefinisi di antaranya.",
+          "intuition": "Bit tidak melompat secara fisik dari 0 ke 1. Yang bergerak adalah tegangan; logic state adalah interpretasi receiver.",
+          "concepts": ["logic high", "logic low", "VIH", "VIL", "undefined region", "rise time", "fall time", "ringing", "noise margin"],
+          "formulas": ["Logic 1 if V ≥ VIH", "Logic 0 if V ≤ VIL"],
+          "design": ["Threshold harus berasal dari datasheet device family yang benar.", "Ringing/ground bounce dapat membuat waveform menyeberangi threshold berkali-kali."],
+          "limitations": ["VIH/VIL bukan nilai universal 0/1; berbeda antar device, supply, family, dan kondisi."],
+          "practice": ["Klasifikasikan beberapa voltage terhadap VIH/VIL.", "Jelaskan kenapa edge rate memengaruhi robustness digital."],
+          "next": ["signal-integrity", "deep-decoupling"]
+        }
+      ]
+    },
+    {
+      "id": "deep-sources-resistive",
+      "title": "B. Sources, Resistors & Resistive Networks",
+      "summary": "Dari battery dan ground reference menuju Ohm, power, divider, real resistor, potentiometer, dan short-circuit reasoning.",
+      "topics": [
+        {
+          "id": "deep-battery-source",
+          "title": "Battery, Reference Ground, Charge Capacity & Energy",
+          "level": "deep-core",
+          "summary": "Battery mempertahankan potential difference melalui proses kimia. Capacity dalam Ah/mAh mewakili charge; energy juga bergantung pada voltage.",
+          "intuition": "Battery 1.5 V menetapkan beda potential terminal. Ground hanya memudahkan penamaan node dengan memilih reference 0 V.",
+          "concepts": ["electrochemical source", "terminal voltage", "reference ground", "capacity", "charge", "energy", "internal behavior"],
+          "formulas": ["Q = I·t", "E ≈ V·Q for approximately constant V"],
+          "design": ["Supply nyata punya source resistance, voltage droop, current limit, discharge curve, dan transient response.", "Ah tidak sama dengan Wh tanpa mempertimbangkan voltage."],
+          "limitations": ["Model ideal voltage source tidak merepresentasikan semua perilaku battery nyata."],
+          "practice": ["Konversi mAh ke coulomb.", "Estimasi energy dari nominal voltage dan charge lalu jelaskan batas estimasinya."],
+          "next": ["sources", "power"]
+        },
+        {
+          "id": "deep-resistor-real",
+          "title": "Resistor: Ideal Law → Heat → Real Part",
+          "level": "deep-core",
+          "summary": "Resistor ideal mengikuti Ohm's law; real resistor juga punya power rating, tolerance, temperature dependence, package, dan parasitic behavior.",
+          "intuition": "Resistance menghubungkan voltage dan current; power menjelaskan seberapa cepat energy berubah menjadi panas.",
+          "concepts": ["Ohm's law", "Joule heating", "tolerance", "power rating", "THT", "SMD", "package", "temperature coefficient"],
+          "formulas": ["V = I·R", "P = V·I", "P = I²R", "P = V²/R"],
+          "design": ["Nominal resistance saja belum cukup untuk memilih part nyata.", "Power rating harus punya margin terhadap worst-case dissipation dan ambient/thermal environment."],
+          "limitations": ["Ohm's law sebagai model linear tidak berarti resistance real selalu konstan untuk semua temperature/frequency/power."],
+          "practice": ["Hitung current dan power sebuah resistor.", "Pilih rating dengan margin dan jelaskan faktor yang masih perlu datasheet."],
+          "next": ["series-parallel", "power", "thermal"]
+        },
+        {
+          "id": "deep-dividers-loading",
+          "title": "Voltage Divider, Current Divider & Loading",
+          "level": "deep-core",
+          "summary": "Divider berasal dari Ohm + topology series/parallel. Rasio ideal mudah; perilaku nyata berubah saat output dibebani atau ada elemen tambahan.",
+          "intuition": "Voltage divider membagi voltage karena current sama pada series path. Current divider membagi current karena voltage sama pada parallel branches.",
+          "concepts": ["voltage divider", "current divider", "loading", "short branch", "equivalent resistance", "bias current"],
+          "formulas": ["Vout = Vin·R2/(R1+R2)", "I1/Itotal = R2/(R1+R2)", "I2/Itotal = R1/(R1+R2)"],
+          "design": ["Absolute resistor values menentukan divider current, source loading, power, susceptibility to leakage/noise, dan interaction dengan input impedance.", "Current-divider shortcut valid untuk branches yang benar-benar parallel atau saat tambahan drop dapat diabaikan."],
+          "limitations": ["Path of least resistance bukan berarti current hanya memilih satu path; ia terbagi menurut network equations."],
+          "practice": ["Bandingkan dua divider dengan rasio sama tetapi total resistance berbeda.", "Tambahkan load ke Vout dan hitung perubahan output."],
+          "next": ["deep-ports-thevenin", "validation"]
+        },
+        {
+          "id": "deep-potentiometer",
+          "title": "Potentiometer as Variable Divider",
+          "level": "deep-practical",
+          "summary": "Potentiometer memiliki dua terminal ujung dengan total resistance tetap dan satu wiper yang membagi resistance sesuai posisi mekanik.",
+          "intuition": "Wiper mengubah rasio dua bagian resistive track tanpa mengubah total end-to-end resistance secara ideal.",
+          "concepts": ["wiper", "variable divider", "three terminals", "position", "end-to-end resistance"],
+          "formulas": ["Rtop + Rbottom ≈ Rtotal"],
+          "design": ["Wiper current, contact resistance, taper, power rating, dan failure mode perlu dipertimbangkan untuk design nyata."],
+          "limitations": ["Model linear position-to-resistance tidak selalu benar untuk audio/log taper potentiometers."],
+          "practice": ["Hitung Vout ideal untuk posisi wiper tertentu.", "Jelaskan efek load pada wiper."],
+          "next": ["divider-voltage", "deep-resistor-real"]
+        }
+      ]
+    },
+    {
+      "id": "deep-network-abstraction",
+      "title": "C. Network Reasoning & Abstraction",
+      "summary": "Teknik menyederhanakan network tanpa kehilangan perilaku yang penting di port yang sedang dipelajari.",
+      "topics": [
+        {
+          "id": "deep-superposition",
+          "title": "Superposition for Linear Circuits",
+          "level": "deep-analysis",
+          "summary": "Untuk network linear dengan beberapa independent sources, response total adalah jumlah response akibat masing-masing source secara terpisah.",
+          "intuition": "Pisahkan penyebab, hitung efek satu per satu, lalu jumlahkan dengan tanda yang benar.",
+          "concepts": ["linearity", "independent source", "source suppression", "sum of responses"],
+          "formulas": ["response_total = Σ response_k"],
+          "design": ["Ideal voltage source yang dimatikan menjadi 0 V → short; ideal current source yang dimatikan menjadi 0 A → open.", "Dependent sources tidak otomatis dimatikan."],
+          "limitations": ["Superposition tidak langsung diterapkan pada power karena power adalah nonlinear terhadap voltage/current."],
+          "practice": ["Pisahkan response network dua source.", "Jelaskan kapan metode tidak valid."],
+          "next": ["deep-ports-thevenin", "dependent-sources"]
+        },
+        {
+          "id": "deep-ports-thevenin",
+          "title": "Ports, Blocks & Thévenin Abstraction",
+          "level": "deep-analysis",
+          "summary": "Port adalah pasangan terminal tempat voltage/current didefinisikan. Network linear dapat diganti dari sudut satu port oleh source voltage seri resistance yang mempertahankan perilaku eksternal terhadap load.",
+          "intuition": "Kita tidak selalu perlu tahu semua node internal untuk memahami bagaimana satu block berinteraksi dengan block berikutnya.",
+          "concepts": ["two-terminal port", "block abstraction", "load", "open-circuit voltage", "equivalent resistance", "Thévenin equivalent"],
+          "formulas": ["Vth = Voc", "Rth = resistance seen at port with independent sources suppressed"],
+          "design": ["Equivalent berlaku dilihat dari port yang dipilih; port lain dapat memiliki equivalent berbeda.", "Block diagram dan schematic adalah tingkat abstraksi berbeda untuk orang dengan kebutuhan berbeda."],
+          "limitations": ["Prosedur resistance suppression sederhana perlu penanganan khusus bila network punya dependent sources."],
+          "practice": ["Tentukan port output sebuah divider dan load.", "Bangun Thévenin equivalent lalu ganti load beberapa nilai."],
+          "next": ["thevenin-norton", "source-transform", "deep-dividers-loading"]
+        }
+      ]
+    },
+    {
+      "id": "deep-capacitors",
+      "title": "D. Capacitors: Field, Dynamics, RC & Real Parts",
+      "summary": "Capacitor dipelajari dari physical structure sampai state/memory, differential relation, transient exponential, real part selection, decoupling, dan filtering.",
+      "topics": [
+        {
+          "id": "deep-cap-physics",
+          "title": "Capacitance, Dielectric, Charge Redistribution & Energy",
+          "level": "deep-core",
+          "summary": "Dua conductive plates dipisahkan dielectric. Capacitance menentukan hubungan charge imbalance dan voltage; energy tersimpan pada electric field.",
+          "intuition": "Capacitor tidak perlu dipahami sebagai kotak yang menyimpan net charge; ia memisahkan/redistribusi charge dan menyimpan energy pada field.",
+          "concepts": ["parallel plates", "dielectric", "permittivity", "electric field", "charge redistribution", "stored energy"],
+          "formulas": ["Q = C·V", "C = ε0εrA/d", "E = ½CV²"],
+          "design": ["Geometry dan dielectric memengaruhi capacitance.", "Polarized capacitor punya orientation constraint."],
+          "limitations": ["Parallel-plate model adalah model pedagogis; commercial capacitor structure lebih kompleks."],
+          "practice": ["Prediksi efek area, spacing, dan dielectric terhadap C.", "Hitung stored energy dan perubahan saat V digandakan."],
+          "next": ["deep-cap-dynamics", "deep-cap-real"]
+        },
+        {
+          "id": "deep-cap-dynamics",
+          "title": "Capacitor State, i=C·dv/dt & Continuity",
+          "level": "deep-analysis",
+          "summary": "Capacitor memiliki state melalui voltage/charge awal. Current terkait slope voltage; voltage ideal capacitor tidak dapat berubah seketika dengan finite current.",
+          "intuition": "Semakin cepat lu paksa voltage berubah, semakin besar current yang diminta oleh C.",
+          "concepts": ["state", "memory", "initial condition", "derivative", "voltage continuity", "AC current"],
+          "formulas": ["i = C·dv/dt", "v(t)=v(t0)+(1/C)∫i(t)dt"],
+          "design": ["Transient solver harus menyimpan initial condition dan mengintegrasikan state terhadap waktu.", "Ideal step voltage langsung pada ideal capacitor menyiratkan impulse/unbounded ideal current; real source/interconnect limits membuat edge finite."],
+          "limitations": ["Pernyataan 'capacitor blocks DC and passes AC' adalah shorthand frequency/steady-state, bukan aturan bahwa tak ada current transient pada DC switching."],
+          "practice": ["Tentukan tanda current dari slope voltage.", "Jelaskan kondisi sebelum dan sesudah switching untuk capacitor."],
+          "next": ["deep-rc-transient", "impedance"]
+        },
+        {
+          "id": "deep-rc-transient",
+          "title": "RC Charge/Discharge, Exponential & Time Constant",
+          "level": "deep-analysis",
+          "summary": "First-order RC response ditentukan initial value, final value, dan time constant τ=RC. Step response bergerak exponential menuju equilibrium.",
+          "intuition": "R membatasi seberapa cepat charge bisa berpindah; C menentukan berapa banyak state/energy yang perlu diubah.",
+          "concepts": ["first-order response", "initial value", "final value", "time constant", "settling", "charge", "discharge"],
+          "formulas": ["τ = R·C", "vC(t)=Vf+(V0−Vf)e^(−t/τ)", "i(t)=(Vs−V0)/R · e^(−t/τ) for simple charging"],
+          "design": ["Sekitar 1τ response menempuh 63.2% perubahan, 2τ 86.5%, 3τ 95.0%, 5τ 99.3%.", "Gunakan equivalent resistance seen by capacitor untuk network first-order yang lebih umum."],
+          "limitations": ["3τ adalah rule-of-thumb, bukan 'selesai' matematis; tolerance target menentukan settling requirement."],
+          "practice": ["Hitung τ dan vC pada 1τ, 3τ, 5τ.", "Bandingkan efek melipatgandakan R vs C."],
+          "next": ["rc-transient", "filters"]
+        },
+        {
+          "id": "deep-cap-real",
+          "title": "Real Capacitors: Type, ESR, Derating, Tolerance & Frequency",
+          "level": "deep-field",
+          "summary": "Pemilihan capacitor nyata melibatkan capacitance, size, voltage rating/derating, ESR, tolerance, frequency response, polarity, dan technology.",
+          "intuition": "Tulisan '10 µF' tidak cukup menjelaskan bagaimana capacitor bekerja di PCB nyata.",
+          "concepts": ["MLCC", "film", "electrolytic", "ESR", "ESL", "DC bias", "temperature", "tolerance", "voltage rating", "polarity"],
+          "formulas": [],
+          "design": ["MLCC kecil/low ESR tetapi capacitance dapat berubah dengan bias dan temperature tergantung dielectric/size.", "Electrolytic menawarkan capacitance tinggi tetapi umumnya lebih besar, polarized, dan punya ESR/aging considerations.", "Film sering stabil dan low loss tetapi lebih besar/costlier."],
+          "limitations": ["Nilai exact harus berasal dari datasheet MPN yang benar; family-level behavior bukan rating exact."],
+          "practice": ["Bandingkan teknologi capacitor untuk decoupling vs bulk storage.", "Daftar parameter datasheet yang perlu dicek selain capacitance."],
+          "next": ["deep-decoupling", "parasitics"]
+        },
+        {
+          "id": "deep-decoupling",
+          "title": "Decoupling/Bypass & Power Integrity",
+          "level": "deep-field",
+          "summary": "IC digital dapat menarik current spike. Bypass capacitor dekat supply pin bertindak sebagai local energy reservoir untuk mengurangi voltage droop/overshoot sementara supply path merespons.",
+          "intuition": "Supply yang jauh tidak selalu bisa mengirim perubahan current seketika karena interconnect nyata punya impedance termasuk inductance.",
+          "concepts": ["VDD/VCC", "local energy", "transient current", "droop", "overshoot", "placement", "loop area", "PDN"],
+          "formulas": ["ΔV ≈ ΔQ/C", "ΔV ≈ I·Δt/C for a simplified local transient"],
+          "design": ["Capacitor harus dekat power/ground pins sesuai datasheet dan return path harus pendek.", "Bulk + local high-frequency decoupling menangani time scales berbeda."],
+          "limitations": ["Nilai dan placement final perlu datasheet, PDN impedance target, package/board parasitics, dan operating conditions."],
+          "practice": ["Jelaskan kenapa average current sama tidak berarti supply transient sama.", "Identifikasi loop decoupling pada layout."],
+          "next": ["power-integrity", "deep-signal-noise"]
+        },
+        {
+          "id": "deep-rc-filter",
+          "title": "RC Low-Pass as Time-Domain Filtering",
+          "level": "deep-application",
+          "summary": "RC low-pass menghaluskan fast changes karena capacitor voltage berubah terbatas. Hubungan time constant terhadap waveform menentukan seberapa banyak komponen cepat diredam.",
+          "intuition": "Filter bukan sekadar formula cutoff; ia adalah konsekuensi dynamical response R+C terhadap perubahan input.",
+          "concepts": ["low-pass", "smoothing", "time constant", "noise", "frequency content"],
+          "formulas": ["fc = 1/(2πRC) for ideal first-order RC low-pass"],
+          "design": ["Pilih RC dari signal bandwidth yang ingin dipertahankan dan noise yang ingin diredam.", "Source/load impedance dapat mengubah response ideal."],
+          "limitations": ["Model ideal mengabaikan component tolerance/parasitics dan loading unless explicitly included."],
+          "practice": ["Bandingkan output untuk input pulse saat τ kecil vs besar.", "Hitung cutoff ideal dan cek hubungan dengan required signal bandwidth."],
+          "next": ["filters", "frequency-response"]
+        }
+      ]
+    },
+    {
+      "id": "deep-diodes",
+      "title": "E. Diodes: Nonlinear IV → Models → Applications",
+      "summary": "Diode dibedah sebagai nonlinear device dengan operating regions, piecewise model, hypothesis-and-verify analysis, LED/Zener, rectification, dan protection.",
+      "topics": [
+        {
+          "id": "deep-diode-iv",
+          "title": "Diode IV Curve & Operating Regions",
+          "level": "deep-core",
+          "summary": "Diode bukan resistor satu arah sederhana. Current-voltage relation nonlinear dan dibaca lewat forward, reverse, serta breakdown regions dengan sign convention anode→cathode.",
+          "intuition": "Operating point adalah titik pertemuan constraint device dengan constraint external circuit.",
+          "concepts": ["anode", "cathode", "forward bias", "reverse bias", "leakage", "breakdown", "operating point", "nonlinearity"],
+          "formulas": ["I≈Is(e^(Vd/(nVt))−1) as a more physical diode model"],
+          "design": ["Forward voltage dan leakage berubah dengan current, temperature, part, dan process.", "Normal diode breakdown dapat menyebabkan destructive dissipation; Zener/avalanche parts dirancang untuk controlled reverse operation within ratings."],
+          "limitations": ["Fixed 0.7 V threshold hanyalah piecewise educational approximation, bukan universal diode voltage."],
+          "practice": ["Tentukan region dari VD dan arah current reference.", "Bandingkan ideal, constant-drop, dan exponential model."],
+          "next": ["deep-diode-piecewise", "nonlinear-analysis"]
+        },
+        {
+          "id": "deep-diode-piecewise",
+          "title": "Piecewise Diode Analysis: Hypothesize → Solve → Verify",
+          "level": "deep-analysis",
+          "summary": "Untuk solve manual, pilih assumed region, ganti diode dengan equivalent model, solve network linear, lalu verifikasi apakah hasil compatible dengan region tersebut.",
+          "intuition": "Model diode bukan dipilih sesudah jawaban keluar; assumption diuji oleh jawaban dan diganti bila tidak konsisten.",
+          "concepts": ["off=open", "on=constant drop", "breakdown model", "assumption", "consistency check"],
+          "formulas": ["If ON: I≈(Vs−Vf)/R for simple series source-resistor-diode"],
+          "design": ["Series resistor/current-control network menentukan diode current; jangan mengandalkan exact forward voltage untuk set current presisi."],
+          "limitations": ["Piecewise model gagal untuk precise analog, temperature effects, dynamic capacitance, recovery, atau operating point dekat knee."],
+          "practice": ["Solve source+R+diode dengan assumption OFF lalu ON.", "Tunjukkan condition yang membatalkan assumption."],
+          "next": ["deep-led", "deep-zener"]
+        },
+        {
+          "id": "deep-led",
+          "title": "LED: Current Limiting, Energy & Color",
+          "level": "deep-application",
+          "summary": "LED adalah diode yang mengubah sebagian electrical energy menjadi photon dan sisanya menjadi heat. Current harus dikontrol oleh external circuit.",
+          "intuition": "Supply menentukan energy budget; resistor/driver mengatur current; LED forward voltage adalah outcome yang bergantung operating point, bukan knob presisi.",
+          "concepts": ["forward current", "current limiting", "photon energy", "color", "efficiency", "thermal"],
+          "formulas": ["R≈(Vs−Vf)/I for simple indicator LED", "P_LED≈Vf·I"],
+          "design": ["Use datasheet Vf range at target current and temperature, not one generic value.", "Check resistor power and LED current rating/thermal limits."],
+          "limitations": ["Simple resistor driver is not ideal for high-power LEDs or widely varying supply."],
+          "practice": ["Dimension indicator LED resistor from Vs, Vf range, target I.", "Hitung worst-case current dengan Vf minimum."],
+          "next": ["deep-diode-piecewise", "thermal"]
+        },
+        {
+          "id": "deep-zener",
+          "title": "Zener Breakdown Regulation",
+          "level": "deep-application",
+          "summary": "Zener diode sengaja dipakai pada reverse breakdown untuk mempertahankan voltage relatif stabil selama current tetap dalam operating range yang sesuai.",
+          "intuition": "Series resistor membatasi current dan membagi perubahan supply/load antara resistor dan Zener.",
+          "concepts": ["Zener voltage", "knee current", "dynamic resistance", "shunt regulation", "load current", "power rating"],
+          "formulas": ["R≈(Vin−Vz)/(Iz+Iload)", "Pz≈Vz·Iz"],
+          "design": ["Verifikasi minimum Zener current pada Vin minimum/load maksimum dan maximum power pada Vin maksimum/load minimum."],
+          "limitations": ["Vz tidak benar-benar konstan; dynamic resistance, tolerance, temperature coefficient, dan power matter."],
+          "practice": ["Check Zener current across source/load corners.", "Hitung resistor dan Zener worst-case dissipation."],
+          "next": ["protection", "power-conversion"]
+        },
+        {
+          "id": "deep-diode-apps",
+          "title": "Rectification & Reverse-Polarity Protection",
+          "level": "deep-application",
+          "summary": "Diode operating regions menghasilkan fungsi sistem: rectifier hanya melewatkan polaritas tertentu; series diode dapat memblok reversed supply.",
+          "intuition": "Aplikasi diode dapat dipahami dengan menggambar waveform/input condition, menentukan ON/OFF setiap interval, lalu menyusun output piecewise.",
+          "concepts": ["half-wave rectifier", "reverse-polarity protection", "piecewise waveform", "forward drop", "power loss"],
+          "formulas": ["Ideal half-wave: Vout=max(0,Vin) for the shown orientation"],
+          "design": ["Real rectifier perlu check reverse voltage, forward current, conduction loss, recovery, and thermal.", "Series reverse-polarity diode punya forward drop/loss; topology lain dapat lebih efisien."],
+          "limitations": ["Ideal diode rectifier waveform ignores Vf, source impedance, load dynamics, diode recovery, and filter capacitor behavior."],
+          "practice": ["Sketch Vout half-wave dari sine input.", "Jelaskan apa yang terjadi saat supply polarity terbalik."],
+          "next": ["rectifier", "protection"]
+        }
+      ]
+    },
+    {
+      "id": "deep-modeling-method",
+      "title": "F. Engineering Method: Model, Validate, Then Go Physical",
+      "summary": "Cara berpikir lintas semua materi: mulai dari model paling sederhana yang valid, solve, validate, lalu tambahkan nonideal effects sesuai kebutuhan project.",
+      "topics": [
+        {
+          "id": "deep-model-ladder",
+          "title": "Model Ladder: Ideal → Piecewise → Dynamic → Field/PCB",
+          "level": "deep-method",
+          "summary": "Model dipilih berdasarkan pertanyaan yang ingin dijawab. Semakin detail bukan otomatis semakin baik jika parameter tidak diketahui atau model tidak diperlukan.",
+          "intuition": "Resistor ideal cukup untuk divider DC; capacitor dynamic diperlukan untuk transient; diode piecewise cukup untuk logic protection sederhana; PCB parasitics diperlukan saat geometry/frequency membuatnya relevan.",
+          "concepts": ["abstraction", "assumptions", "validity region", "initial condition", "nonideal model", "datasheet", "measurement correlation"],
+          "formulas": [],
+          "design": ["Setiap hasil solver seharusnya dapat menjelaskan model apa yang dipakai dan apa yang tidak dimodelkan.", "Project checker harus membedakan rule pedagogis, datasheet rule, simulation result, dan physical measurement."],
+          "limitations": ["Tidak ada satu solver/model sederhana yang otomatis menjamin perilaku lapangan seluruh board."],
+          "practice": ["Pilih level model minimum untuk lima kasus design berbeda.", "Sebutkan data tambahan yang dibutuhkan sebelum meningkatkan fidelity."],
+          "next": ["validation", "parasitics", "power-integrity", "signal-integrity"]
+        }
+      ]
+    }
+  ],
+  "labs": [
+    {"id":"signal","title":"Signal / Logic Lab","purpose":"Period↔frequency, amplitude, VIH/VIL classification."},
+    {"id":"rc","title":"RC Transient Lab","purpose":"Compute τ and analytic first-order capacitor response without pretending it is the project simulator."},
+    {"id":"diode","title":"Diode Region Lab","purpose":"Teach piecewise OFF/ON/BREAKDOWN reasoning with user-supplied thresholds."}
+  ]
+}
