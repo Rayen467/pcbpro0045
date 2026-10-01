@@ -3,7 +3,7 @@
 
   if (window.__PCBPRO_PERF_GUARD__) return;
 
-  const VERSION = '1.2.0';
+  const VERSION = '1.3.0';
   const NativeMutationObserver = window.MutationObserver;
   const INTERNAL_SELECTOR = [
     '[data-wire-overlay]',
@@ -12,6 +12,11 @@
     '.pcb-wire-hud',
     '.net[data-live-net="1"]',
     '#pcbpro-jarvis',
+    '#pcbpro-assistant-v114',
+    '#pcbpro-explain-drawer',
+    '#pcbpro-explain-toast',
+    '#pcbpro-learning-modal',
+    '#pcbpro-deep-modal',
     '#pcbpro-ux-dock',
     '#pcbpro-patch-modal',
     '#pcbpro-kicad-flow',
