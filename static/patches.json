@@ -1,5 +1,28 @@
 [
   {
+    "version": "1.6.0",
+    "date": "2026-10-02",
+    "title": {"id": "Interactive Pin-to-Pin Wiring", "en": "Interactive Pin-to-Pin Wiring"},
+    "changes": {
+      "id": [
+        "Tool Wire sekarang punya pin klik nyata di schematic. Klik pin pertama untuk mulai koneksi dan klik pin tujuan untuk menyelesaikannya.",
+        "Preview wire mengikuti mouse; klik area kosong menambahkan corner orthogonal 90 derajat.",
+        "Endpoint wire ditambatkan ke pin DOM sehingga saat komponen digeser, ujung wire tetap mengikuti komponen.",
+        "Wire graph disimpan ke localStorage dan menjadi sumber netlist dinamis; NET INSPECTOR disinkronkan dari koneksi yang benar-benar dibuat user.",
+        "Klik wire saat bukan mode Wire lalu tekan Delete/Backspace untuk memutus koneksi; perubahan netlist langsung dipublikasikan ke simulator/assistant.",
+        "Static demo wire disembunyikan. Project yang belum di-wire sekarang tampil benar-benar belum terkoneksi, bukan berpura-pura memiliki netlist."
+      ],
+      "en": [
+        "The Wire tool now exposes real clickable schematic pins. Click a source pin to start and a destination pin to finish a connection.",
+        "Wire preview follows the pointer; clicking empty canvas adds orthogonal 90-degree corners.",
+        "Wire endpoints are anchored to component pin elements so moving a component keeps the wire attached.",
+        "The persistent wire graph now drives a dynamic netlist and synchronizes NET INSPECTOR from connections actually created by the user.",
+        "Select a wire outside Wire mode and press Delete/Backspace to break the connection; netlist changes are published immediately to simulator/assistant consumers.",
+        "Static demo wires are hidden. An unwired project is now honestly shown as electrically unconnected."
+      ]
+    }
+  },
+  {
     "version": "1.5.0",
     "date": "2026-10-02",
     "title": {"id": "KiCad-Style End-to-End PCB Workflow", "en": "KiCad-Style End-to-End PCB Workflow"},
