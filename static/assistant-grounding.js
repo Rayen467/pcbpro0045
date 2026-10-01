@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.4.0';
+  const VERSION = '0.5.0';
   let db = null;
   let dbError = null;
   let aiState = 'ready';
@@ -105,15 +105,29 @@
       : `${ref.id} is still generic. There is no exact vendor MPN, so field ratings must not be invented.`;
   }
 
+  function workflowAnswer(query) {
+    const snap = window.PCBProWorkflow?.snapshot?.();
+    if (!snap) return null;
+    const l = lang();
+    const next = snap.stages?.find((s)=>s.id===snap.next);
+    if (!next) return null;
+    const label = next.label?.[l] || next.label?.id || next.id;
+    const detail = next.detail?.[l] || next.detail?.id || '';
+    return l === 'id'
+      ? `Progress workflow ${snap.done}/${snap.total}. Langkah berikutnya: ${label}. ${detail}`
+      : `Workflow progress ${snap.done}/${snap.total}. Next step: ${label}. ${detail}`;
+  }
+
   function localFallback(query, ctx, errorMessage = '') {
     let answer = null;
     if (/(wire|wiring|wayar|kabel|sambung|nyambung|connect|hubung)/i.test(query)) answer = wireGuide(query, ctx?.design);
+    if (!answer && /(workflow|kicad|langkah|selanjutnya|next step|gerber|drill|erc|drc|fabrication|fabrikasi)/i.test(query)) answer = workflowAnswer(query);
     if (!answer) answer = componentAnswer(query, ctx?.design);
     if (!answer) {
       const l = lang();
       answer = l === 'id'
-        ? 'LLM lagi tidak tersedia untuk request ini. Gue masih bisa baca netlist, data komponen terverifikasi, dan state simulator, tapi gue tidak akan bikin jawaban palsu.'
-        : 'The LLM is unavailable for this request. I can still read the netlist, verified component data, and simulator state, but I will not fabricate an answer.';
+        ? 'LLM lagi tidak tersedia untuk request ini. Gue masih bisa baca netlist, workflow, data komponen terverifikasi, dan state simulator, tapi gue tidak akan bikin jawaban palsu.'
+        : 'The LLM is unavailable for this request. I can still read the netlist, workflow, verified component data, and simulator state, but I will not fabricate an answer.';
     }
     return errorMessage ? `${answer}\n\n[LLM fallback: ${errorMessage}]` : answer;
   }
@@ -136,7 +150,7 @@
     refreshBadge();
     const response = await fetch('/api/assistant', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type':'application/json' },
       body: JSON.stringify({
         query,
         history: conversation.slice(-10),
@@ -144,6 +158,7 @@
         analysis: ctx?.analysis || null,
         simulation: simulationSnapshot(),
         reality: ctx?.reality || null,
+        workflow: window.PCBProWorkflow?.snapshot?.() || null,
         catalog: db ? { schema_version:db.schema_version, verified_at:db.verified_at, policy:db.policy, parts:db.parts } : null
       })
     });
@@ -185,7 +200,7 @@
       small.textContent = `PCB ENGINEERING COPILOT · v${VERSION} · ${state}`;
     }
     const foot = root.querySelector('.jarvis-foot');
-    if (foot) foot.innerHTML = `<span>project netlist + vendor catalog + simulator state</span><span>${aiState === 'fallback' ? 'LLM fallback active' : 'LLM via Vercel AI Gateway'}</span>`;
+    if (foot) foot.innerHTML = `<span>project netlist + workflow + vendor catalog + simulator state</span><span>${aiState === 'fallback' ? 'LLM fallback active' : 'LLM via Vercel AI Gateway'}</span>`;
   }
 
   function boot() {
@@ -196,17 +211,18 @@
     refreshBadge();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
 
   window.PCBProGrounding = {
-    version: VERSION,
-    reloadCatalog: loadDb,
+    version:VERSION,
+    reloadCatalog:loadDb,
     wireGuide,
+    workflowAnswer,
     provider,
-    get catalog() { return db; },
-    get catalogError() { return dbError; },
-    get aiState() { return aiState; },
-    get conversation() { return conversation.slice(); }
+    get catalog(){return db;},
+    get catalogError(){return dbError;},
+    get aiState(){return aiState;},
+    get conversation(){return conversation.slice();}
   };
 })();
