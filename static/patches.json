@@ -1,5 +1,34 @@
 [
   {
+    "version": "1.9.0",
+    "date": "2026-10-02",
+    "title": {"id": "Video-Grounded KiCad Interaction + PCB Geometry", "en": "Video-Grounded KiCad Interaction + PCB Geometry"},
+    "changes": {
+      "id": [
+        "Workflow disesuaikan dengan tutorial KiCad yang diberikan user: buat schematic, tambah/edit komponen, wiring, Move/Drag, annotation, footprint assignment, ERC, pindah ke PCB, placement, routing, layer atas/bawah, Edge.Cuts, DRC, dan 3D/fabrication sebagai tahap lanjutan.",
+        "Tambah hotkey perilaku KiCad: W untuk Wire, M untuk Move yang melepas koneksi pin, G untuk Drag yang mempertahankan wire, R rotate, E/V edit value, F footprint picker, serta klik kanan drag untuk pan.",
+        "Tambah KiCad Flow bar pada schematic dengan aksi Wire, Annotation, Footprint, ERC, dan pindah ke PCB.",
+        "Annotation sekarang merapikan RefDes per prefix dan ikut memigrasikan referensi pin pada wire graph.",
+        "Footprint picker menampilkan preset fisik umum dan tetap meminta verifikasi pitch/pin/dimensi terhadap datasheet nyata.",
+        "PCB workspace sekarang punya model geometri persisten untuk track, ratsnest dari netlist schematic, layer F.Cu/B.Cu, manual Edge.Cuts polygon, dan basic geometry DRC.",
+        "Route hanya boleh menyambungkan pad yang berada pada net schematic yang sama; koneksi lintas net ditolak agar tidak membuat short palsu.",
+        "Basic PCB DRC memeriksa koneksi yang belum diroute, Edge.Cuts, footprint di luar outline, serta crossing copper antar-net pada layer yang sama. Manufacturing-grade clearance/drill/zone DRC masih belum diklaim selesai.",
+        "Workflow readiness sekarang membaca geometri board nyata dari PCB engine; routing dan outline tidak lagi dianggap selesai hanya karena tombol UI ditekan."
+      ],
+      "en": [
+        "The workflow is aligned to the user-provided KiCad tutorial: schematic creation, component editing, wiring, Move/Drag, annotation, footprint assignment, ERC, PCB transfer, placement, routing, top/bottom layers, Edge.Cuts, DRC, with 3D/fabrication as later stages.",
+        "Added KiCad-like interaction hotkeys: W for Wire, M for Move that detaches pin connections, G for Drag that preserves wires, R rotate, E/V edit value, F footprint picker, plus right-button drag for pan.",
+        "Added a KiCad Flow bar on the schematic with Wire, Annotation, Footprint, ERC, and PCB actions.",
+        "Annotation now normalizes RefDes numbering by prefix and migrates pin references in the wire graph.",
+        "The footprint picker offers common physical presets while still requiring pitch/pin/dimension verification against the real datasheet.",
+        "The PCB workspace now has a persistent geometry model for tracks, schematic-net-derived ratsnest, F.Cu/B.Cu layers, manual Edge.Cuts polygons, and basic geometry DRC.",
+        "Routing only allows pads belonging to the same schematic net; cross-net connections are rejected instead of creating fake shorts.",
+        "Basic PCB DRC checks unrouted connectivity, Edge.Cuts, footprints outside the outline, and same-layer cross-net copper crossings. Manufacturing-grade clearance/drill/zone DRC is not claimed complete yet.",
+        "Workflow readiness now reads actual board geometry from the PCB engine; routing and outline are no longer considered complete just because a UI button was pressed."
+      ]
+    }
+  },
+  {
     "version": "1.8.0",
     "date": "2026-10-02",
     "title": {"id": "Wire Engine v2 — Stable Pin Layer", "en": "Wire Engine v2 — Stable Pin Layer"},
