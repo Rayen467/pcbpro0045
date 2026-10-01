@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.10.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.11.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -49,6 +49,7 @@
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
+    await load('/learning-center.js?v=1.0.0');
     await load('/kicad-behavior.js?v=1.0.0');
     await load('/pcb-layout-engine.js?v=1.0.0');
     await load('/board-advanced-engine.js?v=1.0.0');
@@ -58,6 +59,7 @@
     window.PCBProBoardModel?.refresh?.();
     window.PCBProAdvancedBoard?.refresh?.();
     window.PCBProBoardWorkflowBridge?.install?.();
+    window.PCBProLearningCenter?.refresh?.();
 
     // Assistant and component intelligence stay deferred so the canvas becomes interactive first.
     idle(async () => {
@@ -72,6 +74,7 @@
       window.PCBProAdvancedBoard?.refresh?.();
       window.PCBProBoardWorkflowBridge?.install?.();
       window.PCBProPatchV110?.inject?.();
+      window.PCBProLearningCenter?.refresh?.();
     }, 850);
 
     document.addEventListener('click', (event) => {
