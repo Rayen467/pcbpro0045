@@ -1,15 +1,15 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.3.0';
+  const VERSION = '0.4.0';
   let db = null;
   let dbError = null;
-  let lastQuery = '';
-  let lastAnswer = '';
+  let aiState = 'ready';
+  let aiModel = 'Vercel AI Gateway';
+  const conversation = [];
 
   const lang = () => window.PCBProUX?.lang || localStorage.getItem('pcbpro0045-lang') || 'id';
   const clean = (s) => String(s || '').trim().replace(/\s+/g, ' ');
-  const norm = (s) => clean(s).toLowerCase();
 
   async function loadDb() {
     try {
@@ -49,53 +49,35 @@
     return '';
   }
 
-  function projectRefs(design) {
-    return new Map((design?.components || []).map((p) => [String(p.id || '').toUpperCase(), p]));
-  }
-
   function pins(net) {
     return String(net?.pins || '').split(/[·,\s]+/).map((x) => x.trim()).filter((x) => /^[A-Za-z]+\d+\.\d+$/.test(x));
   }
 
   function wireGuide(query, design) {
     const l = lang();
-    const refs = projectRefs(design);
+    const refs = new Map((design?.components || []).map((p) => [String(p.id || '').toUpperCase(), p]));
     const mentioned = [...refs.keys()].filter((ref) => new RegExp(`\\b${ref}\\b`, 'i').test(query));
-    const relevant = (design?.nets || []).filter((net) => {
-      const ps = pins(net);
-      return !mentioned.length || ps.some((p) => mentioned.includes(p.split('.')[0].toUpperCase()));
-    });
+    const relevant = (design?.nets || []).filter((net) => !mentioned.length || pins(net).some((p) => mentioned.includes(p.split('.')[0].toUpperCase())));
 
     if (!relevant.length) {
       return l === 'id'
-        ? 'Gue belum nemu koneksi itu di netlist aktif. Gue nggak akan nebak pin. Pilih/beri nama komponen yang mau disambung atau tambahkan net dulu.'
-        : 'I cannot find that connection in the active netlist. I will not guess pins. Name/select the components you want to connect or add the net first.';
+        ? 'Netlist aktif belum punya koneksi yang cukup untuk menjawab wiring itu. Gue tidak akan nebak pin. Sebut ref komponen yang mau disambung atau lengkapi net-nya.'
+        : 'The active netlist does not contain enough connectivity to answer that wiring request. I will not guess pins.';
     }
 
     const lines = [];
     for (const net of relevant) {
       const ps = pins(net);
       if (ps.length < 2) continue;
-      const described = ps.map((p) => {
+      lines.push(`${net.name}: ${ps.map((p) => {
         const ref = p.split('.')[0].toUpperCase();
-        const part = refs.get(ref);
-        const meaning = pinMeaning(part, p);
+        const meaning = pinMeaning(refs.get(ref), p);
         return `${p}${meaning ? ` (${meaning})` : ''}`;
-      });
-      lines.push(`${net.name}: ${described.join(' → ')}`);
+      }).join(' → ')}`);
     }
-
-    const groundSymbol = [...refs.values()].find((p) => partCode(p) === 'GND');
-    const groundInNet = groundSymbol && (design?.nets || []).some((n) => pins(n).some((p) => p.toUpperCase().startsWith(`${String(groundSymbol.id).toUpperCase()}.`)));
-    const note = groundSymbol && !groundInNet
-      ? (l === 'id'
-          ? `\n\nCatatan penting: ${groundSymbol.id} ada secara visual, tapi belum tercatat sebagai pin di netlist aktif. Jadi gue tidak akan bilang simbol ground itu benar-benar tersambung sampai source-of-truth netlist mencatatnya.`
-          : `\n\nImportant: ${groundSymbol.id} exists visually but is not recorded as a pin in the active netlist. I will not claim the ground symbol is electrically connected until the source-of-truth netlist records it.`)
-      : '';
-
     return l === 'id'
-      ? `Berdasarkan NETLIST AKTIF, sambung wayarnya begini:\n${lines.map((x,i)=>`${i+1}. ${x}`).join('\n')}${note}\n\nIni bukan tebakan visual; urutan di atas dibaca dari data net project yang sekarang.`
-      : `From the ACTIVE NETLIST, wire it like this:\n${lines.map((x,i)=>`${i+1}. ${x}`).join('\n')}${note}\n\nThis is not a visual guess; the sequence is read from the current project net data.`;
+      ? `Berdasarkan netlist aktif:\n${lines.map((x,i)=>`${i+1}. ${x}`).join('\n')}\n\nIni dibaca dari data project, bukan tebakan visual.`
+      : `From the active netlist:\n${lines.map((x,i)=>`${i+1}. ${x}`).join('\n')}`;
   }
 
   function findDbPart(query, design) {
@@ -110,58 +92,87 @@
     if (exact) {
       const ratings = Object.entries(exact.ratings || {}).map(([k,v]) => `${k}: ${v}`).join(', ');
       const source = exact.sources?.[0]?.url || '—';
-      const warnings = (exact.warnings || []).join(' ');
       return l === 'id'
-        ? `${exact.mpn} — ${exact.manufacturer}. Status data: ${exact.status}. Package/reference: ${exact.package || 'lihat orderable exact'}. Rating tersimpan: ${ratings || '—'}. ${warnings ? `Peringatan: ${warnings}` : ''}\nSumber vendor: ${source}\nVerified snapshot: ${db.verified_at}.`
-        : `${exact.mpn} — ${exact.manufacturer}. Data status: ${exact.status}. Package/reference: ${exact.package || 'see exact orderable'}. Stored ratings: ${ratings || '—'}. ${warnings ? `Warning: ${warnings}` : ''}\nVendor source: ${source}\nVerified snapshot: ${db.verified_at}.`;
+        ? `${exact.mpn} — ${exact.manufacturer}. Status ${exact.status}. Rating katalog: ${ratings || '—'}. Sumber vendor: ${source}`
+        : `${exact.mpn} — ${exact.manufacturer}. Status ${exact.status}. Catalog ratings: ${ratings || '—'}. Vendor source: ${source}`;
     }
 
-    const components = design?.components || [];
-    const ref = components.find((p) => new RegExp(`\\b${String(p.id)}\\b`, 'i').test(query));
-    if (ref) {
-      const code = partCode(ref);
-      const required = db?.generic_requirements?.[code] || [];
-      return l === 'id'
-        ? `${ref.id} (${ref.name || code}, ${ref.value || 'tanpa value'}) masih GENERIK. Gue tidak punya MPN/vendor exact untuk part ini, jadi gue tidak akan bikin rating lapangan palsu. Untuk sign-off butuh: ${required.join(', ') || 'manufacturer part number + datasheet exact'}.`
-        : `${ref.id} (${ref.name || code}, ${ref.value || 'no value'}) is still GENERIC. There is no exact vendor MPN for this part, so I will not fabricate field ratings. Sign-off requires: ${required.join(', ') || 'exact manufacturer part number + datasheet'}.`;
-    }
-    return null;
+    const ref = (design?.components || []).find((p) => new RegExp(`\\b${String(p.id)}\\b`, 'i').test(query));
+    if (!ref) return null;
+    const required = db?.generic_requirements?.[partCode(ref)] || [];
+    return l === 'id'
+      ? `${ref.id} (${ref.name || partCode(ref)}, ${ref.value || 'tanpa value'}) masih generik. Tidak ada MPN/vendor exact, jadi rating lapangan tidak boleh dibuat-buat. Untuk sign-off butuh: ${required.join(', ') || 'MPN + datasheet exact'}.`
+      : `${ref.id} is still generic. There is no exact vendor MPN, so field ratings must not be invented.`;
   }
 
-  function designSummary(design, analysis) {
-    const l = lang();
-    const count = design?.components?.length || 0;
-    const nets = design?.nets?.length || 0;
-    const issue = analysis?.issues?.length || 0;
-    const warn = analysis?.warnings?.length || 0;
-    return l === 'id'
-      ? `Project aktif: ${count} komponen, ${nets} net, ${issue} issue, ${warn} warning. Gue cuma pakai netlist project + katalog vendor yang sudah diverifikasi; kalau data tidak ada, gue bilang tidak ada.`
-      : `Active project: ${count} components, ${nets} nets, ${issue} issues, ${warn} warnings. I only use the project netlist + verified vendor catalog; missing data is reported as missing.`;
+  function localFallback(query, ctx, errorMessage = '') {
+    let answer = null;
+    if (/(wire|wiring|wayar|kabel|sambung|nyambung|connect|hubung)/i.test(query)) answer = wireGuide(query, ctx?.design);
+    if (!answer) answer = componentAnswer(query, ctx?.design);
+    if (!answer) {
+      const l = lang();
+      answer = l === 'id'
+        ? 'LLM lagi tidak tersedia untuk request ini. Gue masih bisa baca netlist, data komponen terverifikasi, dan state simulator, tapi gue tidak akan bikin jawaban palsu.'
+        : 'The LLM is unavailable for this request. I can still read the netlist, verified component data, and simulator state, but I will not fabricate an answer.';
+    }
+    return errorMessage ? `${answer}\n\n[LLM fallback: ${errorMessage}]` : answer;
+  }
+
+  function simulationSnapshot() {
+    const live = window.PCBProLiveSimulation?.lastResult;
+    if (!live) return null;
+    return {
+      running: Boolean(window.PCBProLiveSimulation?.running),
+      frame: live.frame,
+      nodeVoltages: live.result?.nodeVoltages || null,
+      devices: live.result?.devices || null,
+      warnings: live.warnings || [],
+      fault: live.fault || 'none'
+    };
+  }
+
+  async function callLLM(query, ctx) {
+    aiState = 'thinking';
+    refreshBadge();
+    const response = await fetch('/api/assistant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query,
+        history: conversation.slice(-10),
+        design: ctx?.design || null,
+        analysis: ctx?.analysis || null,
+        simulation: simulationSnapshot(),
+        reality: ctx?.reality || null,
+        catalog: db ? { schema_version:db.schema_version, verified_at:db.verified_at, policy:db.policy, parts:db.parts } : null
+      })
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.text) throw new Error(data?.error || `HTTP ${response.status}`);
+    aiState = 'online';
+    aiModel = data.model || 'AI Gateway';
+    refreshBadge();
+    return String(data.text).trim();
   }
 
   async function provider(ctx) {
     const query = clean(ctx?.query);
-    const q = norm(query);
+    if (!query) return '';
     if (!db && !dbError) await loadDb();
 
-    let answer = null;
-    if (/(wire|wiring|wayar|kabel|sambung|nyambung|connect|hubung|jalur kabel)/i.test(query)) answer = wireGuide(query, ctx?.design);
-    if (!answer && /(datasheet|database|data komponen|rating|capability|kemampuan|mpn|vendor|1n4148|2n7002|lm358)/i.test(query)) answer = componentAnswer(query, ctx?.design);
-    if (!answer) answer = componentAnswer(query, ctx?.design);
-    if (!answer && /(apa yang|status|project|proyek|kondisi)/i.test(query)) answer = designSummary(ctx?.design, ctx?.analysis);
-    if (!answer) {
-      answer = lang() === 'id'
-        ? `Pertanyaan ini belum punya handler engineering yang tervalidasi, dan LLM backend belum tersambung. Gue nggak akan ngarang jawaban. Yang bisa gue jawab sekarang harus berasal dari netlist aktif, hasil Reality Lab, atau component catalog vendor. Coba sebut ref seperti R2/D3 atau tanya "cara sambung wayar".`
-        : `This question does not yet have a validated engineering handler, and the LLM backend is not connected. I will not invent an answer. Current answers must come from the active netlist, Reality Lab, or the vendor component catalog.`;
+    let answer;
+    try {
+      answer = await callLLM(query, ctx);
+    } catch (error) {
+      aiState = 'fallback';
+      refreshBadge();
+      answer = localFallback(query, ctx, error?.message || 'AI unavailable');
     }
 
-    if (q === lastQuery && answer === lastAnswer) {
-      return lang() === 'id'
-        ? 'State project belum berubah sejak pertanyaan yang sama tadi, jadi gue nggak akan mengulang paragraf panjang. Kalau lo mau jawaban berbeda, ubah desain atau sebut komponen/net yang mau dicek.'
-        : 'The project state has not changed since the same question, so I will not repeat the long answer. Change the design or name the component/net you want checked.';
-    }
-    lastQuery = q;
-    lastAnswer = answer;
+    conversation.push({ role:'user', content:query });
+    conversation.push({ role:'assistant', content:answer });
+    if (conversation.length > 20) conversation.splice(0, conversation.length - 20);
     return answer;
   }
 
@@ -169,33 +180,33 @@
     const root = document.querySelector('#pcbpro-jarvis');
     if (!root) return;
     const small = root.querySelector('.jarvis-id small');
-    if (small) small.textContent = `GROUNDED PROJECT REASONER · v${VERSION}`;
-    const foot = root.querySelector('.jarvis-foot');
-    if (foot) foot.innerHTML = `<span>netlist + vendor catalog</span><span>LLM backend: OFF</span>`;
-    const first = root.querySelector('.jarvis-msg.assistant .jarvis-bubble p');
-    if (first && /provider|LLM|workspace aktif/i.test(first.textContent || '')) {
-      first.textContent = lang() === 'id'
-        ? 'Gue baca project aktif dari netlist dan data komponen yang tersedia. Untuk sekarang reasoning bebas bukan LLM: kalau data atau logic belum ada, gue akan bilang belum ada, bukan ngarang.'
-        : 'I read the active project from its netlist and available component data. Free-form reasoning is not an LLM yet: if data or logic is missing, I will say so instead of inventing it.';
+    if (small) {
+      const state = aiState === 'online' ? `LLM ONLINE · ${aiModel}` : aiState === 'thinking' ? 'LLM THINKING…' : aiState === 'fallback' ? 'LLM FALLBACK · GROUNDED LOCAL' : 'LLM READY · PROJECT GROUNDED';
+      small.textContent = `PCB ENGINEERING COPILOT · v${VERSION} · ${state}`;
     }
+    const foot = root.querySelector('.jarvis-foot');
+    if (foot) foot.innerHTML = `<span>project netlist + vendor catalog + simulator state</span><span>${aiState === 'fallback' ? 'LLM fallback active' : 'LLM via Vercel AI Gateway'}</span>`;
   }
 
   function boot() {
     window.PCBProAssistantProvider = provider;
     loadDb();
     const observer = new MutationObserver(() => refreshBadge());
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    observer.observe(document.body, { childList:true, subtree:true });
     refreshBadge();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
   else boot();
 
   window.PCBProGrounding = {
     version: VERSION,
     reloadCatalog: loadDb,
     wireGuide,
+    provider,
     get catalog() { return db; },
-    get catalogError() { return dbError; }
+    get catalogError() { return dbError; },
+    get aiState() { return aiState; },
+    get conversation() { return conversation.slice(); }
   };
 })();
