@@ -3,7 +3,7 @@
   if (window.PCBProBoardModel) return;
 
   const NS='http://www.w3.org/2000/svg';
-  const VERSION='1.0.0';
+  const VERSION='1.1.0';
   const KEY='pcbpro0045-board-v1';
   let model={version:VERSION,tracks:[],outline:[]};
   let overlay=null,padLayer=null,hud=null;
