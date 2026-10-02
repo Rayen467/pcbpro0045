@@ -647,10 +647,11 @@
       return [];
     }
     const physical = window.PCBProPhysicalDRC?.run?.();
+    const physicalFindings = /** @type {Array<{severity:string,message:string}>} */ (physical?.findings || []);
     const findings = [
       ...(hasBase ? (window.PCBProBoardModel.drc() || []) : []),
       ...(hasAdvanced ? (window.PCBProAdvancedBoard.drc() || []) : []),
-      ...((physical?.calibrated ? (physical.findings || []).filter((x) => x.severity === 'error' || x.severity === 'blocker').map((x) => x.message) : []))
+      ...((physical?.calibrated ? physicalFindings.filter((x) => x.severity === 'error' || x.severity === 'blocker').map((x) => x.message) : []))
     ];
     drcFindings = findings.length;
     const physicalNote = physical?.calibrated ? ' · physical mm checks included' : ' · physical mm checks unresolved until board dimensions are set';
