@@ -300,6 +300,17 @@
       describe:()=>t('Reset state Live Circuit simulator.','Reset Live Circuit simulator state.'),
       execute:()=>simulator('reset')
     },
+    'professional.audit':{
+      risk:'low',adapter:'professional-api',schema:{properties:{}},
+      describe:()=>t('Jalankan Professional Audit.','Run the Professional Audit.'),
+      execute:async()=>window.PCBProProfessional?.audit?{ok:true,audit:window.PCBProProfessional.audit()}:{ok:false,error:'Professional engine unavailable'}
+    },
+    'professional.open':{
+      risk:'low',adapter:'professional-api',
+      schema:{properties:{tab:{type:'string',enum:['audit','constraints','impedance','evidence','patents','reference','roadmap']}}},
+      describe:a=>t(`Buka Professional Center${a.tab?` · ${a.tab}`:''}.`,`Open Professional Center${a.tab?` · ${a.tab}`:''}.`),
+      execute:async a=>{if(!window.PCBProProfessional?.open)return{ok:false,error:'Professional engine unavailable'};window.PCBProProfessional.open(a.tab||'audit');return{ok:true,tab:a.tab||'audit'}}
+    },
     'explain.open':{
       risk:'low',adapter:'explain-api',schema:{properties:{}},
       describe:()=>t('Buka Explanation Center.','Open the Explanation Center.'),
