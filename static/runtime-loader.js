@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.16.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.17.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -63,6 +63,7 @@
     await load('/patch-v114.js');
     await load('/patch-v115.js');
     await load('/patch-v116.js');
+    await load('/patch-v117.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
@@ -73,6 +74,7 @@
     await load('/board-advanced-engine.js?v=1.0.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
+    await load('/database-engine-v117.js?v=1.17.0');
     await load('/project-command-bus-v115.js?v=1.15.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
@@ -102,6 +104,7 @@
       window.PCBProPatchV114?.inject?.();
       window.PCBProPatchV115?.inject?.();
       window.PCBProPatchV116?.inject?.();
+      window.PCBProPatchV117?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProExplain?.refresh?.();
