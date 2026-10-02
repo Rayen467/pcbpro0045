@@ -353,6 +353,7 @@
     window.addEventListener('pcbpro:board-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:professional-rules-changed',()=>scheduleSave(350));
     window.addEventListener('pcbpro:manufacturing-preflight',()=>scheduleSave(450));
+    window.addEventListener('pcbpro:manufacturing-calibration-changed',()=>scheduleSave(450));
     window.addEventListener('pcbpro:catalog-ready',render);
     window.addEventListener('pcbpro:project-adapter-ready',()=>scheduleSave(500));
 
