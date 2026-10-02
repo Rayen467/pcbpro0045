@@ -44,9 +44,29 @@
 
   function physicalPadSource(){
     const api=window.PCBProFootprintGeometry;
-    if(!api?.getPads)return {ready:false,count:0,reason:'No verified physical footprint-pad geometry provider is connected.'};
-    const pads=api.getPads();
-    return {ready:Array.isArray(pads)&&pads.length>0,count:Array.isArray(pads)?pads.length:0,pads:Array.isArray(pads)?pads:[],reason:Array.isArray(pads)&&pads.length?'':'Physical footprint-pad geometry is empty.'};
+    if(!api?.getPads)return {ready:false,count:0,pads:[],reason:'No verified physical footprint-pad geometry provider is connected.'};
+    const raw=api.getPads();
+    const pads=Array.isArray(raw)?raw:[];
+    const physical=components().filter(x=>x.footprint&&x.footprint!=='—');
+    const expected=physical.reduce((sum,p)=>sum+(Number.isInteger(p.pinCount)&&p.pinCount>0?p.pinCount:0),0);
+    const unknownPins=physical.filter(p=>!(Number.isInteger(p.pinCount)&&p.pinCount>0)).map(p=>p.id);
+    const valid=pads.filter(p=>{
+      const layer=String(p.layer||'F.Cu');
+      const shape=String(p.shape||'circle').toLowerCase();
+      const sizeOk=shape==='rect'
+        ? Number(p.widthMm)>0&&Number(p.heightMm)>0
+        : Number(p.diameterMm||p.widthMm)>0;
+      return Number.isFinite(Number(p.xMm))&&Number.isFinite(Number(p.yMm))&&['F.Cu','B.Cu','*.Cu'].includes(layer)&&['circle','rect'].includes(shape)&&sizeOk&&p.ref;
+    });
+    const byRef=new Map();
+    for(const p of valid)byRef.set(String(p.ref),(byRef.get(String(p.ref))||0)+1);
+    const incomplete=physical.filter(p=>Number.isInteger(p.pinCount)&&p.pinCount>0&&(byRef.get(p.id)||0)<p.pinCount).map(p=>p.id);
+    let reason='';
+    if(unknownPins.length)reason='Unknown pin count: '+unknownPins.join(', ');
+    else if(incomplete.length)reason='Incomplete pad geometry: '+incomplete.join(', ');
+    else if(!pads.length||valid.length!==pads.length)reason='Physical footprint-pad geometry is invalid or empty.';
+    const ready=pads.length>0&&valid.length===pads.length&&!unknownPins.length&&!incomplete.length&&valid.length>=expected;
+    return {ready,count:valid.length,pads:valid,expected,unknownPins,incomplete,reason};
   }
 
   function preflight(){
