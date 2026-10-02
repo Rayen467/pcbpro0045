@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { parseProject, MAX_PROJECT_BYTES } from '$lib/project.js';
 
-  const version = '1.17.0';
+  const version = '1.18.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
