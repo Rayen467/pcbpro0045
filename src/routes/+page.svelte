@@ -80,18 +80,18 @@
 
   /** @type {CatalogPart[]} */
   const coreLibrary = [
-    { key: 'dc', prefix: 'V', code: 'V', name: 'DC Source', value: '5 V', group: 'Sources', footprint: 'TerminalBlock_2P' },
-    { key: 'r', prefix: 'R', code: 'R', name: 'Resistor', value: '330 Ω', group: 'Passives', footprint: 'R_0805' },
-    { key: 'c', prefix: 'C', code: 'C', name: 'Capacitor', value: '1 µF', group: 'Passives', footprint: 'C_0805' },
-    { key: 'l', prefix: 'L', code: 'L', name: 'Inductor', value: '10 µH', group: 'Passives', footprint: 'L_0805' },
-    { key: 'd', prefix: 'D', code: 'D', name: 'Diode', value: '1N4148', group: 'Semiconductors', footprint: 'SOD-123' },
-    { key: 'led', prefix: 'D', code: 'LED', name: 'LED', value: 'Red 2 V', group: 'Semiconductors', footprint: 'LED_0603' },
-    { key: 'q', prefix: 'Q', code: 'Q', name: 'N-MOSFET', value: '2N7002', group: 'Semiconductors', footprint: 'SOT-23' },
-    { key: 'u', prefix: 'U', code: 'U', name: 'Op-Amp', value: 'LM358', group: 'IC', footprint: 'SOIC-8' },
-    { key: 'sw', prefix: 'SW', code: 'SW', name: 'Switch', value: 'SPST', group: 'Input', footprint: 'SW_THT' },
-    { key: 'j', prefix: 'J', code: 'J', name: 'Connector', value: '2 Pin', group: 'Connectors', footprint: 'HDR_1x02' },
-    { key: 'gnd', prefix: 'G', code: 'GND', name: 'Ground', value: '0 V', group: 'Power', footprint: '—' },
-    { key: 'tp', prefix: 'TP', code: 'TP', name: 'Test Point', value: 'TP', group: 'Debug', footprint: 'TestPoint_1mm' }
+    { key: 'dc', prefix: 'V', code: 'V', name: 'DC Source', value: '5 V', group: 'Sources', footprint: 'TerminalBlock_2P', pinCount: 2 },
+    { key: 'r', prefix: 'R', code: 'R', name: 'Resistor', value: '330 Ω', group: 'Passives', footprint: 'R_0805', pinCount: 2 },
+    { key: 'c', prefix: 'C', code: 'C', name: 'Capacitor', value: '1 µF', group: 'Passives', footprint: 'C_0805', pinCount: 2 },
+    { key: 'l', prefix: 'L', code: 'L', name: 'Inductor', value: '10 µH', group: 'Passives', footprint: 'L_0805', pinCount: 2 },
+    { key: 'd', prefix: 'D', code: 'D', name: 'Diode', value: '1N4148', group: 'Semiconductors', footprint: 'SOD-123', pinCount: 2 },
+    { key: 'led', prefix: 'D', code: 'LED', name: 'LED', value: 'Red 2 V', group: 'Semiconductors', footprint: 'LED_0603', pinCount: 2 },
+    { key: 'q', prefix: 'Q', code: 'Q', name: 'N-MOSFET', value: '2N7002', group: 'Semiconductors', footprint: 'SOT-23', pinCount: 3 },
+    { key: 'u', prefix: 'U', code: 'U', name: 'Op-Amp', value: 'LM358', group: 'IC', footprint: 'SOIC-8', pinCount: 8 },
+    { key: 'sw', prefix: 'SW', code: 'SW', name: 'Switch', value: 'SPST', group: 'Input', footprint: 'SW_THT', pinCount: 2 },
+    { key: 'j', prefix: 'J', code: 'J', name: 'Connector', value: '2 Pin', group: 'Connectors', footprint: 'HDR_1x02', pinCount: 2 },
+    { key: 'gnd', prefix: 'G', code: 'GND', name: 'Ground', value: '0 V', group: 'Power', footprint: '—', pinCount: 1 },
+    { key: 'tp', prefix: 'TP', code: 'TP', name: 'Test Point', value: 'TP', group: 'Debug', footprint: 'TestPoint_1mm', pinCount: 1 }
   ];
 
   /** @type {CatalogPart[]} */
@@ -163,17 +163,13 @@
 
   /** @type {ProjectComponent[]} */
   let components = [
-    { id: 'V1', code: 'V', name: 'DC Source', value: '5 V', footprint: 'TerminalBlock_2P', sx: 18, sy: 52, px: 18, py: 57, rot: 0 },
-    { id: 'R2', code: 'R', name: 'Resistor', value: '330 Ω', footprint: 'R_0805', sx: 47, sy: 29, px: 45, py: 29, rot: 0 },
-    { id: 'D3', code: 'LED', name: 'LED', value: 'Red 2 V', footprint: 'LED_0603', sx: 78, sy: 51, px: 76, py: 60, rot: 0 },
-    { id: 'G4', code: 'GND', name: 'Ground', value: '0 V', footprint: '—', sx: 49, sy: 74, px: 50, py: 76, rot: 0 }
+    { id: 'V1', code: 'V', name: 'DC Source', value: '5 V', footprint: 'TerminalBlock_2P', pinCount: 2, sx: 18, sy: 52, px: 18, py: 57, rot: 0 },
+    { id: 'R2', code: 'R', name: 'Resistor', value: '330 Ω', footprint: 'R_0805', pinCount: 2, sx: 47, sy: 29, px: 45, py: 29, rot: 0 },
+    { id: 'D3', code: 'LED', name: 'LED', value: 'Red 2 V', footprint: 'LED_0603', pinCount: 2, sx: 78, sy: 51, px: 76, py: 60, rot: 0 },
+    { id: 'G4', code: 'GND', name: 'Ground', value: '0 V', footprint: '—', pinCount: 1, sx: 49, sy: 74, px: 50, py: 76, rot: 0 }
   ];
 
-  let nets = [
-    { name: 'VCC', pins: 'V1.1 · R2.1' },
-    { name: 'LED_A', pins: 'R2.2 · D3.1' },
-    { name: 'GND', pins: 'D3.2 · V1.2' }
-  ];
+  let nets = [];
 
   /** @type {{part: (typeof library)[number], pointerId: number, startX: number, startY: number, x: number, y: number, moved: boolean} | null} */
   let libraryDrag = null;
