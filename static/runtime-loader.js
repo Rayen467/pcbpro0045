@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.15.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.16.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -51,9 +51,10 @@
 
   async function boot() {
     await load('/interaction-bridge.js');
+    await load('/component-catalog-v116.js?v=1.16.0');
 
     // Editing engines first: schematic connectivity, learning, KiCad-like behavior, PCB geometry, and universal explanation.
-    await load('/wire-engine.js?v=2.0.0');
+    await load('/wire-engine.js?v=2.1.0');
     await load('/ux-engine.js');
     await load('/patch-v110.js');
     await load('/patch-v111.js');
@@ -61,13 +62,14 @@
     await load('/patch-v113.js');
     await load('/patch-v114.js');
     await load('/patch-v115.js');
+    await load('/patch-v116.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
     await load('/learning-center.js?v=1.0.0');
     await load('/learning-merge-v112.js?v=1.12.0');
     await load('/kicad-behavior.js?v=1.0.0');
-    await load('/pcb-layout-engine.js?v=1.0.0');
+    await load('/pcb-layout-engine.js?v=1.1.0');
     await load('/board-advanced-engine.js?v=1.0.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
@@ -83,7 +85,7 @@
 
     // The AI engineering agent is deferred so editing remains responsive. It uses typed commands, local RAG/memory, and LLM planning/reasoning.
     idle(async () => {
-      await load('/assistant-brain-v115.js?v=1.15.0');
+      await load('/assistant-brain-v115.js?v=1.16.0');
       await load('/assistant-engine-v115.js?v=1.15.0');
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
@@ -99,6 +101,7 @@
       window.PCBProPatchV113?.inject?.();
       window.PCBProPatchV114?.inject?.();
       window.PCBProPatchV115?.inject?.();
+      window.PCBProPatchV116?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProExplain?.refresh?.();
