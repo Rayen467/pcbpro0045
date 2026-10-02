@@ -204,11 +204,23 @@
     notify(text('Project diekspor dari state wiring/netlist aktif.','Project exported from the active wiring/netlist state.'));
   }
 
+  function resetLayout() {
+    for (const key of ['pcbpro0045-wiregraph-v1', 'pcbpro0045-wiregraph-v2', 'pcbpro0045-board-v1', 'pcbpro0045-board-advanced-v1']) localStorage.removeItem(key);
+    window.PCBProWireEngine?.clear?.();
+    window.PCBProBoardModel?.clear?.();
+    window.PCBProAdvancedBoard?.clear?.();
+  }
+  window.addEventListener('pcbpro:reset-layout', (event) => { resetLayout(); event.preventDefault(); });
+
   function newProject() {
     if (!confirm(text('Buat project kosong? Project lokal yang belum diekspor akan diganti.','Create an empty project? Unexported local work will be replaced.'))) return;
-    localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({components:[],savedAt:'New project'}));
-    localStorage.setItem('pcbpro0045-wiregraph-v1', JSON.stringify({version:'1.1.0',routes:[]}));
-    location.reload();
+    try {
+      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({components:[],savedAt:'New project'}));
+      resetLayout();
+      location.reload();
+    } catch {
+      notify(text('Penyimpanan gagal. Ekspor proyek sebelum mencoba lagi.','Storage failed. Export your project before trying again.'),'warn');
+    }
   }
 
   function showMenu(anchor, items) {

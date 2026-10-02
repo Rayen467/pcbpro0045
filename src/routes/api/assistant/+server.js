@@ -11,8 +11,10 @@ const FALLBACKS = {
 };
 
 const MAX_OUTPUT = { fast: 520, standard: 800, reason: 1200 };
+/** @param {unknown} value */
 const clampText = (value, max = 4000) => String(value ?? '').slice(0, max);
 
+/** @param {unknown} value */
 function compact(value, max = 8000) {
   try {
     return JSON.stringify(value ?? null).slice(0, max);
@@ -21,11 +23,13 @@ function compact(value, max = 8000) {
   }
 }
 
+/** @param {unknown} raw */
 function modeOf(raw) {
   const mode = String(raw || '').toLowerCase();
   return mode === 'fast' || mode === 'reason' ? mode : 'standard';
 }
 
+/** @param {unknown} value */
 function compactHistory(value) {
   if (!Array.isArray(value)) return [];
   return value.slice(-6).map((m) => ({
@@ -34,6 +38,7 @@ function compactHistory(value) {
   }));
 }
 
+/** @param {unknown} value */
 function compactRetrieval(value) {
   if (!Array.isArray(value)) return [];
   return value.slice(0, 6).map((r) => ({
@@ -154,7 +159,7 @@ If prior conversation conflicts with current project state, trust CURRENT_CONTEX
     });
   } catch (error) {
     return Response.json({
-      error:error?.message || 'AI request failed.',
+      error:error instanceof Error ? error.message : 'AI request failed.',
       code:'AI_REQUEST_FAILED',
       tier:mode
     }, { status:502 });

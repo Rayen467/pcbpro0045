@@ -1,9 +1,16 @@
 <script>
   import { onMount } from 'svelte';
+  import { parseProject, MAX_PROJECT_BYTES } from '$lib/project.js';
 
-  const version = '1.1.0';
+  const version = '1.15.1';
+  /** @type {HTMLInputElement | undefined} */
+  let importInput;
+  let savedContent = '';
+  let dirty = false;
+  $: dirty = JSON.stringify(components) !== savedContent;
   const views = ['Schematic', 'PCB', 'Simulator', '3D', 'BOM', 'Fabrication', 'Rules', 'Release'];
   const menus = ['File', 'Edit', 'View', 'Place', 'Route', 'Inspect', 'Tools', 'Manufacture'];
+  /** @type {Record<string, string[]>} */
   const toolsets = {
     Schematic: ['Select', 'Place', 'Wire', 'Bus', 'Net label', 'Junction', 'No connect', 'Power', 'Pan', 'Measure', 'Annotate'],
     PCB: ['Select', 'Route', 'Via', 'Zone', 'Keepout', 'Dimension', 'Pan', 'Measure', 'Tune', 'Layer swap', 'Ratsnest'],
@@ -48,10 +55,11 @@
   let panY = 0;
   let grid = 10;
   let snapEnabled = true;
-  let drcFindings = 2;
+  let drcFindings = 'Not run';
   let routed = false;
   let placementId = '';
   let spaceHeld = false;
+  /** @type {Record<string, boolean>} */
   let layerVisibility = { 'F.Cu': true, 'B.Cu': true, 'F.Silk': true, 'Edge.Cuts': true, Ratsnest: true };
 
   let components = [
@@ -67,14 +75,22 @@
     { name: 'GND', pins: 'D3.2 · V1.2' }
   ];
 
+  /** @type {{part: (typeof library)[number], pointerId: number, startX: number, startY: number, x: number, y: number, moved: boolean} | null} */
   let libraryDrag = null;
+  /** @type {{id: string, surface: string, stage: HTMLElement, element: HTMLElement, pointerId: number, offsetX: number, offsetY: number, x: number, y: number} | null} */
   let nodeDrag = null;
+  /** @type {{pointerId: number, startX: number, startY: number, baseX: number, baseY: number} | null} */
   let panDrag = null;
+  /** @type {{side: string, pointerId: number, startX: number, left: number, right: number} | null} */
   let resizeDrag = null;
+  /** @type {HTMLDivElement | undefined} */
   let dragGhostEl;
   let rafId = 0;
+  /** @type {{x: number, y: number, pointerId: number, altKey: boolean} | null} */
   let pendingPointer = null;
+  /** @type {string[]} */
   let undoStack = [];
+  /** @type {string[]} */
   let redoStack = [];
 
   $: filteredParts = library.filter((part) => `${part.code} ${part.name} ${part.value} ${part.group}`.toLowerCase().includes(query.toLowerCase()));
@@ -84,26 +100,33 @@
   $: isInteracting = Boolean(libraryDrag || nodeDrag || panDrag || resizeDrag);
 
   onMount(() => {
+    savedContent = JSON.stringify(components);
     try {
       const raw = localStorage.getItem('pcbpro0045-project-v11') || localStorage.getItem('pcbpro0045-project');
       if (!raw) return;
-      const saved = JSON.parse(raw);
-      if (Array.isArray(saved.components)) components = saved.components;
-      if (saved.savedAt) savedAt = saved.savedAt;
-      if (Number.isFinite(saved.leftWidth)) leftWidth = saved.leftWidth;
-      if (Number.isFinite(saved.rightWidth)) rightWidth = saved.rightWidth;
+      const saved = parseProject(raw);
+      components = saved.components;
+      savedContent = JSON.stringify(components);
+      savedAt = 'Restored locally';
+      leftWidth = saved.leftWidth;
+      rightWidth = saved.rightWidth;
     } catch (error) {
       console.warn('Restore skipped', error);
+      notify('Saved project could not be restored. Import a valid backup.');
     }
   });
 
+  /** @param {number} min @param {number} value @param {number} max */
   function clamp(min, value, max) { return Math.max(min, Math.min(max, value)); }
+  /** @param {number} value */
   function snap(value, bypass = false) { return !snapEnabled || bypass ? value : Math.round(value * 2) / 2; }
 
+  let toastTimer = 0;
+  /** @param {string} message */
   function notify(message) {
     toast = message;
-    window.clearTimeout(notify.timer);
-    notify.timer = window.setTimeout(() => (toast = ''), 1800);
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (toast = ''), 1800);
   }
 
   function snapshot() {
@@ -126,11 +149,13 @@
     redoStack = redoStack.slice(0, -1);
   }
 
+  /** @param {string} prefix */
   function nextRef(prefix) {
     const nums = components.filter((p) => p.id.startsWith(prefix)).map((p) => Number(p.id.slice(prefix.length))).filter(Number.isFinite);
     return `${prefix}${nums.length ? Math.max(...nums) + 1 : 1}`;
   }
 
+  /** @param {(typeof library)[number]} part */
   function makePart(part, x = 50, y = 50, surface = 'schematic', armPlacement = false) {
     snapshot();
     const id = nextRef(part.prefix);
@@ -145,6 +170,7 @@
     notify(armPlacement ? `${id} added · click workspace to place` : `${id} placed`);
   }
 
+  /** @param {number} clientX @param {number} clientY @param {HTMLElement} stage */
   function pointToPercent(clientX, clientY, stage, bypassSnap = false) {
     const rect = stage.getBoundingClientRect();
     const scale = zoom / 100;
@@ -156,23 +182,27 @@
     };
   }
 
+  /** @param {string} id @param {string} surface @param {number} x @param {number} y */
   function updatePartPosition(id, surface, x, y) {
     components = components.map((p) => p.id === id
       ? { ...p, [surface === 'pcb' ? 'px' : 'sx']: x, [surface === 'pcb' ? 'py' : 'sy']: y }
       : p);
   }
 
+  /** @param {PointerEvent} event @param {(typeof library)[number]} part */
   function startLibraryPointer(event, part) {
     if (event.button !== 0) return;
     event.preventDefault();
     libraryDrag = { part, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY, moved: false };
   }
 
+  /** @param {PointerEvent} event @param {string} id @param {string} surface */
   function startNodeDrag(event, id, surface) {
-    if (event.button !== 0 || !['Select', 'Place'].includes(activeTool)) return;
+    if (event.button !== 0 || spaceHeld || !['Select', 'Place'].includes(activeTool)) return;
     event.preventDefault();
     event.stopPropagation();
-    const stage = event.currentTarget.closest('[data-surface]');
+    const element = /** @type {HTMLElement} */ (event.currentTarget);
+    const stage = /** @type {HTMLElement | null} */ (element.closest('[data-surface]'));
     const part = components.find((p) => p.id === id);
     if (!stage || !part) return;
     snapshot();
@@ -182,36 +212,39 @@
     const currentX = surface === 'pcb' ? part.px : part.sx;
     const currentY = surface === 'pcb' ? part.py : part.sy;
     nodeDrag = {
-      id, surface, stage, element: event.currentTarget, pointerId: event.pointerId,
+      id, surface, stage, element, pointerId: event.pointerId,
       offsetX: currentX - pointer.x, offsetY: currentY - pointer.y, x: currentX, y: currentY
     };
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    (/** @type {HTMLElement} */ (event.currentTarget)).setPointerCapture?.(event.pointerId);
   }
 
+  /** @param {PointerEvent} event @param {string} surface */
   function stagePointerDown(event, surface) {
     if (event.button === 1 || spaceHeld || activeTool === 'Pan') {
       event.preventDefault();
       panDrag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, baseX: panX, baseY: panY };
-      event.currentTarget.setPointerCapture?.(event.pointerId);
+      (/** @type {HTMLElement} */ (event.currentTarget)).setPointerCapture?.(event.pointerId);
       return;
     }
     if (event.button !== 0) return;
     if (placementId) {
-      const point = pointToPercent(event.clientX, event.clientY, event.currentTarget, event.altKey);
+      const point = pointToPercent(event.clientX, event.clientY, /** @type {HTMLElement} */ (event.currentTarget), event.altKey);
       snapshot();
       updatePartPosition(placementId, surface, point.x, point.y);
       placementId = '';
       return;
     }
-    if (!event.target.closest('.node,.footprint,.layer-strip,.floating-card')) selectedId = '';
+    if (!(/** @type {Element} */ (event.target)).closest('.node,.footprint,.layer-strip,.floating-card')) selectedId = '';
   }
 
+  /** @param {PointerEvent} event @param {string} side */
   function startResize(event, side) {
     event.preventDefault();
     resizeDrag = { side, pointerId: event.pointerId, startX: event.clientX, left: leftWidth, right: rightWidth };
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    (/** @type {HTMLElement} */ (event.currentTarget)).setPointerCapture?.(event.pointerId);
   }
 
+  /** @param {PointerEvent} event */
   function handleGlobalPointerMove(event) {
     if (!libraryDrag && !nodeDrag && !panDrag && !resizeDrag) return;
     pendingPointer = { x: event.clientX, y: event.clientY, pointerId: event.pointerId, altKey: event.altKey };
@@ -251,16 +284,21 @@
     }
   }
 
+  /** @param {PointerEvent} event */
   function handleGlobalPointerUp(event) {
+    if (rafId) cancelAnimationFrame(rafId);
+    pendingPointer = { x: event.clientX, y: event.clientY, pointerId: event.pointerId, altKey: event.altKey };
+    flushPointerFrame();
+    pendingPointer = null;
     if (libraryDrag && event.pointerId === libraryDrag.pointerId) {
       const d = libraryDrag;
       libraryDrag = null;
       if (!d.moved) {
         makePart(d.part, 50, 50, activeView === 'PCB' ? 'pcb' : 'schematic', true);
       } else {
-        const hit = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('[data-surface]');
+        const hit = /** @type {HTMLElement | null | undefined} */ (document.elementFromPoint(event.clientX, event.clientY)?.closest('[data-surface]'));
         if (hit) {
-          const surface = hit.dataset.surface;
+          const surface = hit.dataset.surface || 'schematic';
           const point = pointToPercent(event.clientX, event.clientY, hit, event.altKey);
           makePart(d.part, point.x, point.y, surface, false);
         } else notify('Drop inside Schematic or PCB workspace');
@@ -275,12 +313,13 @@
     if (resizeDrag && event.pointerId === resizeDrag.pointerId) resizeDrag = null;
   }
 
+  /** @param {WheelEvent} event */
   function zoomWheel(event) {
     event.preventDefault();
-    const stage = event.currentTarget;
+    const stage = /** @type {HTMLElement} */ (event.currentTarget);
     const rect = stage.getBoundingClientRect();
     const oldScale = zoom / 100;
-    const nextZoom = clamp(35, zoom * (event.deltaY < 0 ? 1.1 : 0.9), 300);
+    const nextZoom = Math.round(clamp(35, zoom * (event.deltaY < 0 ? 1.1 : 0.9), 300));
     const nextScale = nextZoom / 100;
     const vx = event.clientX - rect.left;
     const vy = event.clientY - rect.top;
@@ -293,6 +332,7 @@
 
   function fitView() { zoom = 100; panX = 0; panY = 0; }
 
+  /** @param {'value' | 'footprint'} field @param {string} value */
   function updateSelected(field, value) {
     if (!selected) return;
     snapshot();
@@ -312,6 +352,7 @@
     selectedId = components[0]?.id || '';
   }
 
+  /** @param {string} view */
   function selectView(view) {
     activeView = view;
     activeTool = toolsets[view]?.[0] || 'Select';
@@ -320,11 +361,71 @@
   }
 
   function saveProject() {
-    savedAt = `Saved ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
-    localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ components, savedAt, leftWidth, rightWidth }));
-    notify('Project saved locally');
+    try {
+      const timestamp = `Saved ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ version, components, savedAt: timestamp, leftWidth, rightWidth }));
+      savedContent = JSON.stringify(components);
+      savedAt = timestamp;
+      notify('Project saved locally');
+    } catch {
+      notify('Save failed. Export a JSON backup to keep your work.');
+    }
   }
 
+  /** @param {Event} event */
+  async function importProject(event) {
+    const input = /** @type {HTMLInputElement} */ (event.currentTarget);
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      if (file.size > MAX_PROJECT_BYTES) throw new Error('Project exceeds the 2 MB limit.');
+      const project = parseProject(await file.text());
+      if (!window.confirm('Import this component layout? This replaces components and clears all current wiring and PCB geometry. Export your full project from File first if needed.')) return;
+      const reset = new CustomEvent('pcbpro:reset-layout', { cancelable: true });
+      window.dispatchEvent(reset);
+      if (!reset.defaultPrevented) throw new Error('Project engines are not ready. Please retry shortly.');
+      cancelInteraction();
+      undoStack = [];
+      redoStack = [];
+      selectView('Schematic');
+      components = project.components;
+      selectedId = components[0]?.id || '';
+      placementId = '';
+      fitView();
+      notify('Component layout imported. Save to keep it in this browser.');
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Import failed.');
+    } finally {
+      input.value = '';
+    }
+  }
+
+  function cancelInteraction() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    pendingPointer = null;
+    if (nodeDrag) {
+      const part = components.find((p) => p.id === nodeDrag?.id);
+      if (part) {
+        nodeDrag.element.style.left = `${nodeDrag.surface === 'pcb' ? part.px : part.sx}%`;
+        nodeDrag.element.style.top = `${nodeDrag.surface === 'pcb' ? part.py : part.sy}%`;
+      }
+    }
+    libraryDrag = null;
+    nodeDrag = null;
+    panDrag = null;
+    resizeDrag = null;
+    spaceHeld = false;
+  }
+
+  /** @param {BeforeUnloadEvent} event */
+  function beforeUnload(event) {
+    if (!dirty) return;
+    event.preventDefault();
+    event.returnValue = '';
+  }
+
+  /** @param {string} name @param {string} content */
   function download(name, content, type = 'application/json') {
     const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
@@ -332,17 +433,18 @@
     a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
   }
 
-  function exportProject() { download('pcbpro0045-project.json', JSON.stringify({ version, components, nets }, null, 2)); }
+  function exportProject() { download('pcbpro0045-layout.json', JSON.stringify({ format: 'pcbpro0045-component-layout', version, components }, null, 2)); }
   function exportBom() {
     const rows = [['Ref','Part','Value','Footprint'], ...components.map((p) => [p.id,p.name,p.value,p.footprint])];
     download('pcbpro0045-bom.csv', rows.map((r) => r.map((v) => `"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'), 'text/csv');
   }
 
   function runDrc() {
-    drcFindings = routed ? 0 : Math.max(1, pcbParts.length - 2);
-    notify(drcFindings === 0 ? 'DRC clean' : `${drcFindings} DRC findings`);
+    drcFindings = 'Unavailable';
+    notify('DRC engine is not connected. Clearance, routing and manufacturing readiness have not been verified.');
   }
 
+  /** @param {string} tool */
   function toolAction(tool) {
     activeTool = tool;
     if (tool === 'Export CSV') exportBom();
@@ -350,8 +452,9 @@
     if (['Gerber','Drill','Pick & Place'].includes(tool)) notify(`${tool} exporter staged · engine pending`);
   }
 
+  /** @param {KeyboardEvent} event */
   function handleKeyDown(event) {
-    if (['input','textarea','select'].includes(event.target?.tagName?.toLowerCase())) return;
+    if (['input','textarea','select'].includes((/** @type {HTMLElement | null} */ (event.target))?.tagName?.toLowerCase() || '')) return;
     if (event.code === 'Space') { spaceHeld = true; event.preventDefault(); }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? redo() : undo(); return; }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') { event.preventDefault(); redo(); return; }
@@ -360,12 +463,13 @@
     if (event.key.toLowerCase() === 'r') rotateSelected();
     if (event.key.toLowerCase() === 'w') { activeView = 'Schematic'; activeTool = 'Wire'; }
     if (event.key.toLowerCase() === 'x') activeLayer = activeLayer === 'F.Cu' ? 'B.Cu' : 'F.Cu';
-    if (event.key === 'Escape') { placementId = ''; libraryDrag = null; nodeDrag = null; }
+    if (event.key === 'Escape') { placementId = ''; cancelInteraction(); }
   }
+  /** @param {KeyboardEvent} event */
   function handleKeyUp(event) { if (event.code === 'Space') spaceHeld = false; }
 </script>
 
-<svelte:window onpointermove={handleGlobalPointerMove} onpointerup={handleGlobalPointerUp} onpointercancel={handleGlobalPointerUp} onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
+<svelte:window onpointermove={handleGlobalPointerMove} onpointerup={handleGlobalPointerUp} onpointercancel={cancelInteraction} onblur={cancelInteraction} onbeforeunload={beforeUnload} onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
 
 <svelte:head>
   <title>PCB Pro 0045 — EDA Workspace</title>
@@ -381,10 +485,12 @@
       <button class="project-pill"><i></i><b>LED Driver · Rev A</b><span>⌄</span></button>
     </div>
     <div class="top-actions">
-      <span class="save-state">{savedAt}</span>
-      <button onclick={() => notify('New project flow ready')}>New</button>
+      <span class="save-state">{dirty ? 'Unsaved changes' : savedAt}</span>
+      <button onclick={() => notify('Project commands are loading. Please try again shortly.')}>New</button>
+      <input hidden type="file" accept=".json,application/json" bind:this={importInput} onchange={importProject} aria-label="Import project JSON" />
+      <button onclick={() => importInput?.click()}>Import layout</button>
       <button onclick={saveProject}>Save</button>
-      <button onclick={exportProject}>Export</button>
+      <button onclick={exportProject}>Export layout</button>
       <button class="primary" onclick={() => selectView('Simulator')}>▶ Simulate</button>
       <button class="icon-btn" onclick={() => rightOpen = !rightOpen}>☷</button>
     </div>
@@ -410,7 +516,7 @@
           {/each}
         </div>
       {:else if leftTab === 'Project'}
-        <div class="tree"><label>PROJECT TREE</label><button class="root">▾ ◫ LED Driver · Rev A</button><button>⌁ Main schematic</button><button>▦ Main PCB</button><button>◈ 3D Assembly</button><button>☷ BOM · {components.length}</button><button>⬡ Fabrication</button></div>
+        <div class="tree"><span>PROJECT TREE</span><button class="root">▾ ◫ LED Driver · Rev A</button><button>⌁ Main schematic</button><button>▦ Main PCB</button><button>◈ 3D Assembly</button><button>☷ BOM · {components.length}</button><button>⬡ Fabrication</button></div>
       {:else}
         <div class="history"><article><b>v1.1.0</b><strong>Smooth Pointer Engine</strong><p>rAF-batched pointer drag, direct DOM positioning, panel resize, pan/zoom, undo/redo.</p></article><article><b>v1.0.0</b><strong>PCB Pro baseline</strong><p>New repository and clean SvelteKit/Vercel baseline.</p></article></div>
       {/if}
@@ -426,7 +532,7 @@
 
       <div class="content">
         {#if activeView === 'Schematic'}
-          <section class:placing={placementId} class="stage schematic" data-surface="schematic" onpointerdown={(e)=>stagePointerDown(e,'schematic')} onwheel={zoomWheel}>
+          <section class:placing={Boolean(placementId)} class="stage schematic" aria-label="Schematic canvas" data-surface="schematic" onpointerdown={(e)=>stagePointerDown(e,'schematic')} onwheel={zoomWheel}>
             <div class="stage-info"><span>SCHEMATIC / MAIN</span><div><b>{zoom}%</b><b>{snapEnabled?'SNAP':'FREE'}</b><b>{spaceHeld?'PAN':''}</b></div></div>
             <div class="world" style={`transform:translate3d(${panX}px,${panY}px,0) scale(${zoom/100})`}>
               <svg class="wires" viewBox="0 0 1000 620" preserveAspectRatio="none"><polyline points="170,300 310,300 310,175 470,175"/><polyline points="530,175 710,175 710,300 810,300"/><polyline points="810,300 810,450 170,450 170,300"/></svg>
@@ -439,7 +545,7 @@
             <div class="stage-help"><span>Wheel: zoom</span><span>Space/middle: pan</span><span>Alt: bypass snap</span><span>Ctrl+Z/Y: undo/redo</span></div>
           </section>
         {:else if activeView === 'PCB'}
-          <section class:placing={placementId} class="stage pcbstage" data-surface="pcb" onpointerdown={(e)=>stagePointerDown(e,'pcb')} onwheel={zoomWheel}>
+          <section class:placing={Boolean(placementId)} class="stage pcbstage" aria-label="PCB canvas" data-surface="pcb" onpointerdown={(e)=>stagePointerDown(e,'pcb')} onwheel={zoomWheel}>
             <div class="stage-info"><span>PCB / MAIN · {activeLayer}</span><div><b>{zoom}%</b><b>2 LAYER</b><b>FR-4</b></div></div>
             <div class="layer-strip">{#each ['F.Cu','B.Cu','F.Silk','Edge.Cuts','Ratsnest'] as layer}<button class:off={!layerVisibility[layer]} class:active={activeLayer===layer} onclick={() => { if(layer==='F.Cu'||layer==='B.Cu') activeLayer=layer; layerVisibility={...layerVisibility,[layer]:!layerVisibility[layer]}; }}><i class={`dot ${layer.replace('.','-')}`}></i>{layer}</button>{/each}</div>
             <div class="world" style={`transform:translate3d(${panX}px,${panY}px,0) scale(${zoom/100})`}>
@@ -449,10 +555,10 @@
               {/each}
               {#if layerVisibility.Ratsnest && !routed}<svg class="rats" viewBox="0 0 1000 620"><line x1="180" y1="350" x2="470" y2="190"/><line x1="470" y1="190" x2="760" y2="370"/></svg>{/if}
             </div>
-            <div class="floating-card"><span>ROUTING</span><strong>{routed?'100':'42'}%</strong><small>{routed?'0 unrouted':`${Math.max(1,pcbParts.length-2)} unrouted`}</small><button onclick={() => {routed=true;drcFindings=0;}}>Mark routed</button></div>
+            <div class="floating-card"><span>ROUTING</span><strong>Preview</strong><small>Routing not calculated</small><button onclick={() => notify('Routing engine is not connected. Copper routing is not verified.')}>Routing unavailable</button></div>
           </section>
         {:else if activeView === 'Simulator'}
-          <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Operating Point</h2><p>UI workbench ready; production SPICE bridge remains separate.</p></div><button class="primary" onclick={() => notify('SPICE bridge not connected yet')}>▶ Run</button></div><div class="metrics"><article><span>V(source)</span><strong>5.000 V</strong></article><article><span>I(R2)</span><strong>9.091 mA</strong></article><article><span>P(R2)</span><strong>27.27 mW</strong></article><article><span>V(D3)</span><strong>2.000 V</strong></article></div><div class="scope"><svg viewBox="0 0 900 280"><path d="M0 235 C90 230 110 60 190 60 S420 60 900 60"/><path class="b" d="M0 240 C120 235 170 170 260 170 S500 170 900 170"/></svg></div></section>
+          <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Operating Point</h2><p>Illustrative demo values only. These are not simulation results from your project; the SPICE engine is not connected.</p></div><button class="primary" onclick={() => notify('SPICE bridge not connected yet')}>▶ Run</button></div><div class="metrics"><article><span>V(source)</span><strong>5.000 V</strong></article><article><span>I(R2)</span><strong>9.091 mA</strong></article><article><span>P(R2)</span><strong>27.27 mW</strong></article><article><span>V(D3)</span><strong>2.000 V</strong></article></div><div class="scope"><svg viewBox="0 0 900 280"><path d="M0 235 C90 230 110 60 190 60 S420 60 900 60"/><path class="b" d="M0 240 C120 235 170 170 260 170 S500 170 900 170"/></svg></div></section>
         {:else if activeView === '3D'}
           <section class="panel"><div class="panel-title"><div><span>3D ASSEMBLY</span><h2>Mechanical preview</h2><p>Fast viewport placeholder for later WebGL/STEP engine.</p></div></div><div class="scene"><div class="board3d"><div>J1</div><div>R2</div><div>LED</div><div>U1</div></div></div></section>
         {:else if activeView === 'BOM'}
@@ -474,21 +580,21 @@
 
     <aside class="inspector">
       <section><div class="ins-title"><span>PROPERTIES</span><b>{selected?.id || '—'}</b></div>{#if selected}<label><span>Reference</span><input value={selected.id} readonly/></label><label><span>Value</span><input value={selected.value} onchange={(e)=>updateSelected('value',e.currentTarget.value)}/></label><label><span>Footprint</span><input value={selected.footprint} onchange={(e)=>updateSelected('footprint',e.currentTarget.value)}/></label><div class="prop-actions"><button onclick={rotateSelected}>↻ Rotate</button><button onclick={deleteSelected}>Delete</button></div>{:else}<p class="empty">Select a component.</p>{/if}</section>
-      <section><div class="ins-title"><span>DESIGN CHECKS</span><b>{drcFindings}</b></div><button class="check">✓ ERC <small>clean</small></button><button class="check" onclick={runDrc}>• DRC <small>{drcFindings} findings</small></button><button class="check">✓ Footprints <small>{pcbParts.length} mapped</small></button></section>
+      <section><div class="ins-title"><span>DESIGN CHECKS</span><b>{drcFindings}</b></div><button class="check" onclick={() => notify('ERC engine is not connected. Electrical connectivity has not been verified.')}>ERC <small>Not verified</small></button><button class="check" onclick={runDrc}>• DRC <small>{drcFindings}</small></button><button class="check">✓ Footprints <small>{pcbParts.length} mapped</small></button></section>
       <section><div class="ins-title"><span>NET INSPECTOR</span><b>{nets.length}</b></div>{#each nets as net}<button class="net"><i></i><span><b>{net.name}</b><small>{net.pins}</small></span></button>{/each}</section>
       <section><div class="ins-title"><span>WORKSPACE</span><b>FLEX</b></div><div class="workspace-controls"><button onclick={() => leftWidth=clamp(190,leftWidth-20,430)}>Library −</button><button onclick={() => leftWidth=clamp(190,leftWidth+20,430)}>Library +</button><button onclick={() => rightWidth=clamp(220,rightWidth-20,430)}>Inspector −</button><button onclick={() => rightWidth=clamp(220,rightWidth+20,430)}>Inspector +</button></div></section>
     </aside>
   </div>
 
   {#if libraryDrag}<div bind:this={dragGhostEl} class="drag-ghost"><span>{libraryDrag.part.code}</span><b>{libraryDrag.part.name}</b></div>{/if}
-  {#if toast}<div class="toast">{toast}</div>{/if}
+  {#if toast}<div class="toast" role="status">{toast}</div>{/if}
 </div>
 
 <style>
   :global(*){box-sizing:border-box} :global(html),:global(body){margin:0;width:100%;height:100%;background:#060b11;color:#d9e5ee;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif} :global(body){overflow:hidden} :global(button),:global(input){font:inherit} :global(button){cursor:pointer} :global(:root){color-scheme:dark}
   .app{height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:#071019}.app.interacting{user-select:none}.topbar{height:54px;flex:0 0 54px;border-bottom:1px solid #1b2937;background:#08121c;display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:10px}.brand-group,.top-actions{display:flex;align-items:center;gap:7px;min-width:0}.icon-btn,.top-actions>button,.panel-title button{border:1px solid #273a4a;background:#0e1924;color:#b8c8d5;border-radius:7px;padding:7px 10px;font-size:9px}.icon-btn{width:32px;height:32px;padding:0}.logo{width:31px;height:31px;border-radius:8px;background:#1fc4aa;display:grid;place-items:center;color:#06221d;font-weight:900}.brand{display:flex;align-items:baseline;gap:5px;white-space:nowrap}.brand strong{font-size:14px}.brand span{font:800 8px ui-monospace;color:#4fd7c0}.version{font-size:7px;letter-spacing:.12em;color:#63d7c0;border:1px solid #245548;background:#0b211c;border-radius:5px;padding:4px 6px;white-space:nowrap}.project-pill{border:0;background:transparent;color:#9eb1c0;padding:6px 8px;display:flex;gap:7px;align-items:center}.project-pill i{width:6px;height:6px;border-radius:50%;background:#47d7aa}.project-pill b{font-size:9px}.save-state{font-size:8px;color:#5c7184}.top-actions .primary,.primary{background:#159f89;border-color:#29bba4;color:#fff}
   .menubar{height:29px;flex:0 0 29px;border-bottom:1px solid #182633;background:#080f17;display:flex;align-items:center;justify-content:space-between;padding:0 9px;overflow:hidden}.menus{display:flex;overflow:auto;scrollbar-width:none}.menus button{border:0;background:transparent;color:#72879a;font-size:8px;padding:6px 8px}.menus button:hover{background:#101d29;color:#d5e0e8}.workspace-state{font:7px ui-monospace;color:#5a7082;white-space:nowrap}.workspace-state i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#43d4aa;margin-right:5px}.workspace-state span{margin:0 5px}
-  .shell{flex:1;min-height:0;display:grid;grid-template-columns:var(--left) var(--ls) minmax(0,1fr) var(--rs) var(--right);background:#09121b}.leftbar,.inspector{min-width:0;overflow:auto;background:#09131d}.leftbar{border-right:1px solid #1b2a37}.inspector{border-left:1px solid #1b2a37}.splitter{width:5px;border:0;padding:0;background:#0b1721;cursor:col-resize;position:relative;z-index:10}.splitter:hover,.interacting .splitter{background:#1c5a50}.splitter.right{grid-column:4}.side-tabs{display:flex;position:sticky;top:0;background:#09131d;z-index:3;border-bottom:1px solid #1b2a37}.side-tabs button{flex:1;border:0;border-bottom:2px solid transparent;background:transparent;color:#687f92;font-size:7px;font-weight:800;padding:10px 4px}.side-tabs button.active{color:#d8e5ee;border-color:#35c9b2}.side-title{display:flex;justify-content:space-between;align-items:end;padding:14px 12px 7px}.side-title span,.ins-title span,.panel-title span{font-size:7px;letter-spacing:.13em;font-weight:850;color:#5d778b}.side-title h2{font-size:15px;margin:3px 0 0}.side-title>b,.ins-title>b{font:800 8px ui-monospace;border:1px solid #294052;background:#10202d;color:#8ca7ba;border-radius:10px;padding:2px 7px}.search{display:flex;margin:6px 10px;border:1px solid #223747;background:#0d1924;border-radius:7px;padding:0 8px;align-items:center;gap:6px}.search input{width:100%;min-width:0;border:0;background:transparent;color:#d4e0e8;outline:0;padding:8px 0;font-size:9px}.hint{margin:8px 10px;padding:7px 8px;border:1px solid #1d443a;background:#0c211c;border-radius:6px;color:#6dbfae;font-size:7px;line-height:1.45}.parts{padding:0 6px 12px}.part{width:100%;border:1px solid transparent;background:transparent;color:#b9c8d4;border-radius:7px;padding:6px;display:grid;grid-template-columns:34px 1fr 18px;align-items:center;text-align:left;touch-action:none}.part:hover{background:#101f2b;border-color:#243a4a}.part:active{background:#143027}.part-symbol{width:29px;height:29px;border:1px solid #2c4a5d;background:#102430;border-radius:6px;display:grid;place-items:center;color:#65dac5;font:800 8px ui-monospace}.part-copy b{display:block;font-size:9px}.part-copy small{display:block;color:#637a8d;font-size:7px;margin-top:2px}.part em{font-style:normal;color:#5b7488}.tree,.history{padding:12px 9px}.tree label{display:block;font-size:7px;color:#5c7488;margin:3px 6px 7px}.tree button{width:100%;border:0;background:transparent;color:#869caf;text-align:left;border-radius:6px;padding:8px;font-size:8px}.tree button:hover,.tree .root{background:#0f1e2a;color:#d2dfe7}.history article{border:1px solid #203342;background:#0d1924;border-radius:8px;padding:9px;margin-bottom:8px}.history b{font:800 8px ui-monospace;color:#4fd6bd}.history strong{display:block;font-size:9px;margin-top:3px}.history p{font-size:7px;color:#657d90;line-height:1.45;margin:5px 0 0}
+  .shell{flex:1;min-height:0;display:grid;grid-template-columns:var(--left) var(--ls) minmax(0,1fr) var(--rs) var(--right);background:#09121b}.leftbar,.inspector{min-width:0;overflow:auto;background:#09131d}.leftbar{border-right:1px solid #1b2a37}.inspector{border-left:1px solid #1b2a37}.splitter{width:5px;border:0;padding:0;background:#0b1721;cursor:col-resize;position:relative;z-index:10}.splitter:hover,.interacting .splitter{background:#1c5a50}.splitter.right{grid-column:4}.side-tabs{display:flex;position:sticky;top:0;background:#09131d;z-index:3;border-bottom:1px solid #1b2a37}.side-tabs button{flex:1;border:0;border-bottom:2px solid transparent;background:transparent;color:#687f92;font-size:7px;font-weight:800;padding:10px 4px}.side-tabs button.active{color:#d8e5ee;border-color:#35c9b2}.side-title{display:flex;justify-content:space-between;align-items:end;padding:14px 12px 7px}.side-title span,.ins-title span,.panel-title span{font-size:7px;letter-spacing:.13em;font-weight:850;color:#5d778b}.side-title h2{font-size:15px;margin:3px 0 0}.side-title>b,.ins-title>b{font:800 8px ui-monospace;border:1px solid #294052;background:#10202d;color:#8ca7ba;border-radius:10px;padding:2px 7px}.search{display:flex;margin:6px 10px;border:1px solid #223747;background:#0d1924;border-radius:7px;padding:0 8px;align-items:center;gap:6px}.search input{width:100%;min-width:0;border:0;background:transparent;color:#d4e0e8;outline:0;padding:8px 0;font-size:9px}.hint{margin:8px 10px;padding:7px 8px;border:1px solid #1d443a;background:#0c211c;border-radius:6px;color:#6dbfae;font-size:7px;line-height:1.45}.parts{padding:0 6px 12px}.part{width:100%;border:1px solid transparent;background:transparent;color:#b9c8d4;border-radius:7px;padding:6px;display:grid;grid-template-columns:34px 1fr 18px;align-items:center;text-align:left;touch-action:none}.part:hover{background:#101f2b;border-color:#243a4a}.part:active{background:#143027}.part-symbol{width:29px;height:29px;border:1px solid #2c4a5d;background:#102430;border-radius:6px;display:grid;place-items:center;color:#65dac5;font:800 8px ui-monospace}.part-copy b{display:block;font-size:9px}.part-copy small{display:block;color:#637a8d;font-size:7px;margin-top:2px}.part em{font-style:normal;color:#5b7488}.tree,.history{padding:12px 9px}.tree>span{display:block;font-size:7px;color:#5c7488;margin:3px 6px 7px}.tree button{width:100%;border:0;background:transparent;color:#869caf;text-align:left;border-radius:6px;padding:8px;font-size:8px}.tree button:hover,.tree .root{background:#0f1e2a;color:#d2dfe7}.history article{border:1px solid #203342;background:#0d1924;border-radius:8px;padding:9px;margin-bottom:8px}.history b{font:800 8px ui-monospace;color:#4fd6bd}.history strong{display:block;font-size:9px;margin-top:3px}.history p{font-size:7px;color:#657d90;line-height:1.45;margin:5px 0 0}
   .workbench{min-width:0;min-height:0;display:flex;flex-direction:column;background:#09121b}.tabs{height:42px;flex:0 0 42px;display:flex;border-bottom:1px solid #1b2a37;overflow-x:auto;scrollbar-width:thin}.tabs button{border:0;border-bottom:2px solid transparent;background:transparent;color:#72879a;padding:0 12px;font-size:8px;font-weight:750;white-space:nowrap}.tabs button.active{color:#dbe7ef;border-color:#38cbb4;background:#0e211d}.toolbar-scroll{height:47px;flex:0 0 47px;overflow-x:auto;border-bottom:1px solid #182633}.toolbar{height:46px;min-width:max-content;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 8px}.tools,.tool-right{display:flex;gap:3px;align-items:center}.tools button,.tool-right button{border:1px solid transparent;background:transparent;color:#758b9e;border-radius:6px;height:31px;display:flex;align-items:center;gap:4px;padding:0 7px}.tools button.active{background:#15372f;border-color:#2a6c60;color:#61dcc5}.tools small,.tool-right button{font-size:7px}.tool-right button{border-color:#203545;background:#0c1721}.content{flex:1;min-height:0;display:flex;overflow:hidden}
   .stage{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden;touch-action:none;background-color:#09131c;background-image:radial-gradient(#243746 1px,transparent 1px),radial-gradient(#142431 .7px,transparent .7px);background-size:20px 20px,10px 10px;contain:layout paint size}.stage.placing{cursor:crosshair}.stage-info{position:absolute;z-index:20;left:12px;top:10px;right:12px;display:flex;justify-content:space-between;color:#637b8f;font:750 7px ui-monospace;pointer-events:none}.stage-info div{display:flex;gap:4px}.stage-info b{padding:4px 6px;border:1px solid #263947;background:#0a151ee6;border-radius:5px}.world{position:absolute;inset:0;transform-origin:0 0;will-change:transform;contain:layout paint}.wires,.rats{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.wires polyline{fill:none;stroke:#58d7c0;stroke-width:2}.rats line{stroke:#e3c866;stroke-width:1.2;stroke-dasharray:6 4}.node,.footprint{position:absolute;z-index:5;touch-action:none;will-change:left,top;transform:translate3d(-50%,-50%,0) rotate(var(--rot));transition:border-color .12s,box-shadow .12s}.node{min-width:90px;border:1px solid #223541;background:#0b1822;color:#d4e1ea;border-radius:8px;padding:8px 10px}.node.selected,.footprint.selected{border-color:#3bd0b7;box-shadow:0 0 0 2px #1c5f53}.node.pending{animation:pulse 1s infinite}.node .ref{position:absolute;top:-13px;left:0;color:#8098aa;font:800 7px ui-monospace}.node .symbol{height:20px;display:grid;place-items:center;color:#71ddca;font:800 11px ui-monospace}.node b{display:block;font-size:8px}.node small{font-size:6px;color:#647d90}.board{position:absolute;left:9%;right:9%;top:12%;bottom:12%;border:2px solid #d2b65f;border-radius:7px;background:linear-gradient(135deg,#155440,#0d382d);box-shadow:0 25px 55px #0008,inset 0 0 50px #07271d}.hole{position:absolute;width:12px;height:12px;border:2px solid #ceb361;border-radius:50%;background:#09110e}.h1{left:12px;top:12px}.h2{right:12px;top:12px}.h3{left:12px;bottom:12px}.h4{right:12px;bottom:12px}.footprint{width:88px;height:54px;border:1px solid #d8ba62;background:#153e32e8;color:#e5cd82;border-radius:4px;font:800 7px ui-monospace;padding-top:5px}.footprint>i{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid #dab859;background:#263826;bottom:7px}.footprint>i:first-of-type{left:17px}.footprint>i:last-of-type{right:17px}.footprint small{display:block;font-size:6px;color:#9fb5aa;margin-top:3px}.layer-strip{position:absolute;z-index:25;left:12px;top:36px;display:flex;gap:4px;flex-wrap:wrap}.layer-strip button{border:1px solid #223747;background:#0b1721;color:#8095a6;border-radius:5px;padding:4px 6px;font-size:7px;display:flex;align-items:center;gap:4px}.layer-strip button.active{border-color:#c15f4f;color:#e2a999}.layer-strip button.off{opacity:.4}.dot{width:7px;height:7px;border-radius:2px;background:#cb604d}.dot.B-Cu{background:#5682d0}.dot.F-Silk{background:#e3e8ea}.dot.Edge-Cuts{background:#d7b95d}.dot.Ratsnest{background:#58d6c0}.floating-card{position:absolute;z-index:25;right:12px;bottom:12px;width:165px;border:1px solid #263d4d;background:#0a1620f2;border-radius:9px;padding:10px}.floating-card span{font-size:7px;color:#607b8e}.floating-card strong{display:block;font-size:22px;color:#56d8bf;margin:3px 0}.floating-card small{font-size:7px;color:#71879a}.floating-card button{width:100%;margin-top:7px;border:1px solid #2c6658;background:#12372e;color:#69dbc3;border-radius:6px;padding:6px;font-size:7px}.stage-help{position:absolute;z-index:30;left:10px;bottom:9px;display:flex;gap:4px;flex-wrap:wrap;pointer-events:none}.stage-help span{border:1px solid #213545;background:#08131ddd;color:#62798b;border-radius:5px;padding:4px 6px;font-size:6px}
   .panel{flex:1;min-width:0;min-height:0;overflow:auto;padding:18px;background:linear-gradient(155deg,#0b151f,#091018)}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.panel-title h2{margin:4px 0 2px;font-size:19px}.panel-title p{margin:0;color:#63798c;font-size:8px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:8px}.metrics article,.cards article,.release article{border:1px solid #203342;background:#0d1924;border-radius:9px;padding:12px}.metrics span{font-size:7px;color:#6d8497}.metrics strong{display:block;margin-top:7px;font:800 18px ui-monospace}.scope{margin-top:10px;border:1px solid #1e3141;border-radius:9px;overflow:hidden;background:#071119}.scope svg{width:100%;height:250px;background-image:linear-gradient(#132330 1px,transparent 1px),linear-gradient(90deg,#132330 1px,transparent 1px);background-size:45px 45px}.scope path{fill:none;stroke:#48e1c8;stroke-width:2}.scope path.b{stroke:#a77cf3}.scene{height:75%;min-height:330px;display:grid;place-items:center;perspective:900px}.board3d{width:min(55vw,500px);aspect-ratio:1.85;background:#14533f;border:4px solid #bfae5e;border-radius:9px;transform:rotateX(58deg) rotateZ(-25deg);box-shadow:25px 40px 40px #0008;position:relative}.board3d div{position:absolute;background:#111820;border:2px solid #4d6b5d;padding:15px 24px;border-radius:4px;font:800 8px ui-monospace}.board3d div:nth-child(1){left:8%;top:42%}.board3d div:nth-child(2){left:42%;top:15%}.board3d div:nth-child(3){right:8%;bottom:18%;background:#9c2e28}.board3d div:nth-child(4){right:38%;bottom:20%;padding:22px 30px}.table-wrap{border:1px solid #203240;border-radius:9px;overflow:auto}.table-wrap table{width:100%;border-collapse:collapse;min-width:600px;background:#0c1721}.table-wrap th,.table-wrap td{padding:10px;border-bottom:1px solid #1b2b38;text-align:left;font-size:8px}.table-wrap th{font-size:7px;color:#637b8e}.cards{display:grid;grid-template-columns:repeat(2,minmax(210px,1fr));gap:8px}.cards b,.release b{color:#4fd5bd;font:800 8px ui-monospace}.cards h3,.release h3{font-size:12px;margin:6px 0}.cards p,.release p{font-size:8px;color:#657c8f;line-height:1.45}.rules{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:8px}.rules label{border:1px solid #203342;background:#0d1924;border-radius:8px;padding:9px}.rules span{display:block;font-size:7px;color:#677f92;margin-bottom:5px}.rules input,.inspector input{width:100%;border:1px solid #263c4d;background:#09141e;color:#c8d6e0;border-radius:6px;padding:7px;font-size:8px}.release{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:9px}

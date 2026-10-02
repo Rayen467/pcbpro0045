@@ -1,6 +1,8 @@
 const MODEL='openai/gpt-5.6-sol';
 const FALLBACKS=['anthropic/claude-sonnet-5','google/gemini-3.6-flash'];
+/** @param {unknown} v */
 const clamp=(v,n=4000)=>String(v??'').slice(0,n);
+/** @param {unknown} v */
 const compact=(v,n=9000)=>{try{return JSON.stringify(v??null).slice(0,n)}catch{return'null'}};
 
 export async function POST({request,fetch}){
@@ -52,5 +54,5 @@ Allowed command names: ${allowed.join(', ')}`;
     if(!Array.isArray(plan?.actions))plan.actions=[];
     for(const a of plan.actions){if(!allowed.includes(a?.command))return Response.json({error:`Planner emitted unsupported command: ${a?.command}`,code:'PLAN_UNSUPPORTED_COMMAND'},{status:502})}
     return Response.json({plan,model:data?.model||MODEL,usage:data?.usage||null,grounded:true});
-  }catch(error){return Response.json({error:error?.message||'Planner request failed.',code:'PLAN_REQUEST_FAILED'},{status:502})}
+  }catch(error){return Response.json({error:error instanceof Error ? error.message : 'Planner request failed.',code:'PLAN_REQUEST_FAILED'},{status:502})}
 }
