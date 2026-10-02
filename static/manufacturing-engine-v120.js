@@ -116,12 +116,20 @@
       '%FSLAX46Y46*%','%MOMM*%','%LPD*%'
     ];
   }
-  function apertureMap(tracks,vias=[]){
+  function apertureMap(tracks,vias=[],pads=[]){
     const widths=[...new Set(tracks.map(x=>Number(x.widthMm||0.25).toFixed(6)))].sort((a,b)=>Number(a)-Number(b));
     const map=new Map();let d=10;for(const w of widths)map.set(w,d++);
     const viaDias=[...new Set(vias.map(x=>Number(x.diameterMm||x.diameter||0.6).toFixed(6)))].sort((a,b)=>Number(a)-Number(b));
     const viaMap=new Map();for(const w of viaDias)viaMap.set(w,d++);
-    return {map,viaMap};
+    const padMap=new Map();
+    for(const p of pads){
+      const shape=String(p.shape||'circle').toLowerCase();
+      const key=shape==='rect'
+        ? 'R:'+Number(p.widthMm).toFixed(6)+'x'+Number(p.heightMm).toFixed(6)
+        : 'C:'+Number(p.diameterMm||p.widthMm).toFixed(6);
+      if(!padMap.has(key))padMap.set(key,d++);
+    }
+    return {map,viaMap,padMap};
   }
   function trackWorldPoints(tr){
     if(!tr.start||!tr.end)return[];
