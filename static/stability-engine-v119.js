@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProStability) return;
 
-  const VERSION='1.19.0';
+  const VERSION='1.20.0';
   const runtimeErrors=[];
   let lastReport=null;
 
@@ -42,7 +42,9 @@
       ['command-bus','PCBProCommandBus',window.PCBProCommandBus],
       ['assistant-brain','PCBProAssistantBrain',window.PCBProAssistantBrain],
       ['assistant-ui','PCBProAssistantV115',window.PCBProAssistantV115],
-      ['catalog','PCBProComponentCatalog',window.PCBProComponentCatalog]
+      ['catalog','PCBProComponentCatalog',window.PCBProComponentCatalog],
+      ['manufacturing','PCBProManufacturing',window.PCBProManufacturing],
+      ['geometry-3d','PCBProGeometry3D',window.PCBProGeometry3D]
     ];
   }
 
@@ -66,6 +68,10 @@
 
     const board=window.PCBProBoardModel?.model;
     add(checks,'board-model','Board model',board&&Array.isArray(board.tracks)&&Array.isArray(board.outline)?'pass':'fail',board?`${board.tracks?.length||0} tracks · ${board.outline?.length||0} outline points`:'model unavailable');
+    if(board){
+      const unresolved=(board.tracks||[]).filter(tr=>!(tr.start&&tr.end)).length;
+      add(checks,'persisted-geometry','Persisted PCB geometry',unresolved?'warn':'pass',unresolved?`${unresolved} track(s) still need endpoint capture in PCB view`:`${board.placements?.length||0} placements · ${board.pads?.length||0} pad positions persisted`);
+    }
 
     const db=window.PCBProDatabase?.snapshot?.();
     if(db){
@@ -83,7 +89,9 @@
         {command:'schematic.activateWire',args:{}},
         {command:'workflow.runERC',args:{}},
         {command:'pcb.runDRC',args:{}},
-        {command:'professional.audit',args:{}}
+        {command:'professional.audit',args:{}},
+        {command:'manufacturing.preflight',args:{}},
+        {command:'mechanical3d.open',args:{}}
       ]
     });
     add(checks,'command-validator','Typed command validator',commandTest?.validation?.ok?'pass':'fail',commandTest?.validation?.ok?'safe command manifest validated':(commandTest?.validation?.errors||['validator unavailable']).join('; '));
