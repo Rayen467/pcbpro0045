@@ -97,6 +97,7 @@
   let snapEnabled = true;
   let drcFindings = 'Not run';
   let routed = false;
+  let boardTrackCount = 0;
   let placementId = '';
   let spaceHeld = false;
   /** @type {Record<string, boolean>} */
@@ -200,13 +201,20 @@
       projectDisplayName = localStorage.getItem('pcbpro0045-cloud-project-name') || projectDisplayName;
     } catch {}
 
+    /** @param {Event} event */
     const onNetlist = (event) => {
-      const next = event?.detail?.nets;
+      const next = /** @type {CustomEvent} */ (event).detail?.nets;
       if (Array.isArray(next)) nets = next.map((net) => ({ name: String(net.name || ''), pins: String(net.pins || '') }));
     };
+    const onBoard = () => { boardTrackCount = window.PCBProBoardModel?.tracks?.length || 0; };
     window.addEventListener('pcbpro:netlist-changed', onNetlist);
+    window.addEventListener('pcbpro:board-changed', onBoard);
+    setTimeout(onBoard, 120);
     window.dispatchEvent(new CustomEvent('pcbpro:project-adapter-ready'));
-    return () => window.removeEventListener('pcbpro:netlist-changed', onNetlist);
+    return () => {
+      window.removeEventListener('pcbpro:netlist-changed', onNetlist);
+      window.removeEventListener('pcbpro:board-changed', onBoard);
+    };
   });
 
   /** @param {number} min @param {number} value @param {number} max */
@@ -728,7 +736,7 @@
               {/each}
               
             </div>
-            <div class="floating-card"><span>ROUTING</span><strong>{window.PCBProBoardModel?.tracks?.length || 0} tracks</strong><small>Use Route/Via/Zone tools; DRC verifies the checks currently implemented.</small><button onclick={() => { activeTool='Route'; window.PCBProCommand?.clickTool?.('route'); }}>Activate Route</button></div>
+            <div class="floating-card"><span>ROUTING</span><strong>{boardTrackCount} tracks</strong><small>Use Route/Via/Zone tools; DRC verifies the checks currently implemented.</small><button onclick={() => { activeTool='Route'; window.PCBProCommand?.clickTool?.('route'); }}>Activate Route</button></div>
           </section>
         {:else if activeView === 'Simulator'}
           <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Live Circuit Solver</h2><p>The live solver mounts from the active netlist. No placeholder voltages/currents are shown.</p></div><button class="primary" onclick={runSimulation}>▶ Run</button></div><div class="cards"><article><b>LIVE</b><h3>Solver state</h3><p>Use Run/Stop/Probe after the runtime solver finishes loading. Unsupported device models are reported instead of guessed.</p></article><article><b>MODEL</b><h3>Current scope</h3><p>DC operating-point style solving is available for supported devices; this is not transient/SPICE sign-off.</p></article></div></section>
