@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProCommandBus) return;
 
-  const VERSION='1.15.0';
+  const VERSION='1.19.0';
   const MAX_ACTIONS=12;
   let seq=0;
   const listeners=new Set();
