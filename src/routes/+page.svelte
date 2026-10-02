@@ -68,6 +68,7 @@
       library = [...coreLibrary, ...extra.filter((p) => p?.key && !keys.has(p.key))];
       catalogSummary = api?.summary?.() || { total: library.length, groups: [] };
       catalogLoaded = true;
+      window.dispatchEvent(new CustomEvent('pcbpro:catalog-ready', { detail: { ...catalogSummary, libraryTotal: library.length } }));
     } catch (error) {
       console.warn('Extended component catalog unavailable', error);
       catalogLoaded = false;
