@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { parseProject, MAX_PROJECT_BYTES } from '$lib/project.js';
 
-  const version = '1.16.0';
+  const version = '1.17.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
@@ -150,17 +150,52 @@
     savedContent = JSON.stringify(components);
     try {
       const raw = localStorage.getItem('pcbpro0045-project-v11') || localStorage.getItem('pcbpro0045-project');
-      if (!raw) return;
-      const saved = parseProject(raw);
-      components = saved.components;
-      savedContent = JSON.stringify(components);
-      savedAt = 'Restored locally';
-      leftWidth = saved.leftWidth;
-      rightWidth = saved.rightWidth;
+      if (raw) {
+        const saved = parseProject(raw);
+        components = saved.components;
+        savedContent = JSON.stringify(components);
+        savedAt = 'Restored locally';
+        leftWidth = saved.leftWidth;
+        rightWidth = saved.rightWidth;
+      }
     } catch (error) {
       console.warn('Restore skipped', error);
       notify('Saved project could not be restored. Import a valid backup.');
     }
+
+    window.PCBProProject = Object.assign(window.PCBProProject || {}, {
+      getComponents: () => structuredClone(components),
+      replaceComponents: (next) => {
+        if (!Array.isArray(next)) return false;
+        components = structuredClone(next);
+        selectedId = components[0]?.id || '';
+        placementId = '';
+        savedContent = JSON.stringify(components);
+        return true;
+      },
+      getUiState: () => ({
+        activeView, activeTool, activeLayer, leftTab, leftOpen, rightOpen,
+        leftWidth, rightWidth, zoom, panX, panY, grid, snapEnabled, selectedId
+      }),
+      setUiState: (state = {}) => {
+        if (typeof state.activeView === 'string' && views.includes(state.activeView)) activeView = state.activeView;
+        if (typeof state.activeTool === 'string') activeTool = state.activeTool;
+        if (typeof state.activeLayer === 'string') activeLayer = state.activeLayer;
+        if (typeof state.leftTab === 'string') leftTab = state.leftTab;
+        if (typeof state.leftOpen === 'boolean') leftOpen = state.leftOpen;
+        if (typeof state.rightOpen === 'boolean') rightOpen = state.rightOpen;
+        if (Number.isFinite(Number(state.leftWidth))) leftWidth = Number(state.leftWidth);
+        if (Number.isFinite(Number(state.rightWidth))) rightWidth = Number(state.rightWidth);
+        if (Number.isFinite(Number(state.zoom))) zoom = Number(state.zoom);
+        if (Number.isFinite(Number(state.panX))) panX = Number(state.panX);
+        if (Number.isFinite(Number(state.panY))) panY = Number(state.panY);
+        if (Number.isFinite(Number(state.grid))) grid = Number(state.grid);
+        if (typeof state.snapEnabled === 'boolean') snapEnabled = state.snapEnabled;
+        if (typeof state.selectedId === 'string') selectedId = state.selectedId;
+        return true;
+      }
+    });
+    window.dispatchEvent(new CustomEvent('pcbpro:project-adapter-ready'));
   });
 
   /** @param {number} min @param {number} value @param {number} max */
@@ -423,7 +458,8 @@
       localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ version, components, savedAt: timestamp, leftWidth, rightWidth }));
       savedContent = JSON.stringify(components);
       savedAt = timestamp;
-      notify('Project saved locally');
+      window.dispatchEvent(new CustomEvent('pcbpro:project-local-saved', { detail: { source: 'save-button', at: timestamp } }));
+      notify('Project saved locally · cloud sync queued');
     } catch {
       notify('Save failed. Export a JSON backup to keep your work.');
     }
