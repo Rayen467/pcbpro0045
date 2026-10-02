@@ -10,7 +10,7 @@
       'Assistant sekarang menghasilkan Action Plan yang belum dijalankan, lengkap dengan daftar command/risk/adapter. User menekan Jalankan plan setelah melihat preview.',
       'Schematic wiring dapat dijalankan lewat typed command schematic.connect dengan exact pin IDs dan memakai Wire Engine API nyata.',
       'Jika planner tidak punya data exact seperti pin tujuan, assistant meminta klarifikasi dan tidak mengubah project.',
-      'Jika user meminta PCB copper route/via/zone sementara typed geometry mutation belum tersedia, planner wajib menolak membuat schematic wire sebagai pengganti dan menjelaskan batas implementasi.',
+      'Tambah typed PCB route pad-to-pad untuk net schematic yang sama, termasuk layer F.Cu/B.Cu dan width/corner optional. Via/zone/keepout tetap tidak boleh dikarang karena typed mutation penuh belum tersedia.',
       'Setiap command memancarkan pcbpro:command-executed agar hasil aksi dapat diaudit dan dibaca ulang oleh assistant/workflow.',
       'Adapter component.setValue saat ini masih diberi label ui-bridge karena source-of-truth value mutation belum sepenuhnya dipindahkan ke central domain model; status ini tidak disamarkan sebagai API murni.'
     ]},
@@ -21,7 +21,7 @@
       'The assistant now returns an unexecuted Action Plan with command/risk/adapter details. The user explicitly runs the plan after preview.',
       'Schematic wiring can execute through schematic.connect with exact pin IDs using the real Wire Engine API.',
       'If exact data such as a destination pin is missing, the assistant asks for clarification and makes no project change.',
-      'Requests for PCB copper route/via/zone are not silently translated into schematic wiring when typed PCB geometry mutations are unavailable.',
+      'Added typed pad-to-pad PCB routing for pins on the same schematic net, with F.Cu/B.Cu and optional width/corners. Via/zone/keepout mutations remain unavailable and must not be invented.',
       'Every command emits pcbpro:command-executed for audit and project-state re-read.',
       'component.setValue remains explicitly labeled ui-bridge until value mutation is moved into a true central domain model.'
     ]}
