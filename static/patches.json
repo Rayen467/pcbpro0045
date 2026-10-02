@@ -1,5 +1,35 @@
 [
   {
+    "version": "1.17.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Encrypted Project Database — Supabase + AES-GCM + RLS",
+      "en": "Encrypted Project Database — Supabase + AES-GCM + RLS"
+    },
+    "changes": {
+      "id": [
+        "Buat Supabase khusus PCBPro0045 di ap-southeast-1 dan pisahkan dari ArenaBook.",
+        "Tambah pcb_projects + pcb_project_versions dengan RLS berbasis owner-token hash.",
+        "Project name dan payload dienkripsi AES-GCM di browser sebelum upload.",
+        "Tambah transactional save RPC dan revision history sampai 50 snapshot.",
+        "Project tab mendapat panel database terenkripsi, daftar project remote, Sync sekarang, + Proyek DB, dan Backup key.",
+        "Current local project otomatis disimpan ke database saat database pertama kali kosong; perubahan berikutnya autosync.",
+        "Restore database mengembalikan components, UI state, wiring, PCB geometry, dan advanced board state.",
+        "Security advisor Supabase dibersihkan: function search_path sudah di-hardening."
+      ],
+      "en": [
+        "Created a dedicated PCBPro0045 Supabase project in ap-southeast-1, separate from ArenaBook.",
+        "Added pcb_projects and pcb_project_versions with owner-token-hash RLS.",
+        "Project names and payloads are AES-GCM encrypted in the browser before upload.",
+        "Added transactional save RPC and up to 50 revision snapshots.",
+        "The Project tab gets an encrypted-database panel, remote project list, Sync now, + DB project, and Backup key.",
+        "The current local project is automatically stored when the database is empty; later changes autosync.",
+        "Database restore brings back components, UI state, wiring, PCB geometry, and advanced board state.",
+        "Supabase security advisor is clean after hardening function search paths."
+      ]
+    }
+  },
+  {
     "version": "1.16.0",
     "date": "2026-10-02",
     "title": {
