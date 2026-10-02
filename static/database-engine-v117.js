@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProDatabase) return;
 
-  const VERSION='1.18.0';
+  const VERSION='1.19.0';
   const SUPABASE_URL='https://zomawqbdhktfdnyghxut.supabase.co';
   const ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvbWF3cWJkaGt0ZmRueWdoeHV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MTM2MTIsImV4cCI6MjEwNjQ4OTYxMn0.s55ppUfDs1TawNAWm2L3aTBf6JzptkZ9rTEYsMwrg7o';
   const SECRET_KEY='pcbpro0045-cloud-secret-v1';
@@ -132,7 +132,11 @@
   function projectName(){
     return clean(document.querySelector('.project-pill b')?.textContent)||'PCB Project';
   }
-  async function fingerprintBundle(bundle){return sha256Hex(enc.encode(JSON.stringify(bundle)))}
+  async function fingerprintBundle(bundle){
+    const stable=structuredClone(bundle||{});
+    delete stable.capturedAt;
+    return sha256Hex(enc.encode(JSON.stringify(stable)));
+  }
 
   async function saveRemote(id=activeId,name=projectName(),bundle=captureBundle()){
     if(busy)return null;
@@ -181,7 +185,6 @@
   async function refreshProjects(shouldRender=true){
     try{
       projects=await listRemote();
-      if(!activeId&&projects[0]?.id){activeId=projects[0].id;localStorage.setItem(ACTIVE_KEY,activeId)}
       if(shouldRender)render();
       return projects;
     }catch(error){
@@ -243,6 +246,25 @@
     a.href=url;a.download='pcbpro0045-recovery-key.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
 
+  function importRecovery(){
+    const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+    input.addEventListener('change',async()=>{
+      const file=input.files?.[0];if(!file)return;
+      try{
+        const data=JSON.parse(await file.text());
+        if(data?.format!=='pcbpro0045-cloud-recovery'||data?.supabaseProject!=='zomawqbdhktfdnyghxut'||!data?.secret?.ownerToken||!data?.secret?.aesKey) throw new Error('Invalid PCB Pro recovery key file');
+        b64ToBytes(data.secret.ownerToken); b64ToBytes(data.secret.aesKey);
+        if(!confirm(t('Recovery key valid. Reload dan ganti identity/key browser sekarang?','Recovery key is valid. Reload and replace the browser identity/key now?')))return;
+        localStorage.setItem(SECRET_KEY,JSON.stringify(data.secret));
+        localStorage.removeItem(ACTIVE_KEY);
+        location.reload();
+      }catch(error){
+        lastError=error?.message||String(error);status='error';render();
+      }
+    },{once:true});
+    input.click();
+  }
+
   function scheduleSave(delay=1200){
     clearTimeout(saveTimer);
     saveTimer=setTimeout(async()=>{
@@ -277,6 +299,7 @@
         <button data-pdb-sync>${t('Sync sekarang','Sync now')}</button>
         <button data-pdb-new>${t('+ Proyek DB','+ DB project')}</button>
         <button data-pdb-key>${t('Backup key','Backup key')}</button>
+        <button data-pdb-import-key>${t('Import key','Import key')}</button>
       </div>
       <div class="pdb-list">${projects.map(p=>`
         <button class="pdb-project ${p.id===activeId?'active':''}" data-pdb-open="${p.id}" title="${p.name}">
@@ -291,16 +314,29 @@
       if(name)await createFromCurrent(name).catch(()=>{});
     });
     root.querySelector('[data-pdb-key]')?.addEventListener('click',exportRecovery);
+    root.querySelector('[data-pdb-import-key]')?.addEventListener('click',importRecovery);
     root.querySelectorAll('[data-pdb-open]').forEach(b=>b.addEventListener('click',()=>loadProject(b.dataset.pdbOpen)));
   }
 
   async function boot(){
     loadSecret();status='connected';render();
+    const forceNew=localStorage.getItem('pcbpro0045-cloud-create-new')==='1';
+    if(forceNew){
+      localStorage.removeItem('pcbpro0045-cloud-create-new');
+      activeId='';localStorage.removeItem(ACTIVE_KEY);
+    }
+
     const list=await refreshProjects();
-    if(!list.length){
+
+    if(forceNew || !activeId){
       try{
-        await saveRemote('',projectName(),captureBundle());
+        const preferred=localStorage.getItem('pcbpro0045-cloud-project-name')||projectName();
+        await saveRemote('',preferred,captureBundle());
       }catch{}
+    }else if(!list.some(p=>p.id===activeId)){
+      // Never silently bind a local project to an unrelated remote row.
+      activeId='';localStorage.removeItem(ACTIVE_KEY);
+      try{await saveRemote('',projectName(),captureBundle())}catch{}
     }else{
       try{
         const bundle=captureBundle();
@@ -309,8 +345,10 @@
     }
 
     window.addEventListener('pcbpro:project-local-saved',()=>scheduleSave(100));
+    window.addEventListener('pcbpro:project-components-changed',()=>scheduleSave(250));
     window.addEventListener('pcbpro:netlist-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:board-changed',()=>scheduleSave());
+    window.addEventListener('pcbpro:professional-rules-changed',()=>scheduleSave(350));
     window.addEventListener('pcbpro:catalog-ready',render);
     window.addEventListener('pcbpro:project-adapter-ready',()=>scheduleSave(500));
 
@@ -320,7 +358,7 @@
         const fp=await fingerprintBundle(bundle);
         if(activeId&&fp!==lastFingerprint)scheduleSave(700);
       }catch{}
-    },3500);
+    },5000);
 
     window.dispatchEvent(new CustomEvent('pcbpro:database-ready',{detail:{version:VERSION,projectRef:'zomawqbdhktfdnyghxut'}}));
   }
@@ -333,6 +371,7 @@
     loadProject,
     deleteProject,
     exportRecovery,
+    importRecovery,
     capture:captureBundle,
     scheduleSave,
     snapshot:()=>({version:VERSION,status,activeId,projectCount:projects.length,lastError,encrypted:true,rls:true}),
