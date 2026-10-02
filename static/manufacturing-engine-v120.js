@@ -78,7 +78,7 @@
     const missingEndpoints=(b.tracks||[]).filter(tr=>!(tr.start&&tr.end));
     if(missingEndpoints.length)findings.push({code:'TRACK_GEOMETRY',message:t(`${missingEndpoints.length} track belum punya endpoint geometri tersimpan. Buka tab PCB sekali agar geometry capture diperbarui.`,`${missingEndpoints.length} track(s) are missing persisted geometry endpoints. Open the PCB tab once to refresh geometry capture.`)});
     const physicalPads=physicalPadSource();
-    if(!physicalPads.ready)warnings.push({code:'PAD_GEOMETRY',message:t('Pad fisik footprint belum punya provider geometri terverifikasi; copper Gerber yang dihasilkan hanya mencakup track/via yang diketahui dan BUKAN production release.','Verified physical footprint pad geometry is not connected; generated copper Gerber contains known tracks/vias only and is NOT a production release.')});
+    if(!physicalPads.ready)warnings.push({code:'PAD_GEOMETRY',message:t('Pad fisik footprint belum lengkap/terverifikasi ('+physicalPads.reason+'); copper Gerber hanya mencakup geometry yang diketahui dan BUKAN production release.','Verified physical footprint pad geometry is incomplete/unavailable ('+physicalPads.reason+'); copper Gerber contains only known geometry and is NOT a production release.')});
     const base=window.PCBProBoardModel?.drc?.()||[],adv=window.PCBProAdvancedBoard?.drc?.()||[];
     if(base.length||adv.length)findings.push({code:'DRC',message:t(`DRC masih punya ${base.length+adv.length} temuan.`,`DRC still has ${base.length+adv.length} finding(s).`)});
     const placements=b.placements||[];
@@ -107,7 +107,7 @@
     return report;
   }
 
-  function coordMm(v){return Math.round(v*1e6).toString().padStart(10,'0')}
+  function coordMm(v){const q=Math.round(Number(v)*1e6);return (q<0?'-':'')+Math.abs(q).toString().padStart(10,'0')}
   function gerberHeader(name){
     return [
       'G04 PCB Pro generated RS-274X engineering output*',
