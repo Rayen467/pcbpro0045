@@ -89,7 +89,7 @@
 
     // The AI engineering agent is deferred so editing remains responsive. It uses typed commands, local RAG/memory, and LLM planning/reasoning.
     idle(async () => {
-      await load('/assistant-brain-v115.js?v=1.16.0');
+      await load('/assistant-brain-v115.js?v=1.18.0');
       await load('/assistant-engine-v115.js?v=1.15.0');
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
