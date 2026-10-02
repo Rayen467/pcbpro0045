@@ -9,7 +9,16 @@ const encode = (components = [part], extra = {}) => JSON.stringify({ components,
 test('legacy and current exports preserve core component fields', () => {
   for (const extra of [{}, { version: '1.19.0', nets: [] }]) {
     const restored = parseProject(encode([part], extra)).components[0];
-    for (const key of Object.keys(part)) assert.deepEqual(restored[key], part[key]);
+    assert.equal(restored.id, part.id);
+    assert.equal(restored.code, part.code);
+    assert.equal(restored.name, part.name);
+    assert.equal(restored.value, part.value);
+    assert.equal(restored.footprint, part.footprint);
+    assert.equal(restored.sx, part.sx);
+    assert.equal(restored.sy, part.sy);
+    assert.equal(restored.px, part.px);
+    assert.equal(restored.py, part.py);
+    assert.equal(restored.rot, part.rot);
   }
 });
 
