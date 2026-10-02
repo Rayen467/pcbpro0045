@@ -1,5 +1,35 @@
 [
   {
+    "version": "1.19.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Stability & Integration Pass — real engine bridges + self-test",
+      "en": "Stability & Integration Pass — real engine bridges + self-test"
+    },
+    "changes": {
+      "id": [
+        "Core workspace v1.19.0 menghubungkan ERC, PCB DRC, Live Circuit, Route/Via/Zone, Project Database dan Professional Rules ke engine yang benar-benar tersedia.",
+        "Hapus fake schematic wire, fake ratsnest, decorative 3D board dan angka simulasi ilustratif agar data engineering palsu tidak muncul saat engine belum siap.",
+        "Perbaiki encrypted autosave fingerprint agar capturedAt tidak membuat revision database baru tanpa perubahan desain.",
+        "Tombol New membuat cloud project baru tanpa menimpa remote project lama; Backup key sekarang punya Import key untuk recovery browser.",
+        "Full project snapshot mengambil component metadata, live nets/wires, PCB geometry, advanced board, professional profile, workflow dan database state.",
+        "Extended component metadata dipertahankan dan divalidasi saat import.",
+        "Tambah HEALTH / System Health self-test serta endpoint /api/health untuk engine presence, database, professional evidence, command validator, fake-value guard, runtime errors, server health dan AI-auth status.",
+        "Pipeline produksi sekarang wajib lolos strict Svelte check, unit/runtime regression tests, dan production build."
+      ],
+      "en": [
+        "Core workspace v1.19.0 connects ERC, PCB DRC, Live Circuit, Route/Via/Zone, Project Database, and Professional Rules to the actually available engines.",
+        "Removed fake schematic wires, fake ratsnest, decorative 3D board, and illustrative simulation values so fabricated engineering data is not shown when engines are unavailable.",
+        "Fixed encrypted autosave fingerprinting so capturedAt no longer creates database revisions without design changes.",
+        "New creates a separate cloud project without overwriting the previous remote project; Backup key now has Import key for browser recovery.",
+        "Full project snapshot captures component metadata, live nets/wires, PCB geometry, advanced board state, professional profile, workflow, and database state.",
+        "Extended component metadata is preserved and validated on import.",
+        "Added HEALTH / System Health self-test plus /api/health for engine presence, database, professional evidence, command validation, fake-value guard, runtime errors, server health, and AI-auth status.",
+        "Production pipeline must now pass strict Svelte check, unit/runtime regression tests, and production build."
+      ]
+    }
+  },
+  {
     "version": "1.18.0",
     "date": "2026-10-02",
     "title": {
