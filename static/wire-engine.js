@@ -2,7 +2,7 @@
   'use strict';
 
   const NS = 'http://www.w3.org/2000/svg';
-  const VERSION = '2.0.0';
+  const VERSION = '2.1.0';
   const STORAGE_KEY = 'pcbpro0045-wiregraph-v2';
   const LEGACY_KEY = 'pcbpro0045-wiregraph-v1';
 
