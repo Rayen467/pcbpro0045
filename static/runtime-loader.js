@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.19.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.20.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -72,8 +72,10 @@
     await load('/learning-center.js?v=1.0.0');
     await load('/learning-merge-v112.js?v=1.12.0');
     await load('/kicad-behavior.js?v=1.0.0');
-    await load('/pcb-layout-engine.js?v=1.2.0');
+    await load('/pcb-layout-engine.js?v=1.3.0');
     await load('/board-advanced-engine.js?v=1.1.0');
+    await load('/manufacturing-engine-v120.js?v=1.20.0');
+    await load('/geometry-3d-engine-v120.js?v=1.20.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
     await load('/database-engine-v117.js?v=1.19.0');
@@ -84,6 +86,8 @@
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProBoardModel?.refresh?.();
     window.PCBProAdvancedBoard?.refresh?.();
+    window.PCBProManufacturing?.mount?.();
+    window.PCBProGeometry3D?.mount?.();
     window.PCBProBoardWorkflowBridge?.install?.();
     window.PCBProLearningMergeV112?.merge?.();
     window.PCBProLearningCenter?.refresh?.();
@@ -100,6 +104,8 @@
       window.PCBProKiCadBehavior?.repair?.();
       window.PCBProBoardModel?.refresh?.();
       window.PCBProAdvancedBoard?.refresh?.();
+      window.PCBProManufacturing?.mount?.();
+      window.PCBProGeometry3D?.refresh?.();
       window.PCBProBoardWorkflowBridge?.install?.();
       window.PCBProPatchV110?.inject?.();
       window.PCBProPatchV111?.inject?.();
@@ -124,6 +130,8 @@
       if (!tab) return;
       const view = tab.dataset.pcbView || tab.textContent || '';
       if (/simulator|simulasi/i.test(view)) setTimeout(maybeLoadLiveSimulation, 0);
+      if (/^3d$/i.test(String(view).trim())) setTimeout(()=>window.PCBProGeometry3D?.mount?.(),0);
+      if (/fabrication|fabrikasi/i.test(String(view).trim())) setTimeout(()=>window.PCBProManufacturing?.mount?.(),0);
       if (/^pcb$/i.test(String(view).trim())) setTimeout(()=>{
         window.PCBProBoardModel?.refresh?.();
         window.PCBProAdvancedBoard?.refresh?.();
