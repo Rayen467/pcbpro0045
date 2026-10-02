@@ -3,7 +3,7 @@
 
   if (window.__PCBPRO_PERF_GUARD__) return;
 
-  const VERSION = '1.3.0';
+  const VERSION = '1.4.0';
   const NativeMutationObserver = window.MutationObserver;
   const INTERNAL_SELECTOR = [
     '[data-wire-overlay]',
@@ -15,6 +15,7 @@
     '#pcbpro-assistant-v115',
     '#pcbpro-explain-drawer',
     '#pcbpro-explain-toast',
+    '#pcbpro-db-projects',
     '#pcbpro-assistant-v114',
     '#pcbpro-explain-drawer',
     '#pcbpro-explain-toast',
