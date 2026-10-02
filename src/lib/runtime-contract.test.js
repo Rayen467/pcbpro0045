@@ -9,11 +9,13 @@ const browserScripts = [
   'static/runtime-loader.js',
   'static/workspace-repair.js',
   'static/database-engine-v117.js',
-  'static/stability-engine-v119.js',
+  'static/stability-engine-v120.js',
   'static/project-command-bus-v115.js',
   'static/professional-engine-v118.js',
   'static/pcb-layout-engine.js',
   'static/board-advanced-engine.js',
+  'static/manufacturing-engine-v120.js',
+  'static/geometry-3d-engine-v120.js',
   'static/wire-engine.js'
 ];
 
@@ -34,7 +36,9 @@ test('runtime loader includes critical production engines', () => {
     'project-command-bus-v115.js',
     'assistant-brain-v115.js',
     'assistant-engine-v115.js',
-    'stability-engine-v119.js'
+    'manufacturing-engine-v120.js',
+    'geometry-3d-engine-v120.js',
+    'stability-engine-v120.js'
   ]) assert.match(loader, new RegExp(asset.replaceAll('.', '\\.')));
 });
 
@@ -64,10 +68,31 @@ test('encrypted autosave fingerprint excludes volatile capture timestamps', () =
   assert.match(db, /data-pdb-import-key/);
 });
 
-test('typed command bus exposes professional checks and real PCB routing', () => {
+test('typed command bus exposes professional, manufacturing, 3D, and real PCB actions', () => {
   const bus = read('static/project-command-bus-v115.js');
   assert.match(bus, /'pcb\.route'/);
   assert.match(bus, /'pcb\.runDRC'/);
   assert.match(bus, /'professional\.audit'/);
   assert.match(bus, /'simulation\.run'/);
+  assert.match(bus, /'manufacturing\.preflight'/);
+  assert.match(bus, /'manufacturing\.exportPackage'/);
+  assert.match(bus, /'mechanical3d\.open'/);
+});
+
+test('manufacturing exporter is coverage-gated and never silently fabricates missing footprint pads', () => {
+  const mfg = read('static/manufacturing-engine-v120.js');
+  assert.match(mfg, /ENGINEERING-DRAFT-NOT-FOR-FABRICATION/);
+  assert.match(mfg, /physicalPadSource/);
+  assert.match(mfg, /Gerber/);
+  assert.match(mfg, /Excellon/);
+  assert.match(mfg, /sha256/);
+});
+
+test('3D viewer is driven by persisted board geometry rather than decorative placeholder bodies', () => {
+  const view = read('static/geometry-3d-engine-v120.js');
+  assert.match(view, /PCBProBoardModel/);
+  assert.match(view, /placements/);
+  assert.match(view, /tracks/);
+  assert.match(view, /vias/);
+  assert.match(view, /STEP bodies/);
 });
