@@ -81,8 +81,8 @@
     if(!physicalPads.ready)warnings.push({code:'PAD_GEOMETRY',message:t('Pad fisik footprint belum lengkap/terverifikasi ('+physicalPads.reason+'); copper Gerber hanya mencakup geometry yang diketahui dan BUKAN production release.','Verified physical footprint pad geometry is incomplete/unavailable ('+physicalPads.reason+'); copper Gerber contains only known geometry and is NOT a production release.')});
     const base=window.PCBProBoardModel?.drc?.()||[],adv=window.PCBProAdvancedBoard?.drc?.()||[];
     if(base.length||adv.length)findings.push({code:'DRC',message:t(`DRC masih punya ${base.length+adv.length} temuan.`,`DRC still has ${base.length+adv.length} finding(s).`)});
-    const physical=window.PCBProPhysicalDRC?.run?.()||null;
-    const physicalErrors=physical?.findings?.filter?.(x=>x.severity==='error'||x.severity==='blocker')||[];
+    const physicalDrc=window.PCBProPhysicalDRC?.run?.()||null;
+    const physicalErrors=physicalDrc?.findings?.filter?.(x=>x.severity==='error'||x.severity==='blocker')||[];
     if(physicalErrors.length)findings.push({code:'PHYSICAL_DRC',message:t(`Physical DRC masih punya ${physicalErrors.length} pelanggaran.`,`Physical DRC still has ${physicalErrors.length} violation(s).`)});
     const placements=b.placements||[];
     const physical=c.filter(x=>x.footprint&&x.footprint!=='—');
@@ -100,7 +100,7 @@
         zones:(a.zones||[]).length,
         placements:placements.length,
         physicalPads:physicalPads.count,
-        physicalDrcFindings:physical?.findings?.length??null,
+        physicalDrcFindings:physicalDrc?.findings?.length??null,
         dimensionsMm:cal?{width:cal.widthMm,height:cal.heightMm}:null
       },
       scope:readyForProduction?'production-candidate':'engineering-draft'
