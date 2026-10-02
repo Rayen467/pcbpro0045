@@ -21,6 +21,8 @@ declare global {
     PCBProGeometry3D?: any;
     PCBProFootprintGeometry?: any;
     PCBProStepBodies?: any;
+    PCBProPhysicalDRC?: any;
+    PCBProIntegrity?: any;
   }
 }
 
