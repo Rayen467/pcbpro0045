@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProCommandBus) return;
 
-  const VERSION='1.19.0';
+  const VERSION='1.20.0';
   const MAX_ACTIONS=12;
   let seq=0;
   const listeners=new Set();
@@ -279,6 +279,26 @@
       risk:'low',adapter:'board-api',schema:{properties:{}},
       describe:()=>t('Jalankan DRC yang tersedia pada board aktif.','Run the available DRC on the active board.'),
       execute:runDrc
+    },
+    'manufacturing.preflight':{
+      risk:'low',adapter:'manufacturing-api',schema:{properties:{}},
+      describe:()=>t('Jalankan manufacturing/CAM preflight.','Run manufacturing/CAM preflight.'),
+      execute:async()=>window.PCBProManufacturing?.preflight?{ok:true,report:window.PCBProManufacturing.preflight()}:{ok:false,error:'Manufacturing engine unavailable'}
+    },
+    'manufacturing.exportPackage':{
+      risk:'medium',adapter:'manufacturing-api',schema:{properties:{}},
+      describe:()=>t('Generate dan unduh CAM ZIP berdasarkan geometry yang lolos preflight.','Generate and download a CAM ZIP from geometry that passes preflight.'),
+      execute:async()=>window.PCBProManufacturing?.buildPackage?await window.PCBProManufacturing.buildPackage():{ok:false,error:'Manufacturing engine unavailable'}
+    },
+    'mechanical3d.open':{
+      risk:'low',adapter:'geometry-3d-api',schema:{properties:{}},
+      describe:()=>t('Buka viewer 3D berbasis geometry project.','Open the project geometry-driven 3D viewer.'),
+      execute:async()=>{if(!clickView('3d'))return{ok:false,error:'3D view unavailable'};await wait(80);window.PCBProGeometry3D?.mount?.();return{ok:true,view:'3D'}}
+    },
+    'mechanical3d.resetView':{
+      risk:'low',adapter:'geometry-3d-api',schema:{properties:{}},
+      describe:()=>t('Reset kamera 3D.','Reset the 3D camera.'),
+      execute:async()=>{if(!window.PCBProGeometry3D?.reset)return{ok:false,error:'3D engine unavailable'};window.PCBProGeometry3D.reset();return{ok:true}}
     },
     'simulation.run':{
       risk:'low',adapter:'simulation-api',schema:{properties:{}},
