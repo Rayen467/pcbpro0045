@@ -17,6 +17,10 @@ declare global {
     PCBProComponentCatalog?: any;
     PCBProStability?: any;
     PCBProWorkspaceRepair?: any;
+    PCBProManufacturing?: any;
+    PCBProGeometry3D?: any;
+    PCBProFootprintGeometry?: any;
+    PCBProStepBodies?: any;
   }
 }
 
