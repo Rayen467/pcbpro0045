@@ -80,8 +80,8 @@
     await load('/explain-engine-v113.js?v=1.13.0');
     await load('/database-engine-v117.js?v=1.19.0');
     await load('/professional-engine-v118.js?v=1.18.0');
-    await load('/project-command-bus-v115.js?v=1.19.0');
-    await load('/stability-engine-v119.js?v=1.19.0');
+    await load('/project-command-bus-v115.js?v=1.20.0');
+    await load('/stability-engine-v120.js?v=1.20.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProBoardModel?.refresh?.();
