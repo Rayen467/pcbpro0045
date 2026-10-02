@@ -52,6 +52,8 @@ test('core UI no longer contains fake engineering measurements or stale engine w
     'DRC engine is not connected. Clearance, routing and manufacturing readiness have not been verified.',
     'ERC engine is not connected. Electrical connectivity has not been verified.'
   ]) assert.equal(page.includes(stale), false, `stale UI text found: ${stale}`);
+  assert.match(page, /let nets = \[\];/);
+  assert.equal(page.includes('manufacturing exporter is not implemented yet'), false);
 });
 
 test('workspace repair exposes implemented PCB tools instead of blocking them', () => {
@@ -66,6 +68,8 @@ test('encrypted autosave fingerprint excludes volatile capture timestamps', () =
   assert.match(db, /delete stable\.capturedAt/);
   assert.match(db, /pcbpro0045-cloud-create-new/);
   assert.match(db, /data-pdb-import-key/);
+  assert.match(db, /MANUFACTURING_KEY/);
+  assert.match(db, /pcbpro:manufacturing-calibration-changed/);
 });
 
 test('typed command bus exposes professional, manufacturing, 3D, and real PCB actions', () => {
@@ -86,6 +90,9 @@ test('manufacturing exporter is coverage-gated and never silently fabricates mis
   assert.match(mfg, /Gerber/);
   assert.match(mfg, /Excellon/);
   assert.match(mfg, /sha256/);
+  assert.match(mfg, /downloadGerbers/);
+  assert.match(mfg, /downloadDrill/);
+  assert.match(mfg, /downloadAssembly/);
 });
 
 test('3D viewer is driven by persisted board geometry rather than decorative placeholder bodies', () => {
