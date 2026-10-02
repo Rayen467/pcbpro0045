@@ -1,15 +1,18 @@
 export const MAX_PROJECT_BYTES = 2 * 1024 * 1024;
 export const MAX_COMPONENTS = 5000;
 
+/** @param {unknown} value @param {string} key @param {number} [max] */
 const text = (value, key, max = 256) => {
   if (typeof value !== 'string' || value.length > max) throw new Error(`Invalid component ${key}.`);
   return value;
 };
+/** @param {unknown} value @param {string} key @param {number} [max] */
 const optionalText = (value, key, max = 512) => {
   if (value == null) return '';
   if (typeof value !== 'string' || value.length > max) throw new Error(`Invalid component ${key}.`);
   return value;
 };
+/** @param {unknown} value @param {string} key @param {number} [maxItems] @param {number} [maxLen] */
 const optionalStringArray = (value, key, maxItems = 32, maxLen = 128) => {
   if (value == null) return [];
   if (!Array.isArray(value) || value.length > maxItems || value.some((x) => typeof x !== 'string' || x.length > maxLen)) {
