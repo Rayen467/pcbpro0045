@@ -2,10 +2,11 @@
   import { onMount } from 'svelte';
   import { parseProject, MAX_PROJECT_BYTES } from '$lib/project.js';
 
-  const version = '1.18.0';
+  const version = '1.19.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
+  let projectDisplayName = 'LED Driver · Rev A';
   let dirty = false;
   $: dirty = JSON.stringify(components) !== savedContent;
   const views = ['Schematic', 'PCB', 'Simulator', '3D', 'BOM', 'Fabrication', 'Rules', 'Release'];
@@ -108,7 +109,7 @@
     { id: 'G4', code: 'GND', name: 'Ground', value: '0 V', footprint: '—', sx: 49, sy: 74, px: 50, py: 76, rot: 0 }
   ];
 
-  const nets = [
+  let nets = [
     { name: 'VCC', pins: 'V1.1 · R2.1' },
     { name: 'LED_A', pins: 'R2.2 · D3.1' },
     { name: 'GND', pins: 'D3.2 · V1.2' }
@@ -195,7 +196,17 @@
         return true;
       }
     });
+    try {
+      projectDisplayName = localStorage.getItem('pcbpro0045-cloud-project-name') || projectDisplayName;
+    } catch {}
+
+    const onNetlist = (event) => {
+      const next = event?.detail?.nets;
+      if (Array.isArray(next)) nets = next.map((net) => ({ name: String(net.name || ''), pins: String(net.pins || '') }));
+    };
+    window.addEventListener('pcbpro:netlist-changed', onNetlist);
     window.dispatchEvent(new CustomEvent('pcbpro:project-adapter-ready'));
+    return () => window.removeEventListener('pcbpro:netlist-changed', onNetlist);
   });
 
   /** @param {number} min @param {number} value @param {number} max */
@@ -433,8 +444,16 @@
   function deleteSelected() {
     if (!selected) return;
     snapshot();
-    components = components.filter((p) => p.id !== selectedId);
+    const ref = selectedId;
+    for (const route of window.PCBProWireEngine?.routes || []) {
+      if (String(route.from).startsWith(`${ref}.`) || String(route.to).startsWith(`${ref}.`)) window.PCBProProject?.deleteWire?.(route.id);
+    }
+    for (const track of window.PCBProBoardModel?.tracks || []) {
+      if (String(track.from).startsWith(`${ref}.`) || String(track.to).startsWith(`${ref}.`)) window.PCBProBoardModel?.deleteTrack?.(track.id);
+    }
+    components = components.filter((p) => p.id !== ref);
     selectedId = components[0]?.id || '';
+    window.dispatchEvent(new CustomEvent('pcbpro:project-components-changed', { detail: { action:'delete', ref } }));
   }
 
   /** @param {string} view */
@@ -532,17 +551,69 @@
     download('pcbpro0045-bom.csv', rows.map((r) => r.map((v) => `"${String(v).replaceAll('"','""')}"`).join(',')).join('\n'), 'text/csv');
   }
 
+  function newProject() {
+    if (!window.confirm('Create a new empty PCB project? The current project remains in encrypted database/history if it has been synced.')) return;
+    try {
+      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ version, components:[], savedAt:'New project', leftWidth, rightWidth }));
+      localStorage.setItem('pcbpro0045-cloud-create-new', '1');
+      localStorage.setItem('pcbpro0045-cloud-project-name', 'Untitled PCB');
+      window.dispatchEvent(new CustomEvent('pcbpro:reset-layout', { cancelable:true }));
+      location.reload();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Could not create project.');
+    }
+  }
+
+  function runErc() {
+    const raw = window.PCBProWorkflow?.runErc?.();
+    if (!Array.isArray(raw)) {
+      notify('ERC engine is still loading. Try again in a moment.');
+      return [];
+    }
+    notify(raw.length ? `ERC: ${raw.length} finding(s)` : 'ERC passed for the checks currently implemented.');
+    return raw;
+  }
+
   function runDrc() {
-    drcFindings = 'Unavailable';
-    notify('DRC engine is not connected. Clearance, routing and manufacturing readiness have not been verified.');
+    const hasBase = typeof window.PCBProBoardModel?.drc === 'function';
+    const hasAdvanced = typeof window.PCBProAdvancedBoard?.drc === 'function';
+    if (!hasBase && !hasAdvanced) {
+      drcFindings = 'Loading';
+      notify('PCB DRC engines are still loading.');
+      return [];
+    }
+    const findings = [
+      ...(hasBase ? (window.PCBProBoardModel.drc() || []) : []),
+      ...(hasAdvanced ? (window.PCBProAdvancedBoard.drc() || []) : [])
+    ];
+    drcFindings = findings.length;
+    notify(findings.length ? `DRC: ${findings.length} finding(s)` : 'DRC passed for the geometry/rules currently implemented.');
+    return findings;
+  }
+
+  function runSimulation() {
+    selectView('Simulator');
+    setTimeout(async () => {
+      if (window.PCBProCommandBus?.execute) {
+        const result = await window.PCBProCommandBus.execute('simulation.run', {});
+        if (!result?.ok) notify(`Simulator unavailable: ${result?.error || 'solver not ready'}`);
+        return;
+      }
+      if (window.PCBProLiveSimulation?.start) window.PCBProLiveSimulation.start();
+      else notify('Live Circuit solver is loading. Try Run again in a moment.');
+    }, 80);
   }
 
   /** @param {string} tool */
   function toolAction(tool) {
     activeTool = tool;
     if (tool === 'Export CSV') exportBom();
-    if (tool === 'Run') notify('SPICE engine bridge is not connected yet');
-    if (['Gerber','Drill','Pick & Place'].includes(tool)) notify(`${tool} exporter staged · engine pending`);
+    if (tool === 'Run') runSimulation();
+    if (tool === 'Stop') window.PCBProCommandBus?.execute?.('simulation.pause', {});
+    if (tool === 'Preflight') runDrc();
+    if (tool === 'Electrical') runErc();
+    if (['Clearance','Track width','Via','Differential','Mask','Silkscreen'].includes(tool)) window.PCBProProfessional?.open?.('constraints');
+    if (['Gerber','Drill','Pick & Place','Assembly','Archive'].includes(tool)) notify(`${tool}: manufacturing exporter is not implemented yet; no fake file will be generated.`);
   }
 
   /** @param {KeyboardEvent} event */
@@ -575,16 +646,16 @@
       <button class="icon-btn" onclick={() => leftOpen = !leftOpen}>☰</button>
       <div class="logo">⌁</div><div class="brand"><strong>PCB Pro</strong><span>0045</span></div>
       <span class="version">POINTER ENGINE · v{version}</span>
-      <button class="project-pill" onclick={() => { leftOpen = true; leftTab = 'Project'; }} title="Open project panel"><i></i><b>LED Driver · Rev A</b><span>⌄</span></button>
+      <button class="project-pill" onclick={() => { leftOpen = true; leftTab = 'Project'; }} title="Open project panel"><i></i><b>{projectDisplayName}</b><span>⌄</span></button>
     </div>
     <div class="top-actions">
       <span class="save-state">{dirty ? 'Unsaved changes' : savedAt}</span>
-      <button onclick={() => notify('Project commands are loading. Please try again shortly.')}>New</button>
+      <button onclick={newProject}>New</button>
       <input hidden type="file" accept=".json,application/json" bind:this={importInput} onchange={importProject} aria-label="Import project JSON" />
       <button onclick={() => importInput?.click()}>Import layout</button>
       <button onclick={saveProject}>Save</button>
       <button onclick={exportProject}>Export layout</button>
-      <button class="primary" onclick={() => selectView('Simulator')}>▶ Simulate</button>
+      <button class="primary" onclick={runSimulation}>▶ Simulate</button>
       <button class="icon-btn" onclick={() => rightOpen = !rightOpen}>☷</button>
     </div>
   </header>
@@ -618,7 +689,7 @@
           {/if}
         </div>
       {:else if leftTab === 'Project'}
-        <div class="tree"><span>PROJECT TREE</span><button class="root" onclick={() => projectTreeOpen = !projectTreeOpen}>{projectTreeOpen ? '▾' : '▸'} ◫ LED Driver · Rev A</button>{#if projectTreeOpen}<button class:active={activeView==='Schematic'} onclick={() => openProjectView('Schematic')}>⌁ Main schematic</button><button class:active={activeView==='PCB'} onclick={() => openProjectView('PCB')}>▦ Main PCB</button><button class:active={activeView==='3D'} onclick={() => openProjectView('3D')}>◈ 3D Assembly</button><button class:active={activeView==='BOM'} onclick={() => openProjectView('BOM')}>☷ BOM · {components.length}</button><button class:active={activeView==='Fabrication'} onclick={() => openProjectView('Fabrication')}>⬡ Fabrication</button>{/if}</div>
+        <div class="tree"><span>PROJECT TREE</span><button class="root" onclick={() => projectTreeOpen = !projectTreeOpen}>{projectTreeOpen ? '▾' : '▸'} ◫ {projectDisplayName}</button>{#if projectTreeOpen}<button class:active={activeView==='Schematic'} onclick={() => openProjectView('Schematic')}>⌁ Main schematic</button><button class:active={activeView==='PCB'} onclick={() => openProjectView('PCB')}>▦ Main PCB</button><button class:active={activeView==='3D'} onclick={() => openProjectView('3D')}>◈ 3D Assembly</button><button class:active={activeView==='BOM'} onclick={() => openProjectView('BOM')}>☷ BOM · {components.length}</button><button class:active={activeView==='Fabrication'} onclick={() => openProjectView('Fabrication')}>⬡ Fabrication</button>{/if}</div>
       {:else}
         <div class="history"><article><b>v1.1.0</b><strong>Smooth Pointer Engine</strong><p>rAF-batched pointer drag, direct DOM positioning, panel resize, pan/zoom, undo/redo.</p></article><article><b>v1.0.0</b><strong>PCB Pro baseline</strong><p>New repository and clean SvelteKit/Vercel baseline.</p></article></div>
       {/if}
@@ -637,7 +708,7 @@
           <section class:placing={Boolean(placementId)} class="stage schematic" aria-label="Schematic canvas" data-surface="schematic" onpointerdown={(e)=>stagePointerDown(e,'schematic')} onwheel={zoomWheel}>
             <div class="stage-info"><span>SCHEMATIC / MAIN</span><div><b>{zoom}%</b><b>{snapEnabled?'SNAP':'FREE'}</b><b>{spaceHeld?'PAN':''}</b></div></div>
             <div class="world" style={`transform:translate3d(${panX}px,${panY}px,0) scale(${zoom/100})`}>
-              <svg class="wires" viewBox="0 0 1000 620" preserveAspectRatio="none"><polyline points="170,300 310,300 310,175 470,175"/><polyline points="530,175 710,175 710,300 810,300"/><polyline points="810,300 810,450 170,450 170,300"/></svg>
+              
               {#each components as part}
                 <button class:selected={selectedId===part.id} class:pending={placementId===part.id} class="node" data-pin-count={part.pinCount == null ? '' : part.pinCount} data-catalog-key={part.catalogKey || ''} data-part-kind={part.kind || ''} style={`left:${part.sx}%;top:${part.sy}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'schematic')}>
                   <span class="ref">{part.id}</span><div class="symbol">{part.code==='R'?'─[▰]─':part.code==='C'?'─│ │─':part.code==='GND'?'⏚':part.code==='LED'?'─▷│↗':part.code==='V'?'⊕':part.code}</div><b>{part.value}</b><small>{part.name}</small>
@@ -655,22 +726,22 @@
               {#each pcbParts as part}
                 <button class:selected={selectedId===part.id} class="footprint" data-pin-count={part.pinCount == null ? '' : part.pinCount} data-catalog-key={part.catalogKey || ''} style={`left:${part.px}%;top:${part.py}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'pcb')}><span>{part.id}</span><i></i><i></i><small>{part.footprint}</small></button>
               {/each}
-              {#if layerVisibility.Ratsnest && !routed}<svg class="rats" viewBox="0 0 1000 620"><line x1="180" y1="350" x2="470" y2="190"/><line x1="470" y1="190" x2="760" y2="370"/></svg>{/if}
+              
             </div>
-            <div class="floating-card"><span>ROUTING</span><strong>Preview</strong><small>Routing not calculated</small><button onclick={() => notify('Routing engine is not connected. Copper routing is not verified.')}>Routing unavailable</button></div>
+            <div class="floating-card"><span>ROUTING</span><strong>{window.PCBProBoardModel?.tracks?.length || 0} tracks</strong><small>Use Route/Via/Zone tools; DRC verifies the checks currently implemented.</small><button onclick={() => { activeTool='Route'; window.PCBProCommand?.clickTool?.('route'); }}>Activate Route</button></div>
           </section>
         {:else if activeView === 'Simulator'}
-          <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Operating Point</h2><p>Illustrative demo values only. These are not simulation results from your project; the SPICE engine is not connected.</p></div><button class="primary" onclick={() => notify('SPICE bridge not connected yet')}>▶ Run</button></div><div class="metrics"><article><span>V(source)</span><strong>5.000 V</strong></article><article><span>I(R2)</span><strong>9.091 mA</strong></article><article><span>P(R2)</span><strong>27.27 mW</strong></article><article><span>V(D3)</span><strong>2.000 V</strong></article></div><div class="scope"><svg viewBox="0 0 900 280"><path d="M0 235 C90 230 110 60 190 60 S420 60 900 60"/><path class="b" d="M0 240 C120 235 170 170 260 170 S500 170 900 170"/></svg></div></section>
+          <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Live Circuit Solver</h2><p>The live solver mounts from the active netlist. No placeholder voltages/currents are shown.</p></div><button class="primary" onclick={runSimulation}>▶ Run</button></div><div class="cards"><article><b>LIVE</b><h3>Solver state</h3><p>Use Run/Stop/Probe after the runtime solver finishes loading. Unsupported device models are reported instead of guessed.</p></article><article><b>MODEL</b><h3>Current scope</h3><p>DC operating-point style solving is available for supported devices; this is not transient/SPICE sign-off.</p></article></div></section>
         {:else if activeView === '3D'}
-          <section class="panel"><div class="panel-title"><div><span>3D ASSEMBLY</span><h2>Mechanical preview</h2><p>Fast viewport placeholder for later WebGL/STEP engine.</p></div></div><div class="scene"><div class="board3d"><div>J1</div><div>R2</div><div>LED</div><div>U1</div></div></div></section>
+          <section class="panel"><div class="panel-title"><div><span>3D ASSEMBLY</span><h2>3D engine not yet connected</h2><p>The previous decorative mock board was removed. This view stays explicit until a real WebGL/STEP model is available.</p></div></div><div class="cards"><article><b>NO FAKE 3D</b><h3>Mechanical data required</h3><p>Real 3D needs verified footprint bodies/STEP models, board outline, holes and component heights.</p></article></div></section>
         {:else if activeView === 'BOM'}
           <section class="panel"><div class="panel-title"><div><span>BOM</span><h2>Project components</h2></div><button onclick={exportBom}>Export CSV</button></div><div class="table-wrap"><table><thead><tr><th>Ref</th><th>Part</th><th>Value</th><th>Footprint</th></tr></thead><tbody>{#each components as p}<tr><td>{p.id}</td><td>{p.name}</td><td>{p.value}</td><td>{p.footprint}</td></tr>{/each}</tbody></table></div></section>
         {:else if activeView === 'Fabrication'}
           <section class="panel"><div class="panel-title"><div><span>FABRICATION</span><h2>Manufacturing package</h2><p>Preflight flow without pretending exporters are finished.</p></div><button class="primary" onclick={runDrc}>Run preflight</button></div><div class="cards"><article><b>01</b><h3>DRC</h3><p>Clearance, width, drill and board edge.</p></article><article><b>02</b><h3>Gerber X2</h3><p>Exporter engine pending.</p></article><article><b>03</b><h3>BOM + CPL</h3><p>{pcbParts.length} physical footprints.</p></article><article><b>04</b><h3>Release</h3><p>Revision and checksum package.</p></article></div></section>
         {:else if activeView === 'Rules'}
-          <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Board constraints</h2></div><button class="primary" onclick={runDrc}>Run DRC</button></div><div class="rules"><label><span>Clearance</span><input value="0.20 mm"/></label><label><span>Track width</span><input value="0.25 mm"/></label><label><span>Via</span><input value="0.60 / 0.30 mm"/></label><label><span>Copper-edge</span><input value="0.30 mm"/></label><label><span>Silkscreen</span><input value="0.15 mm"/></label><label><span>Grid</span><input value={`${grid} mil`}/></label></div></section>
+          <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Rules are stored in the project profile instead of fake editable values.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>DRC</b><h3>Deterministic checks</h3><p>Track width and via profile checks are connected. Unsupported geometry checks remain UNKNOWN, not PASS.</p></article><article><b>DFM</b><h3>Fabricator profile</h3><p>Use PRO → Rules & DFM to select and edit the active manufacturing profile.</p></article></div><div class="pp-actions"><button class="primary" onclick={runDrc}>Run DRC</button></div></section>
         {:else}
-          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Performance pass: native drag removed, pointer engine and flexible workspace added.</p></div></div><div class="release"><article><b>v1.1.0</b><h3>Smooth Pointer Engine</h3><p>Pointer Events + requestAnimationFrame, direct element movement, precise drop, panel resize, pan/zoom and undo/redo.</p></article><article><b>v1.0.0</b><h3>Clean baseline</h3><p>Fresh repo, SvelteKit and Vercel configuration.</p></article></div></section>
+          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Stability integration: real engine bridges replace stale placeholder actions.</p></div></div><div class="release"><article><b>v1.19.0</b><h3>Stability & Integration Pass</h3><p>Core ERC/DRC/simulation/project actions are bridged to runtime engines; fake schematic wires/ratsnest/simulator values were removed.</p></article><article><b>v1.18.0</b><h3>Professional Engineering Baseline</h3><p>Professional audit, DFM profiles, SI/timing screening, evidence library and patent awareness.</p></article></div></section>
         {/if}
       </div>
 
@@ -682,7 +753,7 @@
 
     <aside class="inspector">
       <section><div class="ins-title"><span>PROPERTIES</span><b>{selected?.id || '—'}</b></div>{#if selected}<label><span>Reference</span><input value={selected.id} readonly/></label><label><span>Value</span><input value={selected.value} onchange={(e)=>updateSelected('value',e.currentTarget.value)}/></label><label><span>Footprint</span><input value={selected.footprint} onchange={(e)=>updateSelected('footprint',e.currentTarget.value)}/></label><div class="prop-actions"><button onclick={rotateSelected}>↻ Rotate</button><button onclick={deleteSelected}>Delete</button></div>{:else}<p class="empty">Select a component.</p>{/if}</section>
-      <section><div class="ins-title"><span>DESIGN CHECKS</span><b>{drcFindings}</b></div><button class="check" onclick={() => notify('ERC engine is not connected. Electrical connectivity has not been verified.')}>ERC <small>Not verified</small></button><button class="check" onclick={runDrc}>• DRC <small>{drcFindings}</small></button><button class="check">✓ Footprints <small>{pcbParts.length} mapped</small></button></section>
+      <section><div class="ins-title"><span>DESIGN CHECKS</span><b>{drcFindings}</b></div><button class="check" onclick={runErc}>ERC <small>Run check</small></button><button class="check" onclick={runDrc}>• DRC <small>{drcFindings}</small></button><button class="check" onclick={() => window.PCBProKiCadBehavior?.footprintPicker?.()}>✓ Footprints <small>{pcbParts.length} mapped</small></button></section>
       <section><div class="ins-title"><span>NET INSPECTOR</span><b>{nets.length}</b></div>{#each nets as net}<button class="net"><i></i><span><b>{net.name}</b><small>{net.pins}</small></span></button>{/each}</section>
       <section><div class="ins-title"><span>WORKSPACE</span><b>FLEX</b></div><div class="workspace-controls"><button onclick={() => leftWidth=clamp(190,leftWidth-20,430)}>Library −</button><button onclick={() => leftWidth=clamp(190,leftWidth+20,430)}>Library +</button><button onclick={() => rightWidth=clamp(220,rightWidth-20,430)}>Inspector −</button><button onclick={() => rightWidth=clamp(220,rightWidth+20,430)}>Inspector +</button></div></section>
     </aside>
