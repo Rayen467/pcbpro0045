@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.PCBProWorkspaceRepair) return;
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const UI_KEY = 'pcbpro0045-layout-mode';
   let layoutMode = localStorage.getItem(UI_KEY) || 'flex';
   let repairTimer = 0;
