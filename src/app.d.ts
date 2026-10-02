@@ -1,0 +1,23 @@
+declare global {
+  interface Window {
+    PCBProProject?: any;
+    PCBProWireEngine?: any;
+    PCBProBoardModel?: any;
+    PCBProAdvancedBoard?: any;
+    PCBProWorkflow?: any;
+    PCBProProfessional?: any;
+    PCBProCommand?: any;
+    PCBProCommandBus?: any;
+    PCBProKiCadBehavior?: any;
+    PCBProLiveSimulation?: any;
+    PCBProDatabase?: any;
+    PCBProExplain?: any;
+    PCBProAssistantBrain?: any;
+    PCBProAssistantV115?: any;
+    PCBProComponentCatalog?: any;
+    PCBProStability?: any;
+    PCBProWorkspaceRepair?: any;
+  }
+}
+
+export {};
