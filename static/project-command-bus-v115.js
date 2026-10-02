@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProCommandBus) return;
 
-  const VERSION='1.20.0';
+  const VERSION='1.21.0';
   const MAX_ACTIONS=12;
   let seq=0;
   const listeners=new Set();
@@ -279,6 +279,26 @@
       risk:'low',adapter:'board-api',schema:{properties:{}},
       describe:()=>t('Jalankan DRC yang tersedia pada board aktif.','Run the available DRC on the active board.'),
       execute:runDrc
+    },
+    'pcb.runPhysicalDRC':{
+      risk:'low',adapter:'physical-drc-api',schema:{properties:{}},
+      describe:()=>t('Jalankan physical DRC terkalibrasi dalam mm.','Run calibrated physical DRC in mm.'),
+      execute:async()=>window.PCBProPhysicalDRC?.run?{ok:true,report:window.PCBProPhysicalDRC.run()}:{ok:false,error:'Physical DRC engine unavailable'}
+    },
+    'integrity.validate':{
+      risk:'low',adapter:'integrity-api',schema:{properties:{}},
+      describe:()=>t('Audit source-of-truth lintas schematic, PCB, rules, dan manufacturing.','Audit source-of-truth across schematic, PCB, rules, and manufacturing.'),
+      execute:async()=>window.PCBProIntegrity?.validate?{ok:true,report:window.PCBProIntegrity.validate()}:{ok:false,error:'Integrity engine unavailable'}
+    },
+    'integrity.repair':{
+      risk:'medium',adapter:'integrity-api',schema:{properties:{}},
+      describe:()=>t('Repair stale wire/track yang aman dihapus otomatis.','Repair stale wire/track objects that are safe to remove automatically.'),
+      execute:async()=>window.PCBProIntegrity?.repair?window.PCBProIntegrity.repair():{ok:false,error:'Integrity engine unavailable'}
+    },
+    'integrity.open':{
+      risk:'low',adapter:'integrity-api',schema:{properties:{}},
+      describe:()=>t('Buka Project Source-of-Truth Audit.','Open Project Source-of-Truth Audit.'),
+      execute:async()=>{if(!window.PCBProIntegrity?.show)return{ok:false,error:'Integrity engine unavailable'};window.PCBProIntegrity.show();return{ok:true}}
     },
     'manufacturing.preflight':{
       risk:'low',adapter:'manufacturing-api',schema:{properties:{}},
