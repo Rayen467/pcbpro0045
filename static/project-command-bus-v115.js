@@ -212,6 +212,7 @@
     for(const [k,r] of Object.entries(schema.properties||{})){
       if(a[k]===undefined)continue; const v=a[k];
       if(r.type==='string'&&typeof v!=='string')errors.push(`${k} must be string`);
+      if(r.type==='number'&&!Number.isFinite(Number(v)))errors.push(`${k} must be number`);
       if(r.type==='array'&&!Array.isArray(v))errors.push(`${k} must be array`);
       if(r.enum&&!r.enum.includes(String(v).toLowerCase()))errors.push(`${k} must be one of ${r.enum.join(', ')}`);
       if(r.pattern&&typeof v==='string'&&!new RegExp(r.pattern).test(v))errors.push(`${k} invalid format`);
