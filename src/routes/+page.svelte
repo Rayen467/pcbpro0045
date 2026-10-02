@@ -169,6 +169,7 @@
     { id: 'G4', code: 'GND', name: 'Ground', value: '0 V', footprint: '—', pinCount: 1, sx: 49, sy: 74, px: 50, py: 76, rot: 0 }
   ];
 
+  /** @type {Array<{name:string,pins:string}>} */
   let nets = [];
 
   /** @type {{part: (typeof library)[number], pointerId: number, startX: number, startY: number, x: number, y: number, moved: boolean} | null} */
