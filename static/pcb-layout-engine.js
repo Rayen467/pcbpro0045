@@ -3,9 +3,9 @@
   if (window.PCBProBoardModel) return;
 
   const NS='http://www.w3.org/2000/svg';
-  const VERSION='1.2.0';
+  const VERSION='1.3.0';
   const KEY='pcbpro0045-board-v1';
-  let model={version:VERSION,tracks:[],outline:[]};
+  let model={version:VERSION,tracks:[],outline:[],placements:[],pads:[],worldSize:null};
   let overlay=null,padLayer=null,hud=null;
   let currentRoute=null,pointerWorld=null,outlineMode=false,currentLayer='F.Cu';
   let scheduled=false,selectedTrack='';
@@ -15,7 +15,7 @@
   const esc=(v)=>String(v??'').replace(/[&<>"']/g,(m)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const svg=(tag,attrs={})=>{const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,String(v));return el};
 
-  function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.tracks)&&Array.isArray(x.outline))model={version:VERSION,tracks:x.tracks,outline:x.outline}}catch{}}
+  function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.tracks)&&Array.isArray(x.outline))model={version:VERSION,tracks:x.tracks,outline:x.outline,placements:Array.isArray(x.placements)?x.placements:[],pads:Array.isArray(x.pads)?x.pads:[],worldSize:x.worldSize&&Number.isFinite(x.worldSize.width)&&Number.isFinite(x.worldSize.height)?x.worldSize:null}}catch{}}
   function save(){try{localStorage.setItem(KEY,JSON.stringify(model))}catch{}}
   function stage(){return document.querySelector('.stage.pcbstage')}
   function world(){return document.querySelector('.stage.pcbstage .world')}
@@ -44,10 +44,10 @@
   }
 
   function clientToWorld(x,y){const w=world();if(!w)return{x:0,y:0};const r=w.getBoundingClientRect();const sx=r.width/Math.max(1,w.offsetWidth),sy=r.height/Math.max(1,w.offsetHeight);return{x:(x-r.left)/Math.max(.0001,sx),y:(y-r.top)/Math.max(.0001,sy)}}
-  function pinPoint(id){const p=[...document.querySelectorAll('.pcb-board-pad')].find(x=>x.dataset.pin===id);if(!p)return null;const r=p.getBoundingClientRect();return clientToWorld(r.left+r.width/2,r.top+r.height/2)}
+  function pinPoint(id){const p=[...document.querySelectorAll('.pcb-board-pad')].find(x=>x.dataset.pin===id);if(p){const r=p.getBoundingClientRect();return clientToWorld(r.left+r.width/2,r.top+r.height/2)}const saved=model.pads?.find?.(x=>x.id===id);return saved?{x:saved.x,y:saved.y}:null}
   function orth(points,target){const out=[...points],last=out[out.length-1];if(!last)return[target];if(Math.abs(last.x-target.x)<.5||Math.abs(last.y-target.y)<.5){out.push(target);return out}out.push({x:target.x,y:last.y},target);return out}
   function path(points){return points.length?`M ${points.map(p=>`${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' L ')}`:''}
-  function trackPoints(tr,preview=null){const a=pinPoint(tr.from);if(!a)return[];let pts=[a,...(tr.corners||[])];const b=preview||pinPoint(tr.to);if(b)pts=orth(pts,b);return pts}
+  function trackPoints(tr,preview=null){const a=pinPoint(tr.from)||tr.start;if(!a)return[];let pts=[a,...(tr.corners||[])];const b=preview||pinPoint(tr.to)||tr.end;if(b)pts=orth(pts,b);return pts}
   function netForPin(pin){return nets().find(n=>(n.pinList||String(n.pins||'').split(/[·,;\s]+/)).includes(pin))||null}
   function sameNet(a,b){const na=netForPin(a),nb=netForPin(b);return na&&nb&&na.name===nb.name?na:null}
 
@@ -59,8 +59,8 @@
     #pcbpro-board-report{position:fixed;z-index:1900;inset:0;background:#000b;display:grid;place-items:center;padding:16px}.pbr-card{width:min(700px,94vw);max-height:82vh;overflow:auto;border:1px solid #304b59;border-radius:13px;background:#0d1821;padding:15px;color:#dce7ed;box-shadow:0 30px 100px #000d}.pbr-card h3{font-size:21px;margin:4px 0}.pbr-card small{font:800 9px ui-monospace;color:#60d5bd}.pbr-card li,.pbr-card p{font-size:11px;line-height:1.55;color:#a9bbc5}.pbr-card button{border:1px solid #2a8c78;background:#176c5c;color:#fff;border-radius:8px;padding:9px 12px;font-weight:800}
   `;document.head.appendChild(s)}
 
-  function syncPads(){const st=stage(),w=world();if(!st||!w)return;ensureLayers();st.classList.toggle('pcb-route-mode',routeMode());st.classList.toggle('pcb-outline-mode',outlineMode);const keep=new Set();for(const fp of st.querySelectorAll('.footprint')){const{ref}=footprintInfo(fp);if(!ref)continue;const fr=fp.getBoundingClientRect(),wr=w.getBoundingClientRect();for(const spec of specs(ref)){const id=`${ref}.${spec.n}`;keep.add(id);let p=padLayer.querySelector(`[data-pin="${CSS.escape(id)}"]`);if(!p){p=document.createElement('span');p.className='pcb-board-pad';p.dataset.pin=id;p.textContent=spec.n;p.title=id;p.addEventListener('pointerdown',onPadDown);padLayer.appendChild(p)}let cx=spec.side==='left'?fr.left:fr.right;let cy=fr.top+fr.height*spec.pos/100;const q=clientToWorld(cx,cy);p.style.left=`${q.x}px`;p.style.top=`${q.y}px`}}
-    padLayer.querySelectorAll('.pcb-board-pad').forEach(p=>{if(!keep.has(p.dataset.pin))p.remove()})}
+  function syncPads(){const st=stage(),w=world();if(!st||!w)return;ensureLayers();st.classList.toggle('pcb-route-mode',routeMode());st.classList.toggle('pcb-outline-mode',outlineMode);const keep=new Set(),padCache=[],placements=[];const wr=w.getBoundingClientRect();model.worldSize={width:w.offsetWidth,height:w.offsetHeight};for(const fp of st.querySelectorAll('.footprint')){const{ref}=footprintInfo(fp);if(!ref)continue;const fr=fp.getBoundingClientRect();const center=clientToWorld(fr.left+fr.width/2,fr.top+fr.height/2);placements.push({ref,x:center.x,y:center.y,rotationDeg:Number((fp.style.getPropertyValue('--rot')||'0').replace('deg',''))||0});for(const spec of specs(ref)){const id=`${ref}.${spec.n}`;keep.add(id);let p=padLayer.querySelector(`[data-pin="${CSS.escape(id)}"]`);if(!p){p=document.createElement('span');p.className='pcb-board-pad';p.dataset.pin=id;p.textContent=spec.n;p.title=id;p.addEventListener('pointerdown',onPadDown);padLayer.appendChild(p)}let cx=spec.side==='left'?fr.left:fr.right;let cy=fr.top+fr.height*spec.pos/100;const q=clientToWorld(cx,cy);p.style.left=`${q.x}px`;p.style.top=`${q.y}px`;padCache.push({id,ref,pin:spec.n,x:q.x,y:q.y})}}
+    padLayer.querySelectorAll('.pcb-board-pad').forEach(p=>{if(!keep.has(p.dataset.pin))p.remove()});model.pads=padCache;model.placements=placements;for(const tr of model.tracks){const a=padCache.find(p=>p.id===tr.from),b=padCache.find(p=>p.id===tr.to);if(a)tr.start={x:a.x,y:a.y};if(b)tr.end={x:b.x,y:b.y}}}
 
   function requiredEdges(){const edges=[];for(const n of nets()){const pins=n.pinList||String(n.pins||'').split(/[·,;\s]+/).filter(Boolean);for(let i=0;i<pins.length-1;i++)edges.push({net:n.name,a:pins[i],b:pins[i+1]})}return edges}
   function isEdgeRouted(a,b){return model.tracks.some(tr=>(tr.from===a&&tr.to===b)||(tr.from===b&&tr.to===a))}
@@ -73,7 +73,7 @@
     updateHud()}
   function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(draw)}
 
-  function onPadDown(e){if(!routeMode()||e.button!==0)return;e.preventDefault();e.stopPropagation();const id=e.currentTarget.dataset.pin;if(!currentRoute){currentRoute={from:id,corners:[]};pointerWorld=pinPoint(id);e.currentTarget.classList.add('start');schedule();return}if(id===currentRoute.from){cancelRoute();return}const net=sameNet(currentRoute.from,id);if(!net){notify(t(`Tidak bisa short ${currentRoute.from} ke ${id}: kedua pin bukan net yang sama.`,`Cannot short ${currentRoute.from} to ${id}: they are not on the same net.`),'bad');return}if(!isEdgeRouted(currentRoute.from,id))model.tracks.push({id:`T${Date.now()}_${Math.random().toString(36).slice(2,6)}`,net:net.name,from:currentRoute.from,to:id,layer:currentLayer,corners:[...currentRoute.corners],widthMm:.25});save();cancelRoute(false);schedule();window.dispatchEvent(new CustomEvent('pcbpro:board-changed',{detail:{model:structuredClone(model)}}))}
+  function onPadDown(e){if(!routeMode()||e.button!==0)return;e.preventDefault();e.stopPropagation();const id=e.currentTarget.dataset.pin;if(!currentRoute){currentRoute={from:id,corners:[]};pointerWorld=pinPoint(id);e.currentTarget.classList.add('start');schedule();return}if(id===currentRoute.from){cancelRoute();return}const net=sameNet(currentRoute.from,id);if(!net){notify(t(`Tidak bisa short ${currentRoute.from} ke ${id}: kedua pin bukan net yang sama.`,`Cannot short ${currentRoute.from} to ${id}: they are not on the same net.`),'bad');return}if(!isEdgeRouted(currentRoute.from,id)){const a=pinPoint(currentRoute.from),b=pinPoint(id);model.tracks.push({id:`T${Date.now()}_${Math.random().toString(36).slice(2,6)}`,net:net.name,from:currentRoute.from,to:id,layer:currentLayer,corners:[...currentRoute.corners],widthMm:.25,start:a?{...a}:null,end:b?{...b}:null});}save();cancelRoute(false);schedule();window.dispatchEvent(new CustomEvent('pcbpro:board-changed',{detail:{model:structuredClone(model)}}))}
   function cancelRoute(redraw=true){currentRoute=null;pointerWorld=null;document.querySelectorAll('.pcb-board-pad.start').forEach(p=>p.classList.remove('start'));if(redraw)schedule()}
 
   function canvasDown(e){const st=stage();if(!st||!st.contains(e.target)||e.button!==0)return;if(e.target.closest?.('.pcb-board-pad,.footprint,#pcbpro-board-hud,.layer-strip,.stage-info,.floating-card'))return;
@@ -108,7 +108,7 @@
     const layer=['F.Cu','B.Cu'].includes(options.layer)?options.layer:currentLayer;
     const corners=Array.isArray(options.corners)?options.corners.filter(p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(p=>({x:p.x,y:p.y})):[];
     const widthMm=Number.isFinite(Number(options.widthMm))?Number(options.widthMm):.25;
-    const track={id:`T${Date.now()}_${Math.random().toString(36).slice(2,6)}`,net:net.name,from:a,to:b,layer,corners,widthMm};
+    const start=pinPoint(a),end=pinPoint(b);const track={id:`T${Date.now()}_${Math.random().toString(36).slice(2,6)}`,net:net.name,from:a,to:b,layer,corners,widthMm,start:start?{...start}:null,end:end?{...end}:null};
     model.tracks.push(track);save();schedule();window.dispatchEvent(new CustomEvent('pcbpro:board-changed',{detail:{model:structuredClone(model),source:'typed-command',track:structuredClone(track)}}));
     return {ok:true,track:structuredClone(track),alreadyExisted:false};
   }
@@ -121,9 +121,9 @@
     currentLayer=layer;schedule();return {ok:true,layer};
   }
 
-  function mount(){if(!stage())return;ensureLayers();syncPads();updateHud();const fake=world()?.querySelector('svg.rats');if(fake)fake.style.display='none';const card=stage()?.querySelector('.floating-card');if(card)card.style.display='none';schedule()}
+  function mount(){if(!stage())return;ensureLayers();syncPads();save();updateHud();const fake=world()?.querySelector('svg.rats');if(fake)fake.style.display='none';const card=stage()?.querySelector('.floating-card');if(card)card.style.display='none';schedule()}
   function start(){load();installStyles();document.addEventListener('pointerdown',canvasDown,true);document.addEventListener('pointermove',pointerMove,{passive:true});document.addEventListener('dblclick',dblClick,true);document.addEventListener('keydown',keyDown,true);document.addEventListener('click',()=>setTimeout(mount,0),{passive:true});window.addEventListener('resize',schedule,{passive:true});window.addEventListener('pcbpro:netlist-changed',()=>{model.tracks=model.tracks.filter(tr=>sameNet(tr.from,tr.to));save();schedule()});setTimeout(mount,0)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 
-  window.PCBProBoardModel={version:VERSION,get tracks(){return structuredClone(model.tracks)},get outline(){return structuredClone(model.outline)},get zones(){return[]},get model(){return structuredClone(model)},get activeLayer(){return currentLayer},drc,showDrc,routePins,deleteTrack,setActiveLayer,clear(){model={version:VERSION,tracks:[],outline:[]};save();schedule()},refresh:mount};
+  window.PCBProBoardModel={version:VERSION,get tracks(){return structuredClone(model.tracks)},get outline(){return structuredClone(model.outline)},get placements(){return structuredClone(model.placements||[])},get pads(){return structuredClone(model.pads||[])},get worldSize(){return model.worldSize?structuredClone(model.worldSize):null},get zones(){return[]},get model(){return structuredClone(model)},get activeLayer(){return currentLayer},drc,showDrc,routePins,deleteTrack,setActiveLayer,captureGeometry(){if(stage()){syncPads();save()}return structuredClone(model)},clear(){model={version:VERSION,tracks:[],outline:[],placements:[],pads:[],worldSize:null};save();schedule()},refresh:mount};
 })();
