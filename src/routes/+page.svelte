@@ -677,10 +677,16 @@
     if (tool === 'Export CSV') exportBom();
     if (tool === 'Run') runSimulation();
     if (tool === 'Stop') window.PCBProCommandBus?.execute?.('simulation.pause', {});
-    if (tool === 'Preflight') runDrc();
+    if (tool === 'Preflight') activeView === 'Fabrication' ? window.PCBProManufacturing?.preflight?.() : runDrc();
     if (tool === 'Electrical') runErc();
     if (['Clearance','Track width','Via','Differential','Mask','Silkscreen'].includes(tool)) window.PCBProProfessional?.open?.('constraints');
-    if (['Gerber','Drill','Pick & Place','Assembly','Archive'].includes(tool)) notify(`${tool}: manufacturing exporter is not implemented yet; no fake file will be generated.`);
+    if (tool === 'Gerber') window.PCBProManufacturing?.downloadGerbers?.();
+    if (tool === 'Drill') window.PCBProManufacturing?.downloadDrill?.();
+    if (tool === 'Pick & Place') window.PCBProManufacturing?.downloadCpl?.();
+    if (tool === 'Assembly') window.PCBProManufacturing?.downloadAssembly?.();
+    if (tool === 'Archive') window.PCBProManufacturing?.buildPackage?.();
+    if (tool === 'Zoom' && activeView === '3D') window.PCBProGeometry3D?.zoomBy?.(1.15);
+    if (tool === 'Reset' && activeView === '3D') window.PCBProGeometry3D?.reset?.();
   }
 
   /** @param {KeyboardEvent} event */
