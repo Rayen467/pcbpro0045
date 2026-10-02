@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProDatabase) return;
 
-  const VERSION='1.20.0';
+  const VERSION='1.21.0';
   const SUPABASE_URL='https://zomawqbdhktfdnyghxut.supabase.co';
   const ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvbWF3cWJkaGt0ZmRueWdoeHV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MTM2MTIsImV4cCI6MjEwNjQ4OTYxMn0.s55ppUfDs1TawNAWm2L3aTBf6JzptkZ9rTEYsMwrg7o';
   const SECRET_KEY='pcbpro0045-cloud-secret-v1';
