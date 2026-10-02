@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.14.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.15.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -38,7 +38,7 @@
     await load('/live-sim-engine.js');
     window.PCBProWorkspaceRepair?.repair?.();
     window.PCBProExplain?.refresh?.();
-    window.PCBProAssistantV114?.refresh?.();
+    window.PCBProAssistantV115?.refresh?.();
   }
 
   async function maybeLoadDeepLearning() {
@@ -60,6 +60,7 @@
     await load('/patch-v112.js');
     await load('/patch-v113.js');
     await load('/patch-v114.js');
+    await load('/patch-v115.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js');
@@ -70,6 +71,7 @@
     await load('/board-advanced-engine.js?v=1.0.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
+    await load('/project-command-bus-v115.js?v=1.15.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProBoardModel?.refresh?.();
@@ -79,10 +81,10 @@
     window.PCBProLearningCenter?.refresh?.();
     window.PCBProExplain?.refresh?.();
 
-    // The hybrid AI assistant is deferred so editing remains responsive. It replaces the old regex-first chatbot/provider stack.
+    // The AI engineering agent is deferred so editing remains responsive. It uses typed commands, local RAG/memory, and LLM planning/reasoning.
     idle(async () => {
-      await load('/assistant-brain-v114.js?v=1.14.0');
-      await load('/assistant-engine-v114.js?v=1.14.0');
+      await load('/assistant-brain-v115.js?v=1.15.0');
+      await load('/assistant-engine-v115.js?v=1.15.0');
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
       window.PCBProWorkspaceRepair?.repair?.();
@@ -96,10 +98,11 @@
       window.PCBProPatchV112?.inject?.();
       window.PCBProPatchV113?.inject?.();
       window.PCBProPatchV114?.inject?.();
+      window.PCBProPatchV115?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProExplain?.refresh?.();
-      window.PCBProAssistantV114?.refresh?.();
+      window.PCBProAssistantV115?.refresh?.();
     }, 700);
 
     document.addEventListener('click', async (event) => {
@@ -113,7 +116,7 @@
         window.PCBProAdvancedBoard?.refresh?.();
         window.PCBProBoardWorkflowBridge?.install?.();
         window.PCBProExplain?.refresh?.();
-        window.PCBProAssistantV114?.refresh?.();
+        window.PCBProAssistantV115?.refresh?.();
       },0);
     }, { passive: true });
 
