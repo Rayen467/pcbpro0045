@@ -2,7 +2,7 @@
 
 Browser-based EDA workspace built with SvelteKit.
 
-## Current baseline — v1.1.0
+## Original shell baseline — v1.1.0
 
 - Responsive professional workspace shell
 - Schematic, PCB, Simulator, 3D, BOM, Fabrication, Rules, and Release workspaces
@@ -22,6 +22,26 @@ Browser-based EDA workspace built with SvelteKit.
 - Project JSON export
 - BOM CSV export
 - Explicit engine-status labels so unfinished simulation/manufacturing features are not presented as production-ready
+
+## Project management improvements — v1.15.1
+
+The Svelte shell is extended by the engines loaded from `static/runtime-loader.js`, including wiring, PCB geometry, basic ERC/DRC, and a limited circuit solver.
+
+- New clears the component project and resets wiring, tracks, outline, vias, zones, keepouts and differential pairs.
+- Import layout opens a component-layout JSON export, including legacy shell exports. Files are validated before any replacement (2 MB / 5,000 components maximum). Import requires confirmation and clears previous connectivity and board geometry; start a new wiring design from the imported components.
+- Export layout creates a JSON backup of component properties and schematic/PCB positions. It does not contain wiring or board geometry. The existing File menu project snapshot remains a separate diagnostic export and is not accepted as a layout import if required fields are missing.
+- Save persists components in this browser; the runtime engines persist their own data separately. Component storage failures are reported without claiming success.
+- Unsaved component edits are indicated and guarded when leaving the page. Undo/redo applies to component edits, not full-project replacement or runtime engine history.
+- The shell fallback avoids claiming verified ERC/DRC or completed routing before the runtime engines are available. Runtime basic checks remain distinct from manufacturing-grade verification.
+
+## Validation
+
+```bash
+npm ci
+npm test
+npm run check
+npm run build
+```
 
 ## Interaction shortcuts
 
