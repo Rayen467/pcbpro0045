@@ -97,9 +97,11 @@
     const tracks=Array.isArray(board.tracks)?board.tracks:[];
     const vias=Array.isArray(adv.vias)?adv.vias:[];
     const outline=Array.isArray(board.outline)?board.outline:[];
+    const physical=window.PCBProPhysicalDRC?.run?.()||null;
     const findings=[
       ...(window.PCBProBoardModel?.drc?.()||[]),
-      ...(window.PCBProAdvancedBoard?.drc?.()||[])
+      ...(window.PCBProAdvancedBoard?.drc?.()||[]),
+      ...((physical?.findings||[]).filter(x=>x.severity==='error'||x.severity==='blocker').map(x=>x.message))
     ];
     const checks=[];
 
