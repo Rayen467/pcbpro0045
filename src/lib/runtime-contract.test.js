@@ -9,13 +9,15 @@ const browserScripts = [
   'static/runtime-loader.js',
   'static/workspace-repair.js',
   'static/database-engine-v117.js',
-  'static/stability-engine-v120.js',
+  'static/stability-engine-v121.js',
   'static/project-command-bus-v115.js',
   'static/professional-engine-v118.js',
   'static/pcb-layout-engine.js',
   'static/board-advanced-engine.js',
   'static/manufacturing-engine-v120.js',
   'static/geometry-3d-engine-v120.js',
+  'static/physical-drc-v121.js',
+  'static/domain-integrity-v121.js',
   'static/wire-engine.js'
 ];
 
@@ -38,7 +40,9 @@ test('runtime loader includes critical production engines', () => {
     'assistant-engine-v115.js',
     'manufacturing-engine-v120.js',
     'geometry-3d-engine-v120.js',
-    'stability-engine-v120.js'
+    'physical-drc-v121.js',
+    'domain-integrity-v121.js',
+    'stability-engine-v121.js'
   ]) assert.match(loader, new RegExp(asset.replaceAll('.', '\\.')));
 });
 
@@ -81,6 +85,9 @@ test('typed command bus exposes professional, manufacturing, 3D, and real PCB ac
   assert.match(bus, /'manufacturing\.preflight'/);
   assert.match(bus, /'manufacturing\.exportPackage'/);
   assert.match(bus, /'mechanical3d\.open'/);
+  assert.match(bus, /'pcb\.runPhysicalDRC'/);
+  assert.match(bus, /'integrity\.validate'/);
+  assert.match(bus, /'integrity\.repair'/);
 });
 
 test('manufacturing exporter is coverage-gated and never silently fabricates missing footprint pads', () => {
@@ -102,4 +109,30 @@ test('3D viewer is driven by persisted board geometry rather than decorative pla
   assert.match(view, /tracks/);
   assert.match(view, /vias/);
   assert.match(view, /STEP bodies/);
+});
+
+
+test('physical DRC covers calibrated professional geometry rules', () => {
+  const drc = read('static/physical-drc-v121.js');
+  for (const rule of ['TRACK_WIDTH','TRACK_CLEARANCE','TRACK_EDGE_CLEARANCE','VIA_DIAMETER','VIA_DRILL','ANNULAR_RING','VIA_TRACK_CLEARANCE','VIA_CLEARANCE','OUTLINE_SELF_INTERSECTION']) {
+    assert.match(drc, new RegExp(rule));
+  }
+  assert.match(drc, /PCBProManufacturing/);
+  assert.match(drc, /PCBProProfessional/);
+});
+
+test('domain integrity audits cross-engine source of truth and safe repair', () => {
+  const integrity = read('static/domain-integrity-v121.js');
+  for (const check of ['ORPHAN_WIRE_ENDPOINT','TRACK_NET_MISMATCH','ORPHAN_TRACK_ENDPOINT','ORPHAN_VIA_NET','ORPHAN_ZONE_NET']) {
+    assert.match(integrity, new RegExp(check));
+  }
+  assert.match(integrity, /SHA-256/);
+  assert.match(integrity, /deleteWire/);
+  assert.match(integrity, /deleteTrack/);
+});
+
+test('manufacturing preflight is gated by physical DRC', () => {
+  const mfg = read('static/manufacturing-engine-v120.js');
+  assert.match(mfg, /PCBProPhysicalDRC/);
+  assert.match(mfg, /PHYSICAL_DRC/);
 });
