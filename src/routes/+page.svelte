@@ -206,7 +206,7 @@
     const id = nextRef(part.prefix);
     const created = {
       id, code: part.code, name: part.name, value: part.value, footprint: part.footprint,
-      catalogKey: part.key || '', group: part.group || '', pinCount: Number(part.pinCount || 0),
+      catalogKey: part.key || '', group: part.group || '', pinCount: part.pinCount == null ? null : Number(part.pinCount),
       kind: part.kind || 'template', manufacturer: part.manufacturer || '', mpn: part.mpn || '',
       tags: Array.isArray(part.tags) ? [...part.tags] : [], description: part.description || '',
       sx: surface === 'schematic' ? x : 50, sy: surface === 'schematic' ? y : 50,
@@ -594,7 +594,7 @@
             <div class="world" style={`transform:translate3d(${panX}px,${panY}px,0) scale(${zoom/100})`}>
               <svg class="wires" viewBox="0 0 1000 620" preserveAspectRatio="none"><polyline points="170,300 310,300 310,175 470,175"/><polyline points="530,175 710,175 710,300 810,300"/><polyline points="810,300 810,450 170,450 170,300"/></svg>
               {#each components as part}
-                <button class:selected={selectedId===part.id} class:pending={placementId===part.id} class="node" data-pin-count={part.pinCount || 0} data-catalog-key={part.catalogKey || ''} data-part-kind={part.kind || ''} style={`left:${part.sx}%;top:${part.sy}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'schematic')}>
+                <button class:selected={selectedId===part.id} class:pending={placementId===part.id} class="node" data-pin-count={part.pinCount == null ? '' : part.pinCount} data-catalog-key={part.catalogKey || ''} data-part-kind={part.kind || ''} style={`left:${part.sx}%;top:${part.sy}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'schematic')}>
                   <span class="ref">{part.id}</span><div class="symbol">{part.code==='R'?'─[▰]─':part.code==='C'?'─│ │─':part.code==='GND'?'⏚':part.code==='LED'?'─▷│↗':part.code==='V'?'⊕':part.code}</div><b>{part.value}</b><small>{part.name}</small>
                 </button>
               {/each}
@@ -608,7 +608,7 @@
             <div class="world" style={`transform:translate3d(${panX}px,${panY}px,0) scale(${zoom/100})`}>
               <div class="board"><i class="hole h1"></i><i class="hole h2"></i><i class="hole h3"></i><i class="hole h4"></i></div>
               {#each pcbParts as part}
-                <button class:selected={selectedId===part.id} class="footprint" data-pin-count={part.pinCount || 0} data-catalog-key={part.catalogKey || ''} style={`left:${part.px}%;top:${part.py}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'pcb')}><span>{part.id}</span><i></i><i></i><small>{part.footprint}</small></button>
+                <button class:selected={selectedId===part.id} class="footprint" data-pin-count={part.pinCount == null ? '' : part.pinCount} data-catalog-key={part.catalogKey || ''} style={`left:${part.px}%;top:${part.py}%;--rot:${part.rot}deg`} onpointerdown={(e)=>startNodeDrag(e,part.id,'pcb')}><span>{part.id}</span><i></i><i></i><small>{part.footprint}</small></button>
               {/each}
               {#if layerVisibility.Ratsnest && !routed}<svg class="rats" viewBox="0 0 1000 620"><line x1="180" y1="350" x2="470" y2="190"/><line x1="470" y1="190" x2="760" y2="370"/></svg>{/if}
             </div>
