@@ -240,38 +240,97 @@
   function downloadBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
   function downloadText(name,text,mime='text/plain'){downloadBlob(name,new Blob([text],{type:mime}))}
 
-  async function buildPackage(){
-    const report=preflight();if(!report.readyForDraft)return {ok:false,error:'Preflight blocked',report};
-    const b=board(),a=advanced(),cal=calibration(b),name=projectName();
+  function buildKnownFiles(){
+    const report=preflight();
+    if(!report.readyForDraft)return {ok:false,error:'Preflight blocked',report};
+    const b=board(),a=advanced(),cal=calibration(b),name=projectName(),padSource=physicalPadSource();
     if(!cal)return {ok:false,error:'Physical calibration missing',report};
-    const fcu=gerberCopper('F.Cu',cal,b,a),bcu=gerberCopper('B.Cu',cal,b,a),edge=gerberOutline(cal,b),drill=excellon(cal,a),bom=bomCsv(),cpl=cplCsv(cal,b);
-    const files=[
-      {name:`${name}-F_Cu.gbr`,data:fcu},
-      {name:`${name}-B_Cu.gbr`,data:bcu},
-      {name:`${name}-Edge_Cuts.gbr`,data:edge},
-      {name:`${name}.drl`,data:drill},
-      {name:`${name}-BOM.csv`,data:bom},
-      {name:`${name}-CPL.csv`,data:cpl}
+    const physicalPads=padSource.ready?padSource.pads:[];
+    return {
+      ok:true,report,b,a,cal,name,padSource,
+      files:{
+        fcu:gerberCopper('F.Cu',cal,b,a,physicalPads),
+        bcu:gerberCopper('B.Cu',cal,b,a,physicalPads),
+        edge:gerberOutline(cal,b),
+        drill:excellon(cal,a),
+        bom:bomCsv(),
+        cpl:cplCsv(cal,b)
+      }
+    };
+  }
+
+  async function buildPackage(){
+    const built=buildKnownFiles();
+    if(!built.ok)return built;
+    const report=built.report,name=built.name,files=built.files;
+    const list=[
+      {name:name+'-F_Cu.gbr',data:files.fcu},
+      {name:name+'-B_Cu.gbr',data:files.bcu},
+      {name:name+'-Edge_Cuts.gbr',data:files.edge},
+      {name:name+'.drl',data:files.drill},
+      {name:name+'-BOM.csv',data:files.bom},
+      {name:name+'-CPL.csv',data:files.cpl}
     ];
     const manifest={
-      generator:`PCB Pro ${VERSION}`,project:name,createdAt:new Date().toISOString(),
+      generator:'PCB Pro '+VERSION,
+      project:name,
+      createdAt:new Date().toISOString(),
       releaseClass:report.readyForProduction?'production-candidate':'ENGINEERING-DRAFT-NOT-FOR-FABRICATION',
-      dimensionsMm:report.coverage.dimensionsMm,coverage:report.coverage,preflight:report,
+      dimensionsMm:report.coverage.dimensionsMm,
+      coverage:report.coverage,
+      preflight:report,
       professionalRules:professional(),
       limitations:report.readyForProduction?[]:[
-        'Verified per-footprint physical pad geometry is not connected.',
-        'Copper Gerbers include persisted routed tracks and vias only; missing footprint pad flashes make this package unsuitable for fabrication.'
+        'Verified per-footprint physical pad geometry is incomplete or unavailable.',
+        'Copper Gerbers include only verified/known copper geometry; this package must not be sent to fabrication as a production release.'
       ],
       files:[]
     };
-    for(const f of files)manifest.files.push({name:f.name,sha256:await sha256(f.data),bytes:enc.encode(f.data).length});
-    const manifestText=JSON.stringify(manifest,null,2)+'\n';files.push({name:`${name}-MANIFEST.json`,data:manifestText});
-    const zip=zipStore(files);
+    for(const file of list){
+      manifest.files.push({name:file.name,sha256:await sha256(file.data),bytes:enc.encode(file.data).length});
+    }
+    const manifestText=JSON.stringify(manifest,null,2)+'\n';
+    list.push({name:name+'-MANIFEST.json',data:manifestText});
+    const zip=zipStore(list);
     state.lastPackage={manifest,bytes:zip.size};
-    downloadBlob(`${name}-${report.readyForProduction?'manufacturing':'draft-cam'}.zip`,zip);
+    downloadBlob(name+'-'+(report.readyForProduction?'manufacturing':'draft-cam')+'.zip',zip);
     window.dispatchEvent(new CustomEvent('pcbpro:manufacturing-exported',{detail:structuredClone(state.lastPackage)}));
     render();
     return {ok:true,releaseClass:manifest.releaseClass,manifest,bytes:zip.size};
+  }
+
+  function downloadGerbers(){
+    const x=buildKnownFiles();if(!x.ok)return x;
+    const zip=zipStore([
+      {name:x.name+'-F_Cu.gbr',data:x.files.fcu},
+      {name:x.name+'-B_Cu.gbr',data:x.files.bcu},
+      {name:x.name+'-Edge_Cuts.gbr',data:x.files.edge}
+    ]);
+    downloadBlob(x.name+'-gerbers-'+(x.report.readyForProduction?'candidate':'draft')+'.zip',zip);
+    return {ok:true,releaseClass:x.report.readyForProduction?'production-candidate':'engineering-draft'};
+  }
+
+  function downloadDrill(){
+    const x=buildKnownFiles();if(!x.ok)return x;
+    downloadText(x.name+'.drl',x.files.drill);return {ok:true};
+  }
+
+  function downloadBom(){
+    downloadText(projectName()+'-BOM.csv',bomCsv(),'text/csv');return {ok:true};
+  }
+
+  function downloadCpl(){
+    const x=buildKnownFiles();if(!x.ok)return x;
+    downloadText(x.name+'-CPL.csv',x.files.cpl,'text/csv');return {ok:true};
+  }
+
+  function downloadAssembly(){
+    const x=buildKnownFiles();if(!x.ok)return x;
+    downloadBlob(x.name+'-assembly.zip',zipStore([
+      {name:x.name+'-BOM.csv',data:x.files.bom},
+      {name:x.name+'-CPL.csv',data:x.files.cpl}
+    ]));
+    return {ok:true};
   }
 
   function installStyles(){
