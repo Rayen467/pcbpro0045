@@ -139,22 +139,38 @@
     else pts.push({x:tr.end.x,y:last.y},tr.end);
     return pts;
   }
-  function gerberCopper(layer,cal,b,a){
+  function gerberCopper(layer,cal,b,a,physicalPads=[]){
     const tracks=(b.tracks||[]).filter(x=>(x.layer||'F.Cu')===layer);
     const vias=a.vias||[];
-    const {map,viaMap}=apertureMap(tracks,vias);
+    const pads=physicalPads.filter(p=>p.layer===layer||p.layer==='*.Cu');
+    const {map,viaMap,padMap}=apertureMap(tracks,vias,pads);
     const out=gerberHeader(layer);
-    for(const [w,d] of map)out.push(`%ADD${d}C,${w}*%`);
-    for(const [dia,d] of viaMap)out.push(`%ADD${d}C,${dia}*%`);
+    for(const [w,d] of map)out.push('%ADD'+d+'C,'+w+'*%');
+    for(const [dia,d] of viaMap)out.push('%ADD'+d+'C,'+dia+'*%');
+    for(const [key,d] of padMap){
+      if(key.startsWith('R:')){
+        const size=key.slice(2).split('x');
+        out.push('%ADD'+d+'R,'+size[0]+'X'+size[1]+'*%');
+      }else out.push('%ADD'+d+'C,'+key.slice(2)+'*%');
+    }
     for(const tr of tracks){
-      const d=map.get(Number(tr.widthMm||0.25).toFixed(6));const pts=trackWorldPoints(tr).map(cal.point);
+      const d=map.get(Number(tr.widthMm||0.25).toFixed(6));
+      const pts=trackWorldPoints(tr).map(cal.point);
       if(pts.length<2)continue;
-      out.push(`D${d}*`,`X${coordMm(pts[0].x)}Y${coordMm(pts[0].y)}D02*`);
-      for(const p of pts.slice(1))out.push(`X${coordMm(p.x)}Y${coordMm(p.y)}D01*`);
+      out.push('D'+d+'*','X'+coordMm(pts[0].x)+'Y'+coordMm(pts[0].y)+'D02*');
+      for(const p of pts.slice(1))out.push('X'+coordMm(p.x)+'Y'+coordMm(p.y)+'D01*');
     }
     for(const v of vias){
       const p=cal.point(v),dia=Number(v.diameterMm||v.diameter||0.6).toFixed(6),d=viaMap.get(dia);
-      if(d)out.push(`D${d}*`,`X${coordMm(p.x)}Y${coordMm(p.y)}D03*`);
+      if(d)out.push('D'+d+'*','X'+coordMm(p.x)+'Y'+coordMm(p.y)+'D03*');
+    }
+    for(const p of pads){
+      const shape=String(p.shape||'circle').toLowerCase();
+      const key=shape==='rect'
+        ? 'R:'+Number(p.widthMm).toFixed(6)+'x'+Number(p.heightMm).toFixed(6)
+        : 'C:'+Number(p.diameterMm||p.widthMm).toFixed(6);
+      const d=padMap.get(key);
+      if(d)out.push('D'+d+'*','X'+coordMm(Number(p.xMm))+'Y'+coordMm(Number(p.yMm))+'D03*');
     }
     out.push('M02*');
     return out.join('\n')+'\n';
