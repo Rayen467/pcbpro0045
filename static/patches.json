@@ -1,5 +1,37 @@
 [
   {
+    "version": "1.18.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Professional Engineering Baseline — China EDA + Evidence",
+      "en": "Professional Engineering Baseline — China EDA + Evidence"
+    },
+    "changes": {
+      "id": [
+        "Tambah tombol PRO dan Professional Design & Evidence Center: Audit, Rules/DFM, SI/Timing, jurnal 5 tahun, Patent Watch, benchmark tools China, dan Upgrade Map.",
+        "Benchmark publik memakai EasyEDA Pro/JLCEDA Pro dan JLCPCB tanpa menyalin code/UI proprietary.",
+        "Tambah DFM profiles Safe Prototype, JLCPCB Conservative 1 oz, dan JLCPCB Capability Edge 1 oz.",
+        "PCB DRC membaca minimum track width profile; Advanced DRC membaca minimum via diameter/drill profile.",
+        "Tambah impedance/timing screening calculator dengan penandaan tegas bahwa hasil bukan sign-off.",
+        "Supabase evidence library saat ini berisi 12 sumber riset 2022–2025, 7 patent-awareness records, dan 4 reference-tool records yang metadata sumbernya diverifikasi.",
+        "Assistant RAG ikut memakai professional evidence agar LLM tidak berdiri sendiri.",
+        "Database dirancang untuk berkembang ke 100k+ metadata DOI, tetapi release ini tidak mengklaim 100.000 paper sudah dibaca atau diverifikasi.",
+        "Urutan upgrade profesional dikunci: central domain model → full geometry DRC/DFM → Gerber/Drill/CAM → high-speed SI/PI/thermal → AI optimization/digital twin."
+      ],
+      "en": [
+        "Added the PRO button and Professional Design & Evidence Center: Audit, Rules/DFM, SI/Timing, five-year research, Patent Watch, Chinese-tool benchmarks, and Upgrade Map.",
+        "Public benchmarking uses EasyEDA Pro/JLCEDA Pro and JLCPCB without copying proprietary code/UI.",
+        "Added Safe Prototype, JLCPCB Conservative 1 oz, and JLCPCB Capability Edge 1 oz DFM profiles.",
+        "PCB DRC reads profile minimum track width; Advanced DRC reads profile minimum via diameter/drill.",
+        "Added impedance/timing screening calculations with explicit non-sign-off labeling.",
+        "The Supabase evidence library currently contains 12 research records from 2022–2025, 7 patent-awareness records, and 4 verified reference-tool records.",
+        "Assistant RAG now consumes professional evidence so the LLM is not reasoning in isolation.",
+        "The database is designed to scale toward 100k+ DOI metadata records, but this release does not claim 100,000 papers were already read or verified.",
+        "Professional upgrade order is locked: central domain model → full geometry DRC/DFM → Gerber/Drill/CAM → high-speed SI/PI/thermal → AI optimization/digital twin."
+      ]
+    }
+  },
+  {
     "version": "1.17.0",
     "date": "2026-10-02",
     "title": {
