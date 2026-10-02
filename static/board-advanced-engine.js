@@ -3,7 +3,7 @@
   if (window.PCBProAdvancedBoard) return;
 
   const NS = 'http://www.w3.org/2000/svg';
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const KEY = 'pcbpro0045-board-advanced-v1';
   let state = {
     version: VERSION,
@@ -140,7 +140,8 @@
 
   function advancedDrc(){
     const out=[]; const names=new Set(netNames()); const outline=board()?.outline||[];
-    for(const v of state.vias){if(!names.has(v.net))out.push(t(`Via ${v.id}: net ${v.net} tidak ada di schematic.`,`Via ${v.id}: net ${v.net} is not in schematic.`));if(outline.length>=3&&!pointInPoly(v,outline))out.push(t(`Via ${v.id}: berada di luar Edge.Cuts.`,`Via ${v.id}: outside Edge.Cuts.`));for(const k of state.keepouts)if(k.points?.length>=3&&pointInPoly(v,k.points))out.push(t(`Via ${v.id}: masuk area keepout.`,`Via ${v.id}: inside keepout.`))}
+    const pro=window.PCBProProfessional?.state;
+    for(const v of state.vias){if(!names.has(v.net))out.push(t(`Via ${v.id}: net ${v.net} tidak ada di schematic.`,`Via ${v.id}: net ${v.net} is not in schematic.`));if(outline.length>=3&&!pointInPoly(v,outline))out.push(t(`Via ${v.id}: berada di luar Edge.Cuts.`,`Via ${v.id}: outside Edge.Cuts.`));for(const k of state.keepouts)if(k.points?.length>=3&&pointInPoly(v,k.points))out.push(t(`Via ${v.id}: masuk area keepout.`,`Via ${v.id}: inside keepout.`));if(pro?.viaDiameterMm&&Number(v.diameterMm||state.viaDiameterMm)<Number(pro.viaDiameterMm))out.push(t(`Via ${v.id}: diameter di bawah professional profile.`,`Via ${v.id}: diameter is below the professional profile.`));if(pro?.viaDrillMm&&Number(v.drillMm||state.viaDrillMm)<Number(pro.viaDrillMm))out.push(t(`Via ${v.id}: drill di bawah professional profile.`,`Via ${v.id}: drill is below the professional profile.`))}
     for(const z of state.zones){if(z.points?.length<3)out.push(t(`Zone ${z.id}: polygon belum valid.`,`Zone ${z.id}: invalid polygon.`));if(!names.has(z.net))out.push(t(`Zone ${z.id}: net ${z.net} tidak ada.`,`Zone ${z.id}: net ${z.net} does not exist.`))}
     for(const k of state.keepouts)if(k.points?.length<3)out.push(t(`Keepout ${k.id}: polygon belum valid.`,`Keepout ${k.id}: invalid polygon.`));
     for(const pair of state.diffPairs){if(!names.has(pair.p)||!names.has(pair.n)){out.push(t(`Diff pair ${pair.name}: salah satu net tidak ada.`,`Diff pair ${pair.name}: one net is missing.`));continue}const lp=trackLengthForNet(pair.p),ln=trackLengthForNet(pair.n);if(!lp||!ln)out.push(t(`Diff pair ${pair.name}: kedua jalur belum diroute lengkap.`,`Diff pair ${pair.name}: both members are not fully routed.`));else{const delta=Math.abs(lp-ln);if(delta>pair.maxSkewWorld)out.push(t(`Diff pair ${pair.name}: mismatch panjang ${delta.toFixed(1)} > batas ${pair.maxSkewWorld}.`,`Diff pair ${pair.name}: length mismatch ${delta.toFixed(1)} > limit ${pair.maxSkewWorld}.`))}}
