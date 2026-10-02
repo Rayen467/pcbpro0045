@@ -79,9 +79,34 @@
 
   function updateHud(){const st=stage();if(!st){hud=null;return}if(!hud?.isConnected){hud=document.createElement('div');hud.id='pcbpro-board-hud';st.appendChild(hud);hud.addEventListener('click',(e)=>{const a=e.target.closest('button')?.dataset.a;if(a==='route'){outlineMode=false;window.PCBProCommand?.clickTool?.('route');schedule()}if(a==='outline'){outlineMode=!outlineMode;cancelRoute(false);schedule()}if(a==='clear-outline'){model.outline=[];save();schedule()}if(a==='drc')showDrc()})}const unrouted=requiredEdges().filter(e=>!isEdgeRouted(e.a,e.b)).length;hud.innerHTML=`<b>${currentLayer}</b><button data-a="route" class="${routeMode()?'active':''}">⌁ ${t('Route','Route')}</button><button data-a="outline" class="${outlineMode?'active':''}">▱ Edge.Cuts</button><button data-a="drc">DRC</button><button data-a="clear-outline">${t('Reset outline','Reset outline')}</button><span class="${unrouted?'bad':'good'}">${unrouted} unrouted · ${model.tracks.length} track</span>`}
 
+  function routePins(from,to,options={}){
+    if(!stage())return {ok:false,error:'PCB view is not mounted'};
+    ensureLayers();syncPads();
+    const a=String(from||''),b=String(to||'');
+    if(!pinPoint(a)||!pinPoint(b))return {ok:false,error:`Pad endpoint unavailable: ${!pinPoint(a)?a:b}`};
+    const net=sameNet(a,b);
+    if(!net)return {ok:false,error:`${a} and ${b} are not on the same schematic net`};
+    const existing=model.tracks.find(tr=>(tr.from===a&&tr.to===b)||(tr.from===b&&tr.to===a));
+    if(existing)return {ok:true,track:structuredClone(existing),alreadyExisted:true};
+    const layer=['F.Cu','B.Cu'].includes(options.layer)?options.layer:currentLayer;
+    const corners=Array.isArray(options.corners)?options.corners.filter(p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)).map(p=>({x:p.x,y:p.y})):[];
+    const widthMm=Number.isFinite(Number(options.widthMm))?Number(options.widthMm):.25;
+    const track={id:`T${Date.now()}_${Math.random().toString(36).slice(2,6)}`,net:net.name,from:a,to:b,layer,corners,widthMm};
+    model.tracks.push(track);save();schedule();window.dispatchEvent(new CustomEvent('pcbpro:board-changed',{detail:{model:structuredClone(model),source:'typed-command',track:structuredClone(track)}}));
+    return {ok:true,track:structuredClone(track),alreadyExisted:false};
+  }
+  function deleteTrack(id){
+    const idx=model.tracks.findIndex(x=>x.id===id);if(idx<0)return false;
+    const [removed]=model.tracks.splice(idx,1);save();schedule();window.dispatchEvent(new CustomEvent('pcbpro:board-changed',{detail:{model:structuredClone(model),source:'typed-command',removedTrack:structuredClone(removed)}}));return true;
+  }
+  function setActiveLayer(layer){
+    if(!['F.Cu','B.Cu'].includes(layer))return {ok:false,error:'Layer must be F.Cu or B.Cu'};
+    currentLayer=layer;schedule();return {ok:true,layer};
+  }
+
   function mount(){if(!stage())return;ensureLayers();syncPads();updateHud();const fake=world()?.querySelector('svg.rats');if(fake)fake.style.display='none';const card=stage()?.querySelector('.floating-card');if(card)card.style.display='none';schedule()}
   function start(){load();installStyles();document.addEventListener('pointerdown',canvasDown,true);document.addEventListener('pointermove',pointerMove,{passive:true});document.addEventListener('dblclick',dblClick,true);document.addEventListener('keydown',keyDown,true);document.addEventListener('click',()=>setTimeout(mount,0),{passive:true});window.addEventListener('resize',schedule,{passive:true});window.addEventListener('pcbpro:netlist-changed',()=>{model.tracks=model.tracks.filter(tr=>sameNet(tr.from,tr.to));save();schedule()});setTimeout(mount,0)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 
-  window.PCBProBoardModel={version:VERSION,get tracks(){return structuredClone(model.tracks)},get outline(){return structuredClone(model.outline)},get zones(){return[]},get model(){return structuredClone(model)},drc,showDrc,clear(){model={version:VERSION,tracks:[],outline:[]};save();schedule()},refresh:mount};
+  window.PCBProBoardModel={version:VERSION,get tracks(){return structuredClone(model.tracks)},get outline(){return structuredClone(model.outline)},get zones(){return[]},get model(){return structuredClone(model)},get activeLayer(){return currentLayer},drc,showDrc,routePins,deleteTrack,setActiveLayer,clear(){model={version:VERSION,tracks:[],outline:[]};save();schedule()},refresh:mount};
 })();
