@@ -531,7 +531,7 @@
       <button class="icon-btn" onclick={() => leftOpen = !leftOpen}>☰</button>
       <div class="logo">⌁</div><div class="brand"><strong>PCB Pro</strong><span>0045</span></div>
       <span class="version">POINTER ENGINE · v{version}</span>
-      <button class="project-pill"><i></i><b>LED Driver · Rev A</b><span>⌄</span></button>
+      <button class="project-pill" onclick={() => { leftOpen = true; leftTab = 'Project'; }} title="Open project panel"><i></i><b>LED Driver · Rev A</b><span>⌄</span></button>
     </div>
     <div class="top-actions">
       <span class="save-state">{dirty ? 'Unsaved changes' : savedAt}</span>
