@@ -108,15 +108,15 @@
           const existing = document.querySelector('script[data-pcbpro-catalog-v116]');
           if (existing) {
             if (window['PCBProComponentCatalog']) return resolve();
-            existing.addEventListener('load', resolve, { once: true });
-            existing.addEventListener('error', reject, { once: true });
+            existing.addEventListener('load', () => resolve(), { once: true });
+            existing.addEventListener('error', () => reject(new Error('Component catalog failed to load')), { once: true });
             return;
           }
           const script = document.createElement('script');
           script.src = '/component-catalog-v116.js?v=1.16.0';
           script.dataset.pcbproCatalogV116 = '1';
-          script.onload = resolve;
-          script.onerror = reject;
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Component catalog failed to load'));
           document.head.appendChild(script);
         }));
       }
