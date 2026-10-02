@@ -101,25 +101,34 @@
     return { ref, name, value, code };
   }
 
+  function distributedSpecs(count) {
+    if (count <= 0) return [];
+    if (count === 1) return [{ n:1, side:'top', pos:50 }];
+    if (count === 2) return [{ n:1, side:'left', pos:50 }, { n:2, side:'right', pos:50 }];
+    const out = [];
+    const leftCount = Math.ceil(count / 2);
+    const rightCount = Math.floor(count / 2);
+    for (let i = 1; i <= count; i++) {
+      const left = i <= leftCount;
+      const local = left ? i : i - leftCount;
+      const total = left ? leftCount : rightCount;
+      out.push({ n:i, side:left ? 'left' : 'right', pos:(local / (total + 1)) * 100 });
+    }
+    return out;
+  }
+
   function specsFor(node) {
     const c = componentInfo(node);
     if (!c.ref) return [];
+    const rawCount = node.dataset.pinCount;
+    if (rawCount !== undefined && rawCount !== '') {
+      const explicit = Number(rawCount);
+      if (Number.isFinite(explicit)) return distributedSpecs(explicit);
+    }
     if (c.code === 'GND' || c.code === 'TP') return [{ n:1, side:'top', pos:50 }];
-    if (c.code === 'Q') return [
-      { n:1, side:'left', pos:30 },
-      { n:2, side:'left', pos:70 },
-      { n:3, side:'right', pos:50 }
-    ];
-    if (c.code === 'U') return [
-      { n:1,side:'left',pos:20 }, { n:2,side:'left',pos:40 },
-      { n:3,side:'left',pos:60 }, { n:4,side:'left',pos:80 },
-      { n:5,side:'right',pos:80 }, { n:6,side:'right',pos:60 },
-      { n:7,side:'right',pos:40 }, { n:8,side:'right',pos:20 }
-    ];
-    return [
-      { n:1, side:'left', pos:50 },
-      { n:2, side:'right', pos:50 }
-    ];
+    if (c.code === 'Q') return distributedSpecs(3);
+    if (c.code === 'U') return distributedSpecs(8);
+    return distributedSpecs(2);
   }
 
   function installStyles() {
