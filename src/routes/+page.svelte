@@ -646,12 +646,15 @@
       notify('PCB DRC engines are still loading.');
       return [];
     }
+    const physical = window.PCBProPhysicalDRC?.run?.();
     const findings = [
       ...(hasBase ? (window.PCBProBoardModel.drc() || []) : []),
-      ...(hasAdvanced ? (window.PCBProAdvancedBoard.drc() || []) : [])
+      ...(hasAdvanced ? (window.PCBProAdvancedBoard.drc() || []) : []),
+      ...((physical?.calibrated ? (physical.findings || []).filter((x) => x.severity === 'error' || x.severity === 'blocker').map((x) => x.message) : []))
     ];
     drcFindings = findings.length;
-    notify(findings.length ? `DRC: ${findings.length} finding(s)` : 'DRC passed for the geometry/rules currently implemented.');
+    const physicalNote = physical?.calibrated ? ' · physical mm checks included' : ' · physical mm checks unresolved until board dimensions are set';
+    notify(findings.length ? `DRC: ${findings.length} finding(s)${physicalNote}` : `DRC passed for the implemented checks${physicalNote}.`);
     return findings;
   }
 
