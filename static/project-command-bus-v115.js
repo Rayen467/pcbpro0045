@@ -131,6 +131,12 @@
       describe:a=>t(`Buka view ${a.view}.`,`Open ${a.view} view.`),
       execute:async a=>({ok:clickView(a.view),view:a.view})
     },
+    'schematic.activateWire':{
+      risk:'low',adapter:'workspace',
+      schema:{properties:{}},
+      describe:()=>t('Aktifkan tool Wire pada schematic.','Activate the Wire tool on the schematic.'),
+      execute:async()=>{if(!await ensureView('schematic'))return {ok:false,error:'Schematic view unavailable'};const b=[...document.querySelectorAll('.tools button')].find(x=>/^(wire|kabel)$/i.test(clean(x.dataset?.pcbTool||x.querySelector('small')?.textContent||x.textContent)));if(!b)return {ok:false,error:'Wire tool unavailable'};b.click();await wait(30);return {ok:true,mode:'wire'};}
+    },
     'component.select':{
       risk:'low',adapter:'ui-bridge',
       schema:{required:['ref'],properties:{ref:{type:'string',pattern:'^[A-Za-z]+\\d+$'}}},
