@@ -128,6 +128,9 @@
       if(jobs[3].status==='fulfilled')flattenParts(jobs[3].value);
       if(jobs[4].status==='fulfilled')flattenPatches(jobs[4].value);
       if(window.PCBProComponentCatalog?.build)flattenExtendedCatalog(window.PCBProComponentCatalog.build());
+      if(window.PCBProProfessional?.ragChunks){
+        for(const x of window.PCBProProfessional.ragChunks()) addChunk(x.source,x.id,x.title,x.text,{type:'professional-evidence'});
+      }
       libraryReady=true;return chunks;
     })();
     return libraryPromise;
@@ -340,6 +343,7 @@
 
   buildLibrary();
   window.addEventListener('pcbpro:catalog-ready',()=>{libraryPromise=null;libraryReady=false;buildLibrary().catch(()=>{})});
+  window.addEventListener('pcbpro:professional-evidence-ready',()=>{libraryPromise=null;libraryReady=false;buildLibrary().catch(()=>{})});
   window.PCBProAssistantBrain={version:VERSION,ask,retrieve:(q)=>retrieve(q,projectSnapshot()),projectSnapshot,snapshot,resetMemory,rebuildLibrary:()=>{libraryPromise=null;libraryReady=false;return buildLibrary()},get lastMeta(){return lastMeta}};
 
   window.PCBProExplain?.register?.({
