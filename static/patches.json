@@ -1,5 +1,31 @@
 [
   {
+    "version": "1.21.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Domain Integrity + Physical DRC",
+      "en": "Domain Integrity + Physical DRC"
+    },
+    "changes": {
+      "id": [
+        "Audit source-of-truth lintas components, wires, nets, PCB tracks, placements, pads, vias, zones, diff-pairs, rules, dan manufacturing state.",
+        "Deteksi duplicate ref/ID, orphan endpoint, pin di luar pinCount, track/net mismatch, stale placements, orphan via/zone net, dan stale diff-pair.",
+        "Repair mode hanya menghapus stale wire/track yang aman dibuktikan invalid.",
+        "Project fingerprint SHA-256 untuk snapshot source-of-truth.",
+        "Physical DRC terkalibrasi mm: track width, copper clearance, via diameter/drill, annular ring, via-track, via-via, copper-edge, dan Edge.Cuts self-intersection.",
+        "Manufacturing preflight sekarang diblokir jika physical DRC menemukan pelanggaran."
+      ],
+      "en": [
+        "Cross-engine source-of-truth audit across components, wires, nets, PCB tracks, placements, pads, vias, zones, diff pairs, rules, and manufacturing state.",
+        "Detects duplicate refs/IDs, orphan endpoints, pins beyond pinCount, track/net mismatch, stale placements, orphan via/zone nets, and stale diff pairs.",
+        "Repair mode only removes stale wires/tracks that are provably invalid.",
+        "SHA-256 project fingerprint for source-of-truth snapshots.",
+        "Calibrated physical DRC in mm: track width, copper clearance, via diameter/drill, annular ring, via-track, via-via, copper-edge, and Edge.Cuts self-intersection.",
+        "Manufacturing preflight is now blocked when physical DRC finds violations."
+      ]
+    }
+  },
+  {
     "version": "1.20.0",
     "date": "2026-10-02",
     "title": {
