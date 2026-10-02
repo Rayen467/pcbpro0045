@@ -57,7 +57,7 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.20.0';
+  const version = '1.21.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
@@ -809,9 +809,9 @@
         {:else if activeView === 'Fabrication'}
           <section class="panel"><div class="panel-title"><div><span>FABRICATION</span><h2>Manufacturing & CAM package</h2><p>Gerber/Excellon/BOM/CPL export is gated by deterministic preflight and explicit geometry coverage.</p></div><button class="primary" onclick={() => window.PCBProManufacturing?.preflight?.()}>Run preflight</button></div><div class="cards"><article><b>CAM ENGINE</b><h3>Loading manufacturing runtime</h3><p>Physical board dimensions and verified geometry are required before export. Missing footprint pad geometry is never fabricated.</p></article></div></section>
         {:else if activeView === 'Rules'}
-          <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Rules are stored in the project profile instead of fake editable values.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>DRC</b><h3>Deterministic checks</h3><p>Track width and via profile checks are connected. Unsupported geometry checks remain UNKNOWN, not PASS.</p></article><article><b>DFM</b><h3>Fabricator profile</h3><p>Use PRO → Rules & DFM to select and edit the active manufacturing profile.</p></article></div><div class="pp-actions"><button class="primary" onclick={runDrc}>Run DRC</button></div></section>
+          <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Deterministic geometry checks plus calibrated physical DRC in millimeters.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>GEOMETRY DRC</b><h3>Logical + board checks</h3><p>Connectivity, routing, outline, via/zone/keepout and implemented geometry rules.</p></article><article><b>PHYSICAL DRC</b><h3>mm-calibrated clearance</h3><p>Track width, copper clearance, via diameter/drill, annular ring and copper-to-edge checks using the physical board dimensions.</p></article><article><b>DOMAIN INTEGRITY</b><h3>Cross-engine source of truth</h3><p>Audits components, wires, nets, PCB tracks, placements, vias, zones, rules and manufacturing state for stale references.</p></article></div><div class="pp-actions"><button onclick={runDrc}>Run DRC</button><button onclick={() => window.PCBProPhysicalDRC?.show?.()}>Physical DRC</button><button class="primary" onclick={() => window.PCBProIntegrity?.show?.()}>Integrity Audit</button></div></section>
         {:else}
-          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Manufacturing and 3D geometry integration added on top of the stability baseline.</p></div></div><div class="release"><article><b>v1.20.0</b><h3>Manufacturing + 3D Geometry</h3><p>Persisted PCB geometry, interactive 3D board viewer, Gerber/Excellon/BOM/CPL package generation, SHA-256 manifest and explicit production-coverage gates.</p></article><article><b>v1.19.0</b><h3>Stability & Integration Pass</h3><p>Strict checks, runtime regression tests, real engine bridges and placeholder removal.</p></article></div></section>
+          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Cross-engine integrity and calibrated physical DRC extend the manufacturing baseline.</p></div></div><div class="release"><article><b>v1.21.0</b><h3>Domain Integrity + Physical DRC</h3><p>Source-of-truth audit/repair, SHA-256 project fingerprint, mm-calibrated copper clearance, via/drill/annular-ring and copper-edge checks.</p></article><article><b>v1.20.0</b><h3>Manufacturing + 3D Geometry</h3><p>Persisted PCB geometry, interactive 3D viewer and traceable CAM package generation.</p></article></div></section>
         {/if}
       </div>
 
