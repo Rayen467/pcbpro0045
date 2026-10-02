@@ -25,8 +25,23 @@
 
   function nets(){return window.PCBProWireEngine?.nets||[]}
   function footprintInfo(el){const ref=el.querySelector('span')?.textContent?.trim()||'';return{ref,el}}
-  function pinCountForRef(ref){const max=nets().flatMap(n=>n.pinList||String(n.pins||'').split(/[·,;\s]+/)).filter(p=>String(p).startsWith(`${ref}.`)).map(p=>Number(String(p).split('.')[1])).filter(Number.isFinite);return Math.max(2,...max)}
-  function specs(ref){const count=pinCountForRef(ref);if(count<=2)return[{n:1,side:'left',pos:50},{n:2,side:'right',pos:50}];const out=[];for(let i=1;i<=count;i++){const left=i<=Math.ceil(count/2);const local=left?i:i-Math.ceil(count/2);const total=left?Math.ceil(count/2):Math.floor(count/2);out.push({n:i,side:left?'left':'right',pos:(local/(total+1))*100})}return out}
+  function pinCountForRef(ref){
+    const fp=[...document.querySelectorAll('.stage.pcbstage .footprint')].find(el=>el.querySelector('span')?.textContent?.trim()===ref);
+    const raw=fp?.dataset?.pinCount;
+    const max=nets().flatMap(n=>n.pinList||String(n.pins||'').split(/[·,;\\s]+/)).filter(pin=>String(pin).startsWith(`${ref}.`)).map(pin=>Number(String(pin).split('.')[1])).filter(Number.isFinite);
+    if(raw!==undefined&&raw!==''){
+      const explicit=Number(raw);
+      if(Number.isFinite(explicit))return explicit>0?explicit:(max.length?Math.max(...max):0);
+    }
+    return Math.max(2,...max);
+  }
+  function specs(ref){
+    const count=pinCountForRef(ref);
+    if(count<=0)return[];
+    if(count===1)return[{n:1,side:'top',pos:50}];
+    if(count===2)return[{n:1,side:'left',pos:50},{n:2,side:'right',pos:50}];
+    const out=[];for(let i=1;i<=count;i++){const left=i<=Math.ceil(count/2);const local=left?i:i-Math.ceil(count/2);const total=left?Math.ceil(count/2):Math.floor(count/2);out.push({n:i,side:left?'left':'right',pos:(local/(total+1))*100})}return out
+  }
 
   function clientToWorld(x,y){const w=world();if(!w)return{x:0,y:0};const r=w.getBoundingClientRect();const sx=r.width/Math.max(1,w.offsetWidth),sy=r.height/Math.max(1,w.offsetHeight);return{x:(x-r.left)/Math.max(.0001,sx),y:(y-r.top)/Math.max(.0001,sy)}}
   function pinPoint(id){const p=[...document.querySelectorAll('.pcb-board-pad')].find(x=>x.dataset.pin===id);if(!p)return null;const r=p.getBoundingClientRect();return clientToWorld(r.left+r.width/2,r.top+r.height/2)}
