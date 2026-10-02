@@ -4,7 +4,7 @@
 
   const VERSION='1.20.0';
   const KEY='pcbpro0045-3d-v120';
-  let yaw=-0.75,pitch=0.9,zoom=1,drag=null,raf=0;
+  let yaw=-0.75,pitch=0.9,zoom=1,panX=0,panY=0,drag=null,raf=0;
 
   const lang=()=>window.PCBProUX?.lang||localStorage.getItem('pcbpro0045-lang')||'id';
   const t=(id,en)=>lang()==='id'?id:en;
@@ -14,8 +14,8 @@
   const advanced=()=>window.PCBProAdvancedBoard?.model||{vias:[],zones:[],keepouts:[]};
   const mfg=()=>window.PCBProManufacturing?.state||{};
 
-  function save(){try{localStorage.setItem(KEY,JSON.stringify({yaw,pitch,zoom}))}catch{}}
-  function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x){yaw=Number.isFinite(x.yaw)?x.yaw:yaw;pitch=Number.isFinite(x.pitch)?x.pitch:pitch;zoom=Number.isFinite(x.zoom)?x.zoom:zoom}}catch{}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify({yaw,pitch,zoom,panX,panY}))}catch{}}
+  function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x){yaw=Number.isFinite(x.yaw)?x.yaw:yaw;pitch=Number.isFinite(x.pitch)?x.pitch:pitch;zoom=Number.isFinite(x.zoom)?x.zoom:zoom;panX=Number.isFinite(x.panX)?x.panX:panX;panY=Number.isFinite(x.panY)?x.panY:panY}}catch{}}
   function bbox(points){if(!points?.length)return null;const xs=points.map(p=>Number(p.x)).filter(Number.isFinite),ys=points.map(p=>Number(p.y)).filter(Number.isFinite);if(!xs.length||!ys.length)return null;return{minX:Math.min(...xs),maxX:Math.max(...xs),minY:Math.min(...ys),maxY:Math.max(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)}}
   function worldModel(){
     const b=board(),a=advanced(),box=bbox(b.outline||[]);
@@ -67,7 +67,7 @@
     if(!bb||bb.w<=0||bb.h<=0){
       ctx.fillStyle='#8aa0ac';ctx.font='12px system-ui';ctx.fillText(t('Belum ada Edge.Cuts. Buat outline di tab PCB.','No Edge.Cuts yet. Create a board outline in the PCB tab.'),24,36);updateMeta(m);return;
     }
-    const span=Math.max(bb.w,bb.h,1),scale=Math.min(rect.width,rect.height)/span*0.58*zoom,cx=rect.width/2,cy=rect.height/2;
+    const span=Math.max(bb.w,bb.h,1),scale=Math.min(rect.width,rect.height)/span*0.58*zoom,cx=rect.width/2+panX,cy=rect.height/2+panY;
     const ox=(bb.minX+bb.maxX)/2,oy=(bb.minY+bb.maxY)/2;
     const norm=p=>({x:p.x-ox,y:p.y-oy});
 
@@ -127,11 +127,11 @@
       root.innerHTML=`<div class="g3-toolbar"><button data-reset>${t('Reset view','Reset view')}</button><button data-pcb>PCB</button><button data-png>PNG snapshot</button><b>${t('Drag: orbit · Wheel: zoom','Drag: orbit · Wheel: zoom')}</b></div><canvas id="pcbpro-3d-canvas"></canvas><div id="pcbpro-3d-meta"></div><div class="g3-note">${t('Ini adalah 3D geometry viewer dari board outline, copper, via dan placement aktual. Body komponen belum dianggap mekanik akurat sampai STEP/verified body model tersedia.','This is a geometry-driven 3D viewer of the actual board outline, copper, vias, and placements. Component bodies are not treated as mechanically accurate until STEP/verified body models are available.')}</div>`;
       panel.appendChild(root);
       const canvas=root.querySelector('canvas');
-      canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch};canvas.setPointerCapture?.(e.pointerId)});
-      canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;yaw=drag.yaw+(e.clientX-drag.x)*.008;pitch=clamp(.2,drag.pitch+(e.clientY-drag.y)*.006,1.45);save();schedule()});
+      canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;const tool=(document.querySelector('.tools button.active')?.dataset.pcbTool||document.querySelector('.tools button.active small')?.textContent||'orbit').trim().toLowerCase();drag={id:e.pointerId,x:e.clientX,y:e.clientY,yaw,pitch,panX,panY,mode:tool==='pan'?'pan':'orbit'};canvas.setPointerCapture?.(e.pointerId)});
+      canvas.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;if(drag.mode==='pan'){panX=drag.panX+(e.clientX-drag.x);panY=drag.panY+(e.clientY-drag.y)}else{yaw=drag.yaw+(e.clientX-drag.x)*.008;pitch=clamp(.2,drag.pitch+(e.clientY-drag.y)*.006,1.45)}save();schedule()});
       canvas.addEventListener('pointerup',e=>{if(drag?.id===e.pointerId)drag=null});
       canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=clamp(.35,zoom*(e.deltaY>0?.9:1.1),3);save();schedule()},{passive:false});
-      root.querySelector('[data-reset]').onclick=()=>{yaw=-.75;pitch=.9;zoom=1;save();schedule()};
+      root.querySelector('[data-reset]').onclick=()=>{yaw=-.75;pitch=.9;zoom=1;panX=0;panY=0;save();schedule()};
       root.querySelector('[data-pcb]').onclick=()=>window.PCBProCommand?.clickView?.('pcb');
       root.querySelector('[data-png]').onclick=()=>{schedule();setTimeout(()=>{const a=document.createElement('a');a.href=canvas.toDataURL('image/png');a.download='pcbpro-3d-geometry.png';a.click()},40)};
     }
@@ -157,7 +157,7 @@
     setTimeout(mount,0);
   }
 
-  window.PCBProGeometry3D={version:VERSION,mount,refresh:schedule,reset(){yaw=-.75;pitch=.9;zoom=1;save();schedule()},snapshot:worldModel};
+  window.PCBProGeometry3D={version:VERSION,mount,refresh:schedule,zoomBy(factor=1.15){zoom=clamp(.35,zoom*Number(factor||1),3);save();schedule();return zoom},reset(){yaw=-.75;pitch=.9;zoom=1;panX=0;panY=0;save();schedule()},snapshot:worldModel};
 
   window.PCBProExplain?.register?.({
     id:'feature.geometry-3d-v120',match:['3d','mechanical preview','board viewer'],category:'mechanical',status:'geometry-driven-preview',
