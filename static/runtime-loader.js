@@ -66,6 +66,7 @@
     await load('/patch-v117.js');
     await load('/patch-v118.js');
     await load('/patch-v119.js');
+    await load('/patch-v120.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js?v=1.1.0');
@@ -78,7 +79,7 @@
     await load('/geometry-3d-engine-v120.js?v=1.20.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
-    await load('/database-engine-v117.js?v=1.19.0');
+    await load('/database-engine-v117.js?v=1.20.0');
     await load('/professional-engine-v118.js?v=1.18.0');
     await load('/project-command-bus-v115.js?v=1.20.0');
     await load('/stability-engine-v120.js?v=1.20.0');
@@ -117,6 +118,7 @@
       window.PCBProPatchV117?.inject?.();
       window.PCBProPatchV118?.inject?.();
       window.PCBProPatchV119?.inject?.();
+      window.PCBProPatchV120?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProExplain?.refresh?.();
