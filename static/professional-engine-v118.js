@@ -408,7 +408,7 @@
     output:{id:'Audit findings, DFM profile, SI/timing estimates, evidence links, patent-watch notes, dan upgrade map.',en:'Audit findings, DFM profiles, SI/timing estimates, evidence links, patent-watch notes, and an upgrade map.'},
     how_to_read:{id:'Screening result bukan sign-off. Journal/patent adalah evidence/context, bukan otomatis implementasi atau legal clearance.',en:'Screening results are not sign-off. Papers/patents are evidence/context, not automatic implementation or legal clearance.'},
     limits:{id:'Corpus 100k belum diklaim terisi. Seed sekarang berisi metadata sumber terverifikasi; arsitektur database disiapkan untuk tumbuh ke skala besar tanpa memalsukan jumlah paper.',en:'A 100k corpus is not claimed as already populated. The current seed contains verified source metadata; the database architecture is prepared to scale without fabricating paper counts.'},
-    next:{id:'P0 berikutnya: central domain model penuh, full geometry DRC/DFM, dan manufacturing exporters/CAM validation.',en:'Next P0: complete central domain model, full geometry DRC/DFM, and manufacturing exporters/CAM validation.'}
+    next:{id:'P0 berikutnya: central domain model penuh, clearance/drill DRC manufacturing-grade, verified footprint pad geometry, STEP body coverage, dan CAM validation lintas fabricator.',en:'Next P0: complete central domain model, manufacturing-grade clearance/drill DRC, verified footprint pad geometry, STEP body coverage, and cross-fabricator CAM validation.'}
   });
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
