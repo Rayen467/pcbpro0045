@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProDatabase) return;
 
-  const VERSION='1.17.0';
+  const VERSION='1.18.0';
   const SUPABASE_URL='https://zomawqbdhktfdnyghxut.supabase.co';
   const ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvbWF3cWJkaGt0ZmRueWdoeHV0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA5MTM2MTIsImV4cCI6MjEwNjQ4OTYxMn0.s55ppUfDs1TawNAWm2L3aTBf6JzptkZ9rTEYsMwrg7o';
   const SECRET_KEY='pcbpro0045-cloud-secret-v1';
@@ -11,6 +11,7 @@
   const WIRE_KEY='pcbpro0045-wiregraph-v2';
   const BOARD_KEY='pcbpro0045-board-v1';
   const ADV_BOARD_KEY='pcbpro0045-board-advanced-v1';
+  const PROFESSIONAL_KEY='pcbpro0045-professional-v118';
 
   let secret=null;
   let status='boot';
@@ -124,6 +125,7 @@
       wiring:window.PCBProWireEngine?.routes?{version:window.PCBProWireEngine.version,routes:structuredClone(window.PCBProWireEngine.routes)}:localJson(WIRE_KEY,{version:'2.1.0',routes:[]}),
       board:window.PCBProBoardModel?.model?structuredClone(window.PCBProBoardModel.model):localJson(BOARD_KEY,{version:'1.1.0',tracks:[],outline:[]}),
       advancedBoard:localJson(ADV_BOARD_KEY,null),
+      professional:localJson(PROFESSIONAL_KEY,null),
       workflow:window.PCBProWorkflow?.snapshot?.()||null
     };
   }
@@ -208,6 +210,7 @@
       if(bundle.wiring)localStorage.setItem(WIRE_KEY,JSON.stringify(bundle.wiring));
       if(bundle.board)localStorage.setItem(BOARD_KEY,JSON.stringify(bundle.board));
       if(bundle.advancedBoard)localStorage.setItem(ADV_BOARD_KEY,JSON.stringify(bundle.advancedBoard));
+      if(bundle.professional)localStorage.setItem(PROFESSIONAL_KEY,JSON.stringify(bundle.professional));
       activeId=row.id;localStorage.setItem(ACTIVE_KEY,row.id);
       localStorage.setItem('pcbpro0045-cloud-project-name',name);
       status='loaded';
