@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "npm run check && npm test && vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
-    "test": "node --test src/lib/project.test.js"
+    "test": "node --test src/lib/*.test.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",
