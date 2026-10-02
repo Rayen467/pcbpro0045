@@ -130,7 +130,7 @@
       schematic:new Set(['select','place','wire','pan']),
       pcb:new Set(['select','place','route','via','zone','keepout','pan']),
       simulator:new Set(['run','stop','probe','cursor a','cursor b','trace','measure']),
-      '3d':new Set([]), bom:new Set(['refresh','group','mpn','supplier','cost','export csv']), fabrication:new Set(['preflight']), rules:new Set([]), release:new Set([])
+      '3d':new Set(['orbit','pan','zoom','reset']), bom:new Set(['refresh','group','mpn','supplier','cost','export csv']), fabrication:new Set(['preflight','gerber','drill','pick & place','assembly','archive']), rules:new Set([]), release:new Set([])
     };
     document.querySelectorAll('.tools button').forEach((b) => {
       const tool = b.dataset.pcbTool || String(b.querySelector('small')?.textContent || '').trim().toLowerCase();
@@ -233,7 +233,7 @@
   function newProject() {
     if (!confirm(text('Buat project kosong baru? Project database saat ini tidak akan ditimpa; project baru akan dibuat saat reload.','Create a new empty project? The current database project will not be overwritten; a new project will be created after reload.'))) return;
     try {
-      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({version:'1.19.0',components:[],savedAt:'New project'}));
+      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({version:'1.20.0',components:[],savedAt:'New project'}));
       localStorage.setItem('pcbpro0045-cloud-create-new','1');
       localStorage.setItem('pcbpro0045-cloud-project-name','Untitled PCB');
       localStorage.removeItem('pcbpro0045-cloud-active-project');
@@ -287,7 +287,11 @@
       {label:text('Professional Center','Professional Center'),run:()=>window.PCBProProfessional?.open?.('audit')},
       {label:text('System Health','System Health'),run:()=>window.PCBProStability?.open?.()}
     ];
-    if (['produksi','manufacture'].includes(n)) return [{label:text('Buka Fabrikasi','Open Fabrication'),run:()=>window.PCBProCommand?.clickView?.('fabrication')}];
+    if (['produksi','manufacture'].includes(n)) return [
+      {label:text('Buka Fabrikasi','Open Fabrication'),run:()=>window.PCBProCommand?.clickView?.('fabrication')},
+      {label:text('Jalankan CAM preflight','Run CAM preflight'),run:()=>window.PCBProManufacturing?.preflight?.()},
+      {label:text('Generate CAM ZIP','Generate CAM ZIP'),run:()=>window.PCBProManufacturing?.buildPackage?.()}
+    ];
     return [];
   }
 
