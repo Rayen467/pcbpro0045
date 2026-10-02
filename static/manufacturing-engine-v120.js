@@ -355,12 +355,12 @@
       <div class="mfg-grid"><article class="mfg-card"><b>GERBER RS-274X</b><strong>F.Cu / B.Cu / Edge.Cuts</strong><p>${t('Menghasilkan copper track/via yang geometri fisiknya diketahui. Pad footprint tidak dipalsukan bila physical pad geometry belum tersedia.','Generates known copper track/via geometry. Footprint pads are never fabricated when physical pad geometry is unavailable.')}</p></article><article class="mfg-card"><b>EXCELLON</b><strong>Via drill</strong><p>${t('Drill file dibangun dari via diameter/drill yang tersimpan.','Drill file is generated from stored via diameter/drill geometry.')}</p></article><article class="mfg-card"><b>BOM / CPL / MANIFEST</b><strong>Traceable package</strong><p>${t('ZIP berisi checksum SHA-256, coverage dan release class supaya draft tidak tertukar dengan production candidate.','ZIP includes SHA-256 checksums, coverage and release class so drafts cannot be confused with production candidates.')}</p></article></div>
     `;
     const w=root.querySelector('[data-w]'),h=root.querySelector('[data-h]');
-    const applyDims=()=>{state.widthMm=n(w.value);state.heightMm=n(h.value);save();state.lastPreflight=null};
+    const applyDims=()=>{state.widthMm=n(w.value);state.heightMm=n(h.value);save();state.lastPreflight=null;window.dispatchEvent(new CustomEvent('pcbpro:manufacturing-calibration-changed',{detail:{widthMm:state.widthMm,heightMm:state.heightMm}}))};
     w.addEventListener('change',applyDims);h.addEventListener('change',applyDims);
     root.querySelector('[data-preflight]').onclick=preflight;
     root.querySelector('[data-package]').onclick=()=>buildPackage().catch(e=>window.PCBProWorkspaceRepair?.notify?.(e?.message||String(e),'warn'));
-    root.querySelector('[data-bom]').onclick=()=>downloadText(`${projectName()}-BOM.csv`,bomCsv(),'text/csv');
-    root.querySelector('[data-cpl]').onclick=()=>{const b=board(),cal=calibration(b);if(!cal)return window.PCBProWorkspaceRepair?.notify?.(t('Masukkan ukuran board dulu.','Enter board dimensions first.'),'warn');downloadText(`${projectName()}-CPL.csv`,cplCsv(cal,b),'text/csv')};
+    root.querySelector('[data-bom]').onclick=downloadBom;
+    root.querySelector('[data-cpl]').onclick=downloadCpl;
   }
 
   function mount(){
@@ -376,7 +376,7 @@
     setTimeout(mount,0);
   }
 
-  window.PCBProManufacturing={version:VERSION,preflight,buildPackage,mount,render,get state(){return structuredClone(state)},get lastPreflight(){return state.lastPreflight?structuredClone(state.lastPreflight):null}};
+  window.PCBProManufacturing={version:VERSION,preflight,buildPackage,downloadGerbers,downloadDrill,downloadBom,downloadCpl,downloadAssembly,mount,render,get state(){return structuredClone(state)},get lastPreflight(){return state.lastPreflight?structuredClone(state.lastPreflight):null}};
 
   window.PCBProExplain?.register?.({
     id:'feature.manufacturing-v120',match:['gerber','excellon','manufacturing export','cam zip','cpl'],category:'manufacturing',status:'active-with-coverage-gates',
