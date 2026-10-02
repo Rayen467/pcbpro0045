@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.PCBProWorkspaceRepair) return;
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
   const UI_KEY = 'pcbpro0045-layout-mode';
   let layoutMode = localStorage.getItem(UI_KEY) || 'flex';
   let repairTimer = 0;
@@ -128,7 +128,7 @@
     const view = currentView();
     const liveByView = {
       schematic:new Set(['select','place','wire','pan']),
-      pcb:new Set(['select','place','pan']),
+      pcb:new Set(['select','place','route','via','zone','keepout','pan']),
       simulator:new Set(['run','stop','probe','cursor a','cursor b','trace','measure']),
       '3d':new Set([]), bom:new Set(['refresh','group','mpn','supplier','cost','export csv']), fabrication:new Set(['preflight']), rules:new Set([]), release:new Set([])
     };
@@ -142,7 +142,11 @@
   }
 
   function updateTruthGuards() {
-    const findings = window.PCBProWorkflow?.runErc?.() || [];
+    const ercFindings = window.PCBProWorkflow?.runErc?.() || [];
+    const baseDrc = window.PCBProBoardModel?.drc?.() || [];
+    const advDrc = window.PCBProAdvancedBoard?.drc?.() || [];
+    const drcFindings = [...(Array.isArray(baseDrc)?baseDrc:[]), ...(Array.isArray(advDrc)?advDrc:[])];
+
     const section = [...document.querySelectorAll('.inspector section')].find((s) => /DESIGN CHECKS|PEMERIKSAAN DESAIN/i.test(s.querySelector('.ins-title span')?.textContent || ''));
     if (section) {
       const checks = [...section.querySelectorAll('.check')];
@@ -151,57 +155,71 @@
       const badge = section.querySelector('.ins-title b');
       if (erc) {
         const small = erc.querySelector('small');
-        if (small) small.textContent = findings.length ? `${findings.length} ${text('temuan','findings')}` : text('lulus','pass');
-        erc.dataset.state = findings.length ? 'warn' : 'ok';
+        if (small) small.textContent = ercFindings.length ? `${ercFindings.length} ${text('temuan','findings')}` : text('lulus check tersedia','available checks pass');
+        erc.dataset.state = ercFindings.length ? 'warn' : 'ok';
       }
       if (drc) {
         const small = drc.querySelector('small');
-        if (small) small.textContent = text('menunggu geometri PCB nyata','waiting for real PCB geometry');
-        drc.dataset.truthGuard = '1';
+        const ready = typeof window.PCBProBoardModel?.drc === 'function';
+        if (small) small.textContent = ready ? (drcFindings.length ? `${drcFindings.length} ${text('temuan','findings')}` : text('lulus check tersedia','available checks pass')) : text('engine memuat','engine loading');
+        drc.dataset.truthGuard = ready ? '0' : '1';
       }
-      if (badge) badge.textContent = String(findings.length);
+      if (badge) badge.textContent = String(ercFindings.length + drcFindings.length);
     }
 
     const card = document.querySelector('.pcbstage .floating-card');
     if (card) {
-      card.dataset.truthGuard = '1';
+      const tracks = window.PCBProBoardModel?.tracks || [];
       const strong = card.querySelector('strong');
       const small = card.querySelector('small');
-      if (strong) strong.textContent = 'ROUTING —';
-      if (small) small.textContent = text('Trace geometry belum tersedia','Trace geometry not available yet');
       const button = card.querySelector('button');
-      if (button) { button.disabled = true; button.title = text('Mark routed palsu dinonaktifkan','Fake Mark routed action disabled'); }
+      card.dataset.truthGuard = '0';
+      if (strong) strong.textContent = `${tracks.length} ${text('track','tracks')}`;
+      if (small) small.textContent = drcFindings.length
+        ? `${drcFindings.length} DRC ${text('temuan pada check tersedia','findings in available checks')}`
+        : text('Route/Via/Zone aktif · jalankan DRC setelah perubahan','Route/Via/Zone active · run DRC after changes');
+      if (button) {
+        button.disabled = false;
+        button.hidden = false;
+        button.textContent = text('Aktifkan Route','Activate Route');
+        button.title = text('Aktifkan router PCB nyata yang tersedia','Activate the available PCB router');
+      }
     }
 
     const simPanel = [...document.querySelectorAll('.panel')].find((p) => /SIMULATION|SIMULASI/i.test(p.querySelector('.panel-title span')?.textContent || ''));
     if (simPanel && !simPanel.classList.contains('live-sim') && !simPanel.dataset.realSimMounted) {
-      simPanel.querySelector('.metrics')?.classList.add('pcb-fake-hidden');
-      simPanel.querySelector('.scope')?.classList.add('pcb-fake-hidden');
       const h = simPanel.querySelector('.panel-title h2');
       const p = simPanel.querySelector('.panel-title p');
       const b = simPanel.querySelector('.panel-title button');
-      if (h) h.textContent = text('Memuat Live Circuit Solver…','Loading Live Circuit Solver…');
-      if (p) p.textContent = text('Angka placeholder disembunyikan. Menunggu solver nyata dari netlist aktif.','Placeholder values are hidden. Waiting for the real solver from the active netlist.');
-      if (b) { b.disabled = true; b.textContent = text('Memuat…','Loading…'); }
+      if (h) h.textContent = text('Live Circuit Solver','Live Circuit Solver');
+      if (p) p.textContent = text('Solver live sedang dimuat dari netlist aktif. Tidak ada angka placeholder.','The live solver is loading from the active netlist. No placeholder values are shown.');
+      if (b) { b.disabled = false; b.textContent = '▶ Run'; }
     }
   }
 
   function downloadSnapshot() {
-    const components = [...document.querySelectorAll('.stage.schematic .node')].map((n) => ({
+    const components = window.PCBProProject?.getComponents?.() || [...document.querySelectorAll('.stage.schematic .node')].map((n) => ({
       id:n.querySelector('.ref')?.textContent?.trim() || '',
       value:n.querySelector('b')?.textContent?.trim() || '',
       name:n.querySelector('small')?.textContent?.trim() || ''
     })).filter((x)=>x.id);
     const nets = window.PCBProWireEngine?.nets?.map(({name,pins})=>({name,pins})) || [];
     const payload = {
-      format:'pcbpro0045-project', version:VERSION, exportedAt:new Date().toISOString(),
-      components, nets, wireGraph:window.PCBProWireEngine?.routes || [], workflow:window.PCBProWorkflow?.snapshot?.() || null
+      format:'pcbpro0045-full-project-snapshot', version:VERSION, exportedAt:new Date().toISOString(),
+      components,
+      nets,
+      wireGraph:window.PCBProWireEngine?.routes || [],
+      board:window.PCBProBoardModel?.model || null,
+      advancedBoard:window.PCBProAdvancedBoard?.model || null,
+      professional:window.PCBProProfessional?.snapshot?.() || null,
+      workflow:window.PCBProWorkflow?.snapshot?.() || null,
+      database:window.PCBProDatabase?.snapshot?.() || null
     };
     const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = 'pcbpro0045-project.json'; a.click();
+    a.href = URL.createObjectURL(blob); a.download = 'pcbpro0045-full-project.json'; a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),500);
-    notify(text('Project diekspor dari state wiring/netlist aktif.','Project exported from the active wiring/netlist state.'));
+    notify(text('Full project snapshot diekspor dari state engine aktif.','Full project snapshot exported from active engine state.'));
   }
 
   function resetLayout() {
@@ -213,9 +231,12 @@
   window.addEventListener('pcbpro:reset-layout', (event) => { resetLayout(); event.preventDefault(); });
 
   function newProject() {
-    if (!confirm(text('Buat project kosong? Project lokal yang belum diekspor akan diganti.','Create an empty project? Unexported local work will be replaced.'))) return;
+    if (!confirm(text('Buat project kosong baru? Project database saat ini tidak akan ditimpa; project baru akan dibuat saat reload.','Create a new empty project? The current database project will not be overwritten; a new project will be created after reload.'))) return;
     try {
-      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({components:[],savedAt:'New project'}));
+      localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({version:'1.19.0',components:[],savedAt:'New project'}));
+      localStorage.setItem('pcbpro0045-cloud-create-new','1');
+      localStorage.setItem('pcbpro0045-cloud-project-name','Untitled PCB');
+      localStorage.removeItem('pcbpro0045-cloud-active-project');
       resetLayout();
       location.reload();
     } catch {
@@ -254,9 +275,18 @@
       {label:text('Fokus inspector','Inspector focus'),run:()=>applyLayout('inspect')}
     ];
     if (['tempatkan','place'].includes(n)) return [{label:text('Aktifkan tool Tempatkan','Activate Place tool'),run:()=>window.PCBProCommand?.clickTool?.('place')}];
-    if (['jalur','route'].includes(n)) return [{label:currentView()==='schematic'?text('Aktifkan Kabel','Activate Wire'):text('PCB Route belum aktif','PCB Route not active'),run:()=>currentView()==='schematic'?window.PCBProCommand?.clickTool?.('wire'):notify(text('PCB Route belum punya trace geometry nyata.','PCB Route does not have real trace geometry yet.'),'warn')}];
-    if (['periksa','inspect'].includes(n)) return [{label:text('Jalankan ERC aktual','Run actual ERC'),run:()=>{const f=window.PCBProWorkflow?.runErc?.()||[];notify(f.length?`${f.length} ERC ${text('temuan','findings')}`:text('ERC lulus','ERC pass'),f.length?'warn':'info')}}];
-    if (['alat','tools'].includes(n)) return [{label:'AI Copilot',run:()=>window.PCBProAssistant?.open?.()},{label:'Workflow',run:()=>window.PCBProWorkflow?.open?.()}];
+    if (['jalur','route'].includes(n)) return [{label:currentView()==='schematic'?text('Aktifkan Kabel','Activate Wire'):text('Aktifkan PCB Route','Activate PCB Route'),run:()=>window.PCBProCommand?.clickTool?.(currentView()==='schematic'?'wire':'route')}];
+    if (['periksa','inspect'].includes(n)) return [
+      {label:text('Jalankan ERC','Run ERC'),run:()=>{const f=window.PCBProWorkflow?.runErc?.()||[];notify(f.length?`${f.length} ERC ${text('temuan','findings')}`:text('ERC check tersedia lulus','Available ERC checks pass'),f.length?'warn':'info')}},
+      {label:text('Jalankan PCB DRC','Run PCB DRC'),run:()=>{const f=[...(window.PCBProBoardModel?.drc?.()||[]),...(window.PCBProAdvancedBoard?.drc?.()||[])];notify(f.length?`${f.length} DRC ${text('temuan','findings')}`:text('DRC check tersedia lulus','Available DRC checks pass'),f.length?'warn':'info')}},
+      {label:text('Professional Audit','Professional Audit'),run:()=>window.PCBProProfessional?.open?.('audit')}
+    ];
+    if (['alat','tools'].includes(n)) return [
+      {label:'AI Engineering Agent',run:()=>window.PCBProAssistantV115?.open?.()},
+      {label:'Workflow',run:()=>window.PCBProWorkflow?.open?.()},
+      {label:text('Professional Center','Professional Center'),run:()=>window.PCBProProfessional?.open?.('audit')},
+      {label:text('System Health','System Health'),run:()=>window.PCBProStability?.open?.()}
+    ];
     if (['produksi','manufacture'].includes(n)) return [{label:text('Buka Fabrikasi','Open Fabrication'),run:()=>window.PCBProCommand?.clickView?.('fabrication')}];
     return [];
   }
@@ -285,10 +315,8 @@
 
     if (/DRC/i.test(button.textContent || '') && (button.closest('.tool-right') || button.closest('.inspector'))) {
       event.preventDefault(); event.stopImmediatePropagation();
-      if (currentView() === 'schematic') {
-        const f = window.PCBProWorkflow?.runErc?.() || [];
-        notify(f.length ? `${f.length} ERC ${text('temuan','findings')}` : text('ERC dasar lulus.','Basic ERC passes.'), f.length?'warn':'info');
-      } else notify(text('DRC geometri PCB belum aktif. Angka DRC lama tidak lagi dianggap valid.','PCB geometry DRC is not active yet. The old DRC number is no longer treated as valid.'),'warn');
+      const f=[...(window.PCBProBoardModel?.drc?.()||[]),...(window.PCBProAdvancedBoard?.drc?.()||[])];
+      notify(f.length ? `${f.length} DRC ${text('temuan','findings')}` : text('DRC check yang tersedia lulus.','Available DRC checks pass.'), f.length?'warn':'info');
       return;
     }
   }
