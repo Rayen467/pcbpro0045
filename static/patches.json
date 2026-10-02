@@ -1,8 +1,37 @@
 [
   {
+    "version": "1.16.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Universal Component Catalog — 1,000+ Parts",
+      "en": "Universal Component Catalog — 1,000+ Parts"
+    },
+    "changes": {
+      "id": [
+        "Component Library diperluas menjadi sekitar 1.484 entry termasuk 1.472 entry baru plus 12 core parts.",
+        "Tambah kategori Audio, Raspberry Pi, MCU, wireless, sensor, power, logic, analog, connector, motor/driver, display, memory, protection, timing, passives, dan lainnya.",
+        "Catalog memakai pencarian, filter kategori, lazy load, dan Load More untuk menjaga performa.",
+        "Generic template tidak mengarang rating; exact part identifier tetap perlu datasheet/package verification.",
+        "Wire Engine dan PCB pad engine membaca pin-count metadata dari catalog bila tersedia.",
+        "Extended catalog diindeks oleh local RAG assistant agar pencarian komponen bisa dilakukan tanpa selalu memakai token LLM."
+      ],
+      "en": [
+        "Expanded the Component Library to roughly 1,484 entries, including 1,472 new entries plus the 12 core parts.",
+        "Added Audio, Raspberry Pi, MCU, wireless, sensor, power, logic, analog, connector, motor/driver, display, memory, protection, timing, passive, and other categories.",
+        "The catalog uses search, category filtering, lazy loading, and Load More to preserve performance.",
+        "Generic templates do not invent ratings; exact part identifiers still require datasheet/package verification.",
+        "The Wire Engine and PCB pad engine read catalog pin-count metadata when available.",
+        "The extended catalog is indexed by the assistant local RAG so component lookup does not always spend LLM tokens."
+      ]
+    }
+  },
+  {
     "version": "1.9.0",
     "date": "2026-10-02",
-    "title": {"id": "Video-Grounded KiCad Interaction + PCB Geometry", "en": "Video-Grounded KiCad Interaction + PCB Geometry"},
+    "title": {
+      "id": "Video-Grounded KiCad Interaction + PCB Geometry",
+      "en": "Video-Grounded KiCad Interaction + PCB Geometry"
+    },
     "changes": {
       "id": [
         "Workflow disesuaikan dengan tutorial KiCad yang diberikan user: buat schematic, tambah/edit komponen, wiring, Move/Drag, annotation, footprint assignment, ERC, pindah ke PCB, placement, routing, layer atas/bawah, Edge.Cuts, DRC, dan 3D/fabrication sebagai tahap lanjutan.",
@@ -31,7 +60,10 @@
   {
     "version": "1.8.0",
     "date": "2026-10-02",
-    "title": {"id": "Wire Engine v2 — Stable Pin Layer", "en": "Wire Engine v2 — Stable Pin Layer"},
+    "title": {
+      "id": "Wire Engine v2 — Stable Pin Layer",
+      "en": "Wire Engine v2 — Stable Pin Layer"
+    },
     "changes": {
       "id": [
         "Wire engine dibangun ulang memakai pin layer terpisah dari DOM komponen supaya klik pin tidak bentrok dengan drag/select komponen Svelte.",
@@ -54,7 +86,10 @@
   {
     "version": "1.7.0",
     "date": "2026-10-02",
-    "title": {"id": "Workspace Interaction + Layout Repair", "en": "Workspace Interaction + Layout Repair"},
+    "title": {
+      "id": "Workspace Interaction + Layout Repair",
+      "en": "Workspace Interaction + Layout Repair"
+    },
     "changes": {
       "id": [
         "Workspace utama sekarang diberi frame/card yang jelas dengan padding, border, dan overflow yang terkontrol agar canvas tidak terlihat terpotong atau menyatu dengan panel lain.",
@@ -83,7 +118,10 @@
   {
     "version": "1.6.0",
     "date": "2026-10-02",
-    "title": {"id": "Interactive Pin-to-Pin Wiring", "en": "Interactive Pin-to-Pin Wiring"},
+    "title": {
+      "id": "Interactive Pin-to-Pin Wiring",
+      "en": "Interactive Pin-to-Pin Wiring"
+    },
     "changes": {
       "id": [
         "Tool Wire sekarang punya pin klik nyata di schematic. Klik pin pertama untuk mulai koneksi dan klik pin tujuan untuk menyelesaikannya.",
@@ -106,7 +144,10 @@
   {
     "version": "1.5.0",
     "date": "2026-10-02",
-    "title": {"id": "KiCad-Style End-to-End PCB Workflow", "en": "KiCad-Style End-to-End PCB Workflow"},
+    "title": {
+      "id": "KiCad-Style End-to-End PCB Workflow",
+      "en": "KiCad-Style End-to-End PCB Workflow"
+    },
     "changes": {
       "id": [
         "Tambah Workflow Center 16 tahap dari project, schematic capture, annotation, footprint, ERC, transfer ke PCB, Edge.Cuts, placement, routing, copper zone, DRC/preflight, Gerber/drill, CAM check, sampai handoff manufaktur.",
@@ -129,7 +170,10 @@
   {
     "version": "1.4.0",
     "date": "2026-10-01",
-    "title": {"id": "LLM Brain + Live Simulation", "en": "LLM Brain + Live Simulation"},
+    "title": {
+      "id": "LLM Brain + Live Simulation",
+      "en": "LLM Brain + Live Simulation"
+    },
     "changes": {
       "id": [
         "Copilot sekarang memakai backend LLM sungguhan melalui Vercel AI Gateway, dengan context project, netlist, hasil simulator, history percakapan, dan katalog komponen terverifikasi.",
@@ -152,7 +196,10 @@
   {
     "version": "1.3.0",
     "date": "2026-10-01",
-    "title": {"id": "Grounded Copilot + Netlist Wiring", "en": "Grounded Copilot + Netlist Wiring"},
+    "title": {
+      "id": "Grounded Copilot + Netlist Wiring",
+      "en": "Grounded Copilot + Netlist Wiring"
+    },
     "changes": {
       "id": [
         "Copilot tidak lagi pura-pura sebagai LLM penuh: status UI menyatakan backend model belum aktif pada versi ini.",
@@ -171,7 +218,10 @@
   {
     "version": "1.2.0",
     "date": "2026-10-01",
-    "title": {"id": "Readable UI, Bahasa, dan Component Intelligence", "en": "Readable UI, Language, and Component Intelligence"},
+    "title": {
+      "id": "Readable UI, Bahasa, dan Component Intelligence",
+      "en": "Readable UI, Language, and Component Intelligence"
+    },
     "changes": {
       "id": [
         "Comfort UI menjadi default: teks, tombol, tab, inspector, library, simulator, dan chat diperbesar agar tidak membuat mata cepat lelah.",
@@ -194,28 +244,53 @@
   {
     "version": "1.1.0",
     "date": "2026-09-29",
-    "title": {"id": "Smooth Pointer Engine", "en": "Smooth Pointer Engine"},
+    "title": {
+      "id": "Smooth Pointer Engine",
+      "en": "Smooth Pointer Engine"
+    },
     "changes": {
-      "id": ["Pointer Events + requestAnimationFrame untuk drag yang lebih ringan.", "Panel resize, pan/zoom, undo/redo, dan placement yang lebih fleksibel."],
-      "en": ["Pointer Events + requestAnimationFrame for smoother movement.", "Resizable panels, pan/zoom, undo/redo, and more flexible placement."]
+      "id": [
+        "Pointer Events + requestAnimationFrame untuk drag yang lebih ringan.",
+        "Panel resize, pan/zoom, undo/redo, dan placement yang lebih fleksibel."
+      ],
+      "en": [
+        "Pointer Events + requestAnimationFrame for smoother movement.",
+        "Resizable panels, pan/zoom, undo/redo, and more flexible placement."
+      ]
     }
   },
   {
     "version": "0.2.0",
     "date": "2026-10-01",
-    "title": {"id": "Field Reality Lab", "en": "Field Reality Lab"},
+    "title": {
+      "id": "Field Reality Lab",
+      "en": "Field Reality Lab"
+    },
     "changes": {
-      "id": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, dan fault injection.", "Field envelope menjadi analisis lanjutan setelah live solver."],
-      "en": ["Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, and fault injection.", "Field envelope is now an advanced analysis after the live solver."]
+      "id": [
+        "Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, dan fault injection.",
+        "Field envelope menjadi analisis lanjutan setelah live solver."
+      ],
+      "en": [
+        "Monte Carlo, tolerance, electro-thermal iteration, source/trace droop, and fault injection.",
+        "Field envelope is now an advanced analysis after the live solver."
+      ]
     }
   },
   {
     "version": "0.1.0",
     "date": "2026-10-01",
-    "title": {"id": "PCB Pro Copilot", "en": "PCB Pro Copilot"},
+    "title": {
+      "id": "PCB Pro Copilot",
+      "en": "PCB Pro Copilot"
+    },
     "changes": {
-      "id": ["Fondasi awal asisten membaca project aktif dan menjalankan aksi dasar workspace."],
-      "en": ["Initial assistant foundation for reading the active project and basic workspace actions."]
+      "id": [
+        "Fondasi awal asisten membaca project aktif dan menjalankan aksi dasar workspace."
+      ],
+      "en": [
+        "Initial assistant foundation for reading the active project and basic workspace actions."
+      ]
     }
   }
 ]
