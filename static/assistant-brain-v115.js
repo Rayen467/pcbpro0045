@@ -106,6 +106,13 @@
   }
   function flattenExplanations(data){for(const x of data?.entries||[])addChunk('explanations',x.id,x.title?.id||x.title?.en,[x.what?.id,x.why?.id,x.input?.id,x.process?.id,x.output?.id,x.how_to_read?.id,x.limits?.id,x.next?.id].filter(Boolean).join(' | '),{type:'feature'});}
   function flattenParts(data){for(const p of data?.parts||[])addChunk('component-catalog',p.mpn,p.mpn,`${p.manufacturer||''} ${p.status||''} ${(p.package||[]).join?.(' ')||p.package||''} ${Object.entries(p.ratings||{}).map(([k,v])=>`${k}=${v}`).join(' ')} ${(p.notes||[]).join?.(' ')||''}`,{type:'exact-part',manufacturer:p.manufacturer,status:p.status});}
+  function flattenExtendedCatalog(list){
+    for(const p of Array.isArray(list)?list:[]){
+      addChunk('extended-component-catalog',p.key||p.mpn||p.name,p.name,
+        [p.value,p.group,p.mpn,p.manufacturer,(p.tags||[]).join(' '),p.description,p.footprint&&p.footprint!=='—'?p.footprint:''].filter(Boolean).join(' | '),
+        {type:p.kind||'template',group:p.group,pins:p.pinCount||0,mpn:p.mpn||'',provenance:p.provenance||'catalog-template'});
+    }
+  }
   function flattenPatches(data){for(const p of Array.isArray(data)?data:[]){const ch=p.changes?.id||p.changes?.en||[];addChunk('patch-history',`patch-${p.version}`,p.title?.id||p.title?.en||`v${p.version}`,`${p.date||''} ${ch.join(' ')}`,{type:'patch',version:p.version});}}
 
   async function buildLibrary(){
@@ -120,6 +127,7 @@
       if(jobs[2].status==='fulfilled')flattenExplanations(jobs[2].value);
       if(jobs[3].status==='fulfilled')flattenParts(jobs[3].value);
       if(jobs[4].status==='fulfilled')flattenPatches(jobs[4].value);
+      if(window.PCBProComponentCatalog?.build)flattenExtendedCatalog(window.PCBProComponentCatalog.build());
       libraryReady=true;return chunks;
     })();
     return libraryPromise;
@@ -331,6 +339,7 @@
   function snapshot(){return {version:VERSION,libraryReady,libraryChunks:chunks.length,memory:getMemory(),history:getHistory(),project:projectSnapshot(),lastMeta}}
 
   buildLibrary();
+  window.addEventListener('pcbpro:catalog-ready',()=>{libraryPromise=null;libraryReady=false;buildLibrary().catch(()=>{})});
   window.PCBProAssistantBrain={version:VERSION,ask,retrieve:(q)=>retrieve(q,projectSnapshot()),projectSnapshot,snapshot,resetMemory,rebuildLibrary:()=>{libraryPromise=null;libraryReady=false;return buildLibrary()},get lastMeta(){return lastMeta}};
 
   window.PCBProExplain?.register?.({
