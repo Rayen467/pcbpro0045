@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.PCBProWorkspaceRepair) return;
-  const VERSION = '1.2.0';
+  const VERSION = '1.3.0';
   const UI_KEY = 'pcbpro0045-layout-mode';
   let layoutMode = localStorage.getItem(UI_KEY) || 'flex';
   let repairTimer = 0;
@@ -285,6 +285,8 @@
       {label:'AI Engineering Agent',run:()=>window.PCBProAssistantV115?.open?.()},
       {label:'Workflow',run:()=>window.PCBProWorkflow?.open?.()},
       {label:text('Professional Center','Professional Center'),run:()=>window.PCBProProfessional?.open?.('audit')},
+      {label:text('Physical DRC','Physical DRC'),run:()=>window.PCBProPhysicalDRC?.show?.()},
+      {label:text('Integrity Audit','Integrity Audit'),run:()=>window.PCBProIntegrity?.show?.()},
       {label:text('System Health','System Health'),run:()=>window.PCBProStability?.open?.()}
     ];
     if (['produksi','manufacture'].includes(n)) return [
