@@ -3,7 +3,7 @@
   if (window.PCBProBoardModel) return;
 
   const NS='http://www.w3.org/2000/svg';
-  const VERSION='1.1.0';
+  const VERSION='1.2.0';
   const KEY='pcbpro0045-board-v1';
   let model={version:VERSION,tracks:[],outline:[]};
   let overlay=null,padLayer=null,hud=null;
@@ -88,6 +88,8 @@
   function intersect(a,b,c,d){const o1=orient(a,b,c),o2=orient(a,b,d),o3=orient(c,d,a),o4=orient(c,d,b);return o1!==o2&&o3!==o4}
   function pointInPoly(p,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const a=poly[i],b=poly[j];const hit=((a.y>p.y)!==(b.y>p.y))&&(p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y+1e-9)+a.x);if(hit)inside=!inside}return inside}
   function drc(){const findings=[];if(model.outline.length<3)findings.push(t('Edge.Cuts belum berupa polygon tertutup.','Edge.Cuts is not a closed polygon.'));const unrouted=requiredEdges().filter(e=>!isEdgeRouted(e.a,e.b));if(unrouted.length)findings.push(`${unrouted.length} ${t('koneksi belum diroute','connection(s) remain unrouted')}: ${unrouted.map(e=>`${e.a}↔${e.b}`).join(', ')}`);
+    const pro=window.PCBProProfessional?.state;
+    if(pro?.trackWidthMm){for(const tr of model.tracks){const w=Number(tr.widthMm||.25);if(w<Number(pro.trackWidthMm))findings.push(t(`Track ${tr.id}: width ${w}mm < profile ${pro.trackWidthMm}mm.`,`Track ${tr.id}: width ${w}mm < profile ${pro.trackWidthMm}mm.`))}}
     const tracks=model.tracks.map(tr=>({tr,pts:trackPoints(tr)})).filter(x=>x.pts.length>1);for(let i=0;i<tracks.length;i++)for(let j=i+1;j<tracks.length;j++){const A=tracks[i],B=tracks[j];if(A.tr.layer!==B.tr.layer||A.tr.net===B.tr.net)continue;outer:for(const[a,b]of segs(A.pts))for(const[c,d]of segs(B.pts))if(intersect(a,b,c,d)){findings.push(`${t('Crossing copper antar net','Copper crossing between nets')} ${A.tr.net} / ${B.tr.net} (${A.tr.layer})`);break outer}}
     if(model.outline.length>=3){for(const fp of stage()?.querySelectorAll('.footprint')||[]){const r=fp.getBoundingClientRect();const p=clientToWorld(r.left+r.width/2,r.top+r.height/2);if(!pointInPoly(p,model.outline))findings.push(`${footprintInfo(fp).ref}: ${t('footprint berada di luar Edge.Cuts','footprint lies outside Edge.Cuts')}`)}}return findings}
   function showDrc(){const f=drc();let m=document.querySelector('#pcbpro-board-report');m?.remove();m=document.createElement('div');m.id='pcbpro-board-report';m.innerHTML=`<div class="pbr-card"><small>PCB GEOMETRY DRC · v${VERSION}</small><h3>${f.length?`${f.length} ${t('temuan','findings')}`:t('Lulus basic DRC','Basic DRC pass')}</h3>${f.length?`<ul>${f.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${t('Connectivity routing, crossing antar-net satu layer, outline, dan posisi footprint lolos pemeriksaan dasar. Ini belum menggantikan manufacturing-grade clearance/drill DRC.','Routing connectivity, same-layer cross-net crossings, outline and footprint position pass the basic checks. This does not replace manufacturing-grade clearance/drill DRC.')}</p>`}<button>${t('Tutup','Close')}</button></div>`;document.body.appendChild(m);m.querySelector('button').onclick=()=>m.remove();m.onclick=(e)=>{if(e.target===m)m.remove()}}
