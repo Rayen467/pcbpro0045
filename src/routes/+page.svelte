@@ -2,6 +2,61 @@
   import { onMount } from 'svelte';
   import { parseProject, MAX_PROJECT_BYTES } from '$lib/project.js';
 
+  /**
+   * @typedef {Object} CatalogPart
+   * @property {string} key
+   * @property {string} prefix
+   * @property {string} code
+   * @property {string} name
+   * @property {string} value
+   * @property {string} group
+   * @property {string} footprint
+   * @property {number | null} [pinCount]
+   * @property {string} [kind]
+   * @property {string} [manufacturer]
+   * @property {string} [mpn]
+   * @property {string[]} [tags]
+   * @property {string} [description]
+   */
+  /**
+   * @typedef {Object} ProjectComponent
+   * @property {string} id
+   * @property {string} code
+   * @property {string} name
+   * @property {string} value
+   * @property {string} footprint
+   * @property {string} [catalogKey]
+   * @property {string} [group]
+   * @property {number | null} [pinCount]
+   * @property {string} [kind]
+   * @property {string} [manufacturer]
+   * @property {string} [mpn]
+   * @property {string[]} [tags]
+   * @property {string} [description]
+   * @property {number} sx
+   * @property {number} sy
+   * @property {number} px
+   * @property {number} py
+   * @property {number} rot
+   */
+  /**
+   * @typedef {Object} UiState
+   * @property {string} [activeView]
+   * @property {string} [activeTool]
+   * @property {string} [activeLayer]
+   * @property {string} [leftTab]
+   * @property {boolean} [leftOpen]
+   * @property {boolean} [rightOpen]
+   * @property {number} [leftWidth]
+   * @property {number} [rightWidth]
+   * @property {number} [zoom]
+   * @property {number} [panX]
+   * @property {number} [panY]
+   * @property {number} [grid]
+   * @property {boolean} [snapEnabled]
+   * @property {string} [selectedId]
+   */
+
   const version = '1.19.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
@@ -23,6 +78,7 @@
     Release: ['Snapshot', 'Compare', 'Tag', 'Notes', 'Package']
   };
 
+  /** @type {CatalogPart[]} */
   const coreLibrary = [
     { key: 'dc', prefix: 'V', code: 'V', name: 'DC Source', value: '5 V', group: 'Sources', footprint: 'TerminalBlock_2P' },
     { key: 'r', prefix: 'R', code: 'R', name: 'Resistor', value: '330 Ω', group: 'Passives', footprint: 'R_0805' },
@@ -38,6 +94,7 @@
     { key: 'tp', prefix: 'TP', code: 'TP', name: 'Test Point', value: 'TP', group: 'Debug', footprint: 'TestPoint_1mm' }
   ];
 
+  /** @type {CatalogPart[]} */
   let library = [...coreLibrary];
   let libraryGroup = 'All';
   let libraryLimit = 220;
@@ -47,7 +104,7 @@
   async function loadExtendedCatalog() {
     try {
       if (!window['PCBProComponentCatalog']) {
-        await new Promise((resolve, reject) => {
+        await /** @type {Promise<void>} */ (new Promise((resolve, reject) => {
           const existing = document.querySelector('script[data-pcbpro-catalog-v116]');
           if (existing) {
             if (window['PCBProComponentCatalog']) return resolve();
@@ -61,10 +118,10 @@
           script.onload = resolve;
           script.onerror = reject;
           document.head.appendChild(script);
-        });
+        }));
       }
       const api = window['PCBProComponentCatalog'];
-      const extra = Array.isArray(api?.build?.()) ? api.build() : [];
+      const extra = /** @type {CatalogPart[]} */ (Array.isArray(api?.build?.()) ? api.build() : []);
       const keys = new Set(coreLibrary.map((p) => p.key));
       library = [...coreLibrary, ...extra.filter((p) => p?.key && !keys.has(p.key))];
       catalogSummary = api?.summary?.() || { total: library.length, groups: [] };
@@ -95,6 +152,7 @@
   let panY = 0;
   let grid = 10;
   let snapEnabled = true;
+  /** @type {string | number} */
   let drcFindings = 'Not run';
   let routed = false;
   let boardTrackCount = 0;
@@ -103,6 +161,7 @@
   /** @type {Record<string, boolean>} */
   let layerVisibility = { 'F.Cu': true, 'B.Cu': true, 'F.Silk': true, 'Edge.Cuts': true, Ratsnest: true };
 
+  /** @type {ProjectComponent[]} */
   let components = [
     { id: 'V1', code: 'V', name: 'DC Source', value: '5 V', footprint: 'TerminalBlock_2P', sx: 18, sy: 52, px: 18, py: 57, rot: 0 },
     { id: 'R2', code: 'R', name: 'Resistor', value: '330 Ω', footprint: 'R_0805', sx: 47, sy: 29, px: 45, py: 29, rot: 0 },
@@ -167,7 +226,7 @@
 
     window.PCBProProject = Object.assign(window.PCBProProject || {}, {
       getComponents: () => structuredClone(components),
-      replaceComponents: (next) => {
+      replaceComponents: (/** @type {ProjectComponent[]} */ next) => {
         if (!Array.isArray(next)) return false;
         components = structuredClone(next);
         selectedId = components[0]?.id || '';
@@ -179,7 +238,7 @@
         activeView, activeTool, activeLayer, leftTab, leftOpen, rightOpen,
         leftWidth, rightWidth, zoom, panX, panY, grid, snapEnabled, selectedId
       }),
-      setUiState: (state = {}) => {
+      setUiState: (/** @type {UiState} */ state = {}) => {
         if (typeof state.activeView === 'string' && views.includes(state.activeView)) activeView = state.activeView;
         if (typeof state.activeTool === 'string') activeTool = state.activeTool;
         if (typeof state.activeLayer === 'string') activeLayer = state.activeLayer;
