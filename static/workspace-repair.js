@@ -145,7 +145,9 @@
     const ercFindings = window.PCBProWorkflow?.runErc?.() || [];
     const baseDrc = window.PCBProBoardModel?.drc?.() || [];
     const advDrc = window.PCBProAdvancedBoard?.drc?.() || [];
-    const drcFindings = [...(Array.isArray(baseDrc)?baseDrc:[]), ...(Array.isArray(advDrc)?advDrc:[])];
+    const physical = window.PCBProPhysicalDRC?.run?.() || null;
+    const physicalDrc = physical?.calibrated ? (physical.findings||[]).filter(x=>x.severity==='error'||x.severity==='blocker').map(x=>x.message) : [];
+    const drcFindings = [...(Array.isArray(baseDrc)?baseDrc:[]), ...(Array.isArray(advDrc)?advDrc:[]), ...physicalDrc];
 
     const section = [...document.querySelectorAll('.inspector section')].find((s) => /DESIGN CHECKS|PEMERIKSAAN DESAIN/i.test(s.querySelector('.ins-title span')?.textContent || ''));
     if (section) {
