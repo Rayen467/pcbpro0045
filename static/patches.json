@@ -1,5 +1,35 @@
 [
   {
+    "version": "1.20.0",
+    "date": "2026-10-02",
+    "title": {
+      "id": "Manufacturing + 3D Geometry — CAM export dan geometry persistence",
+      "en": "Manufacturing + 3D Geometry — CAM export and geometry persistence"
+    },
+    "changes": {
+      "id": [
+        "PCB board model menyimpan track endpoints, pad positions, component placements, dan world size agar geometry bisa dipakai lintas tab.",
+        "Manufacturing engine menghasilkan Gerber RS-274X untuk F.Cu/B.Cu/Edge.Cuts, Excellon via drill, BOM, CPL, ZIP, SHA-256 manifest, dan release classification.",
+        "CAM export wajib memakai dimensi fisik board yang dimasukkan user; skala visual canvas tidak diperlakukan sebagai ukuran mekanik.",
+        "Tanpa verified physical footprint-pad geometry, output diberi kelas ENGINEERING-DRAFT-NOT-FOR-FABRICATION dan tidak diklaim siap pabrik.",
+        "3D viewer membaca outline/copper/via/placement project aktual dengan orbit, zoom, reset, dan PNG snapshot.",
+        "Body komponen 3D tetap placement proxy sampai STEP/body geometry terverifikasi tersedia.",
+        "Typed Command Bus dan System Health mencakup manufacturing preflight/export serta 3D geometry actions.",
+        "Encrypted project persistence kini menyimpan CAM calibration bersama board/professional state."
+      ],
+      "en": [
+        "PCB board model now persists track endpoints, pad positions, component placements, and world size for cross-view geometry use.",
+        "Manufacturing engine generates Gerber RS-274X F.Cu/B.Cu/Edge.Cuts, Excellon via drill, BOM, CPL, ZIP, SHA-256 manifest, and release classification.",
+        "CAM export requires user-provided physical board dimensions; visual canvas scale is not treated as mechanical scale.",
+        "Without verified physical footprint-pad geometry, output is classified ENGINEERING-DRAFT-NOT-FOR-FABRICATION and is not claimed fabrication-ready.",
+        "3D viewer reads the actual project outline/copper/vias/placements with orbit, zoom, reset, and PNG snapshot.",
+        "3D component bodies remain placement proxies until verified STEP/body geometry is available.",
+        "Typed Command Bus and System Health now cover manufacturing preflight/export and 3D geometry actions.",
+        "Encrypted project persistence now stores CAM calibration alongside board/professional state."
+      ]
+    }
+  },
+  {
     "version": "1.19.0",
     "date": "2026-10-02",
     "title": {
