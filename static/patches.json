@@ -1,5 +1,27 @@
 [
   {
+    "version": "1.22.0",
+    "date": "2026-10-04",
+    "title": {
+      "id": "PCB Workspace Layout Repair — command dock tanpa overlap",
+      "en": "PCB Workspace Layout Repair — non-overlapping command dock"
+    },
+    "changes": {
+      "id": [
+        "Board HUD dan FIELD PCB HUD dipindahkan dari overlay absolute ke command dock yang mengambil ruang layout sendiri.",
+        "Route/Via/Zone/Keepout memakai toolbar utama sebagai source-of-truth agar kontrol tidak ganda.",
+        "Advanced dock hanya memuat mode/net/layer/Diff Pair/Stack/Adv DRC; board dock hanya memuat Edge.Cuts/status routing.",
+        "Layout sempit memakai horizontal scroll sehingga canvas tidak tertutup control panel."
+      ],
+      "en": [
+        "Board HUD and FIELD PCB HUD moved from absolute overlays into a command dock with its own layout space.",
+        "Route/Via/Zone/Keepout use the main toolbar as the source of truth to eliminate duplicate controls.",
+        "Advanced dock contains mode/net/layer/Diff Pair/Stack/Adv DRC; board dock contains Edge.Cuts/routing status.",
+        "Narrow layouts use horizontal scrolling so controls do not cover the canvas."
+      ]
+    }
+  },
+  {
     "version": "1.21.0",
     "date": "2026-10-02",
     "title": {
