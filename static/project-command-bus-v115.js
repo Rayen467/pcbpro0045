@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProCommandBus) return;
 
-  const VERSION='1.21.0';
+  const VERSION='1.23.0';
   const MAX_ACTIONS=12;
   let seq=0;
   const listeners=new Set();
@@ -274,6 +274,29 @@
       }},
       describe:a=>t(`Route copper ${a.from} → ${a.to}${a.layer?` di ${a.layer}`:''}.`,`Route copper ${a.from} → ${a.to}${a.layer?` on ${a.layer}`:''}.`),
       execute:routePcb
+    },
+    'pcb.autoroute.preview':{
+      risk:'low',adapter:'autorouter-api',
+      schema:{properties:{
+        scope:{type:'string',enum:['all','net']},
+        net:{type:'string'},
+        layers:{type:'number'},
+        strategy:{type:'string',enum:['speed','completion']},
+        grid:{type:'number'},
+        widthMm:{type:'number'}
+      }},
+      describe:a=>t(`Buat preview Auto Route ${a.scope==='net'&&a.net?'untuk '+a.net:'untuk semua unrouted net'} · ${a.layers||1} layer.`,`Preview Auto Route ${a.scope==='net'&&a.net?'for '+a.net:'for all unrouted nets'} · ${a.layers||1} layer(s).`),
+      execute:async a=>window.PCBProAutoRouter?.plan?{ok:true,plan:window.PCBProAutoRouter.plan({...a,ignoreGnd:a.ignoreGnd!==false})}:{ok:false,error:'Auto Router unavailable'}
+    },
+    'pcb.autoroute.apply':{
+      risk:'medium',adapter:'autorouter-api',schema:{properties:{}},
+      describe:()=>t('Apply preview Auto Route terakhir lalu jalankan physical DRC bila tersedia.','Apply the latest Auto Route preview, then run physical DRC when available.'),
+      execute:async()=>window.PCBProAutoRouter?.apply?await window.PCBProAutoRouter.apply():{ok:false,error:'Auto Router unavailable'}
+    },
+    'pcb.autoroute.open':{
+      risk:'low',adapter:'autorouter-api',schema:{properties:{}},
+      describe:()=>t('Buka panel Auto Route preview-first.','Open the preview-first Auto Route panel.'),
+      execute:async()=>{if(!await ensureView('pcb'))return{ok:false,error:'PCB view unavailable'};await wait(80);if(!window.PCBProAutoRouter?.open)return{ok:false,error:'Auto Router unavailable'};window.PCBProAutoRouter.open();return{ok:true}}
     },
     'pcb.runDRC':{
       risk:'low',adapter:'board-api',schema:{properties:{}},
