@@ -69,6 +69,7 @@
     await load('/patch-v120.js');
     await load('/patch-v121.js');
     await load('/patch-v122.js');
+    await load('/patch-v123.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js?v=1.3.0');
@@ -133,6 +134,7 @@
       window.PCBProPatchV120?.inject?.();
       window.PCBProPatchV121?.inject?.();
       window.PCBProPatchV122?.inject?.();
+      window.PCBProPatchV123?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProProfessionalLearning?.ensure?.();
