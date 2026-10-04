@@ -9,11 +9,12 @@ const browserScripts = [
   'static/runtime-loader.js',
   'static/workspace-repair.js',
   'static/database-engine-v117.js',
-  'static/stability-engine-v121.js',
+  'static/stability-engine-v122.js',
   'static/project-command-bus-v115.js',
   'static/professional-engine-v118.js',
   'static/pcb-layout-engine.js',
   'static/board-advanced-engine.js',
+  'static/pcb-command-dock-v122.js',
   'static/manufacturing-engine-v120.js',
   'static/geometry-3d-engine-v120.js',
   'static/physical-drc-v121.js',
@@ -33,6 +34,7 @@ test('runtime loader includes critical production engines', () => {
     'wire-engine.js',
     'pcb-layout-engine.js',
     'board-advanced-engine.js',
+    'pcb-command-dock-v122.js',
     'database-engine-v117.js',
     'professional-engine-v118.js',
     'project-command-bus-v115.js',
@@ -42,7 +44,7 @@ test('runtime loader includes critical production engines', () => {
     'geometry-3d-engine-v120.js',
     'physical-drc-v121.js',
     'domain-integrity-v121.js',
-    'stability-engine-v121.js'
+    'stability-engine-v122.js'
   ]) assert.match(loader, new RegExp(asset.replaceAll('.', '\\.')));
 });
 
@@ -135,4 +137,25 @@ test('manufacturing preflight is gated by physical DRC', () => {
   const mfg = read('static/manufacturing-engine-v120.js');
   assert.match(mfg, /PCBProPhysicalDRC/);
   assert.match(mfg, /PHYSICAL_DRC/);
+});
+
+
+test('PCB command controls are docked and not absolutely overlaid on the canvas', () => {
+  const board = read('static/pcb-layout-engine.js');
+  const advanced = read('static/board-advanced-engine.js');
+  const dock = read('static/pcb-command-dock-v122.js');
+  assert.match(board, /PCBProPcbDock/);
+  assert.match(advanced, /PCBProPcbDock/);
+  assert.match(dock, /pcb-dock-layout/);
+  assert.equal(/#pcbpro-board-hud\{position:absolute/.test(board), false);
+  assert.equal(/#pcbpro-advanced-hud\{position:absolute/.test(advanced), false);
+});
+
+test('main PCB toolbar is the source of truth for Via Zone Keepout modes', () => {
+  const advanced = read('static/board-advanced-engine.js');
+  assert.match(advanced, /function toolbarMode/);
+  assert.match(advanced, /function syncToolbarMode/);
+  assert.equal(advanced.includes('data-mode="via"'), false);
+  assert.equal(advanced.includes('data-mode="zone"'), false);
+  assert.equal(advanced.includes('data-mode="keepout"'), false);
 });
