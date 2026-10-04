@@ -3,7 +3,7 @@
   if (window.PCBProAdvancedBoard) return;
 
   const NS = 'http://www.w3.org/2000/svg';
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
   const KEY = 'pcbpro0045-board-advanced-v1';
   let state = {
     version: VERSION,
@@ -70,10 +70,10 @@
       .ab-via{fill:#e6c46b;stroke:#18130a;stroke-width:2;vector-effect:non-scaling-stroke}.ab-via-hole{fill:#071018;stroke:#fff5;stroke-width:1;vector-effect:non-scaling-stroke}
       .ab-zone{fill:#5a9be022;stroke:#5a9be0;stroke-width:1.5;vector-effect:non-scaling-stroke}.ab-keepout{fill:#e06b5518;stroke:#e06b55;stroke-width:1.5;stroke-dasharray:7 5;vector-effect:non-scaling-stroke}
       .ab-draft{fill:none;stroke:#e8cb72;stroke-width:2;stroke-dasharray:6 4;vector-effect:non-scaling-stroke}.ab-node{fill:#e8cb72;stroke:#071018;stroke-width:1;vector-effect:non-scaling-stroke}
-      #pcbpro-advanced-hud{position:absolute;z-index:75;right:14px;top:46px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:min(740px,72%);padding:6px;border:1px solid #2e4654;background:#09151eed;border-radius:9px;box-shadow:0 12px 34px #0008;backdrop-filter:blur(8px)}
-      #pcbpro-advanced-hud b{font:800 8px ui-monospace;color:#67d8c0;padding:0 4px}#pcbpro-advanced-hud button,#pcbpro-advanced-hud select{border:1px solid #2b4653;background:#10212b;color:#c5d4dc;border-radius:7px;padding:7px 8px;font-size:9px;font-weight:800}#pcbpro-advanced-hud button.active{border-color:#e4c05d;background:#3a2f13;color:#ffe28a}
+      #pcbpro-advanced-hud{position:static;z-index:auto;display:flex;gap:5px;align-items:center;flex-wrap:nowrap;max-width:none;padding:0;border:0;background:transparent;border-radius:0;box-shadow:none;backdrop-filter:none;min-width:max-content}
+      #pcbpro-advanced-hud b{font:800 8px ui-monospace;color:#67d8c0;padding:0 3px}#pcbpro-advanced-hud button,#pcbpro-advanced-hud select{border:1px solid #2b4653;background:#10212b;color:#c5d4dc;border-radius:6px;padding:0 8px;font-size:8px;font-weight:800;height:28px}#pcbpro-advanced-hud .ab-mode{border:1px solid #31505c;border-radius:999px;padding:4px 7px;color:#8fa7b2;font:800 7px ui-monospace}#pcbpro-advanced-hud .ab-mode.active{border-color:#d6af4e;background:#3a2f13;color:#f8d978}
       #pcbpro-advanced-modal{position:fixed;z-index:1950;inset:0;background:#000b;display:grid;place-items:center;padding:16px}.ab-card{width:min(760px,95vw);max-height:84vh;overflow:auto;border:1px solid #304b59;border-radius:13px;background:#0d1821;padding:15px;color:#dce7ed;box-shadow:0 30px 100px #000d}.ab-card h3{font-size:22px;margin:4px 0}.ab-card small{font:800 9px ui-monospace;color:#60d5bd}.ab-card p,.ab-card li{font-size:11px;line-height:1.55;color:#a9bbc5}.ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.ab-card label{display:grid;gap:5px;color:#8fa4af;font-size:9px}.ab-card input,.ab-card select{border:1px solid #2d4653;background:#08131b;color:#dce7ed;border-radius:8px;padding:9px}.ab-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.ab-actions button{border:1px solid #2a8c78;background:#176c5c;color:#fff;border-radius:8px;padding:9px 12px;font-weight:800}.ab-actions button.secondary{background:#12232d;border-color:#34505e;color:#cbd9e0}.ab-list{display:grid;gap:7px;margin-top:10px}.ab-row{border:1px solid #243b48;background:#0a141c;border-radius:8px;padding:9px;font-size:10px;color:#b9c9d1}.ab-bad{color:#ef9b86}.ab-good{color:#6adabd}
-      @media(max-width:850px){#pcbpro-advanced-hud{left:8px;right:8px;top:46px;max-width:none;overflow:auto;flex-wrap:nowrap}.ab-grid{grid-template-columns:1fr}}
+      @media(max-width:850px){#pcbpro-advanced-hud{max-width:none;overflow:visible;flex-wrap:nowrap}.ab-grid{grid-template-columns:1fr}}
     `;
     document.head.appendChild(s);
   }
@@ -92,11 +92,11 @@
   function selectNetHtml(){const names=netNames();if(!state.activeNet&&names.length)state.activeNet=names[0];return names.map(n=>`<option value="${esc(n)}"${n===state.activeNet?' selected':''}>${esc(n)}</option>`).join('')||'<option value="">NO NET</option>'}
   function updateHud(){
     const st=stage(); if(!st){hud?.remove();hud=null;return}
-    if(!hud){hud=document.createElement('div');hud.id='pcbpro-advanced-hud';st.appendChild(hud)}
-    hud.innerHTML=`<b>FIELD PCB · v${VERSION}</b><select data-net>${selectNetHtml()}</select><select data-layer>${state.stack.map(l=>`<option${l===state.activeLayer?' selected':''}>${esc(l)}</option>`).join('')}</select><button data-mode="via" class="${mode==='via'?'active':''}">Via</button><button data-mode="zone" class="${mode==='zone'?'active':''}">Zone</button><button data-mode="keepout" class="${mode==='keepout'?'active':''}">Keepout</button><button data-action="diff">Diff Pair</button><button data-action="stack">Stack</button><button data-action="drc">Adv DRC</button>`;
+    if(!hud){hud=document.createElement('div');hud.id='pcbpro-advanced-hud'}
+    window.PCBProPcbDock?.attach?.(hud,'advanced')||(!hud.isConnected&&st.appendChild(hud));
+    hud.innerHTML=`<b>FIELD PCB · v${VERSION}</b><span class="ab-mode ${mode?'active':''}">${mode?mode.toUpperCase():'READY'}</span><select data-net>${selectNetHtml()}</select><select data-layer>${state.stack.map(l=>`<option${l===state.activeLayer?' selected':''}>${esc(l)}</option>`).join('')}</select><button data-action="diff">Diff Pair</button><button data-action="stack">Stack</button><button data-action="drc">Adv DRC</button>`;
     hud.querySelector('[data-net]')?.addEventListener('change',e=>{state.activeNet=e.target.value;save()});
     hud.querySelector('[data-layer]')?.addEventListener('change',e=>{state.activeLayer=e.target.value;save()});
-    hud.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(mode===b.dataset.mode?'':b.dataset.mode)));
     hud.querySelector('[data-action="diff"]')?.addEventListener('click',openDiffModal);
     hud.querySelector('[data-action="stack"]')?.addEventListener('click',openStackModal);
     hud.querySelector('[data-action="drc"]')?.addEventListener('click',showDrc);
@@ -104,6 +104,7 @@
   function setMode(next){mode=next;draft=[];pointer=null;schedule();notify(next?t(`${next.toUpperCase()} aktif. Klik workspace untuk membuat geometri.`,` ${next.toUpperCase()} active. Click workspace to create geometry.`):t('Mode advanced dibatalkan.','Advanced mode cancelled.'))}
 
   function onCanvasDown(e){
+    syncToolbarMode();
     const st=stage(); if(!st||!mode||e.button!==0||!st.contains(e.target))return;
     if(e.target.closest?.('#pcbpro-advanced-hud,.pcb-board-pad,.footprint,.layer-strip,.stage-info'))return;
     e.preventDefault();e.stopPropagation();const p=clientToWorld(e.clientX,e.clientY);
@@ -167,13 +168,23 @@
   }
   function openModal(inner){document.querySelector('#pcbpro-advanced-modal')?.remove();const m=document.createElement('div');m.id='pcbpro-advanced-modal';m.innerHTML=`<div class="ab-card">${inner}</div>`;document.body.appendChild(m);m.addEventListener('pointerdown',e=>{if(e.target===m)m.remove()});m.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>m.remove()))}
 
+  function toolbarMode(){
+    const b=document.querySelector('.tools button.active');
+    const name=(b?.dataset.pcbTool||b?.querySelector('small')?.textContent||'').trim().toLowerCase();
+    return ['via','zone','keepout'].includes(name)?name:'';
+  }
+  function syncToolbarMode(){
+    const next=toolbarMode();
+    if(next===mode)return;
+    mode=next;draft=[];pointer=null;schedule();
+  }
   function wireToolbar(){
     if(!stage())return;
     const tools=[...document.querySelectorAll('.tools button')];
-    for(const b of tools){const name=(b.dataset.pcbTool||b.querySelector('small')?.textContent||'').trim().toLowerCase();if(['via','zone','keepout'].includes(name)){b.classList.remove('pcb-tool-unavailable');b.removeAttribute('title');b.addEventListener('click',()=>setMode(name),{once:true})}}
+    for(const b of tools){const name=(b.dataset.pcbTool||b.querySelector('small')?.textContent||'').trim().toLowerCase();if(['via','zone','keepout'].includes(name)){b.classList.remove('pcb-tool-unavailable');b.removeAttribute('title')}}
   }
-  function mount(){if(!stage()){hud?.remove();hud=null;return}installStyles();ensureOverlay();wireToolbar();schedule();emit()}
-  function start(){load();installStyles();document.addEventListener('pointerdown',onCanvasDown,true);document.addEventListener('pointermove',onMove,{passive:true});document.addEventListener('dblclick',onDbl,true);document.addEventListener('keydown',onKey,true);document.addEventListener('click',()=>setTimeout(mount,0),{passive:true});window.addEventListener('resize',schedule,{passive:true});window.addEventListener('pcbpro:netlist-changed',()=>{if(state.activeNet&&!netNames().includes(state.activeNet))state.activeNet=netNames()[0]||'';schedule()});setTimeout(mount,0)}
+  function mount(){if(!stage()){hud?.remove();hud=null;window.PCBProPcbDock?.refresh?.();return}installStyles();window.PCBProPcbDock?.refresh?.();ensureOverlay();wireToolbar();syncToolbarMode();schedule();emit()}
+  function start(){load();installStyles();document.addEventListener('pointerdown',onCanvasDown,true);document.addEventListener('pointermove',onMove,{passive:true});document.addEventListener('dblclick',onDbl,true);document.addEventListener('keydown',onKey,true);document.addEventListener('click',()=>setTimeout(()=>{syncToolbarMode();mount()},0),{passive:true});window.addEventListener('resize',schedule,{passive:true});window.addEventListener('pcbpro:netlist-changed',()=>{if(state.activeNet&&!netNames().includes(state.activeNet))state.activeNet=netNames()[0]||'';schedule()});setTimeout(mount,0)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 
   window.PCBProAdvancedBoard={version:VERSION,get model(){return structuredClone(state)},get vias(){return structuredClone(state.vias)},get zones(){return structuredClone(state.zones)},get keepouts(){return structuredClone(state.keepouts)},get diffPairs(){return structuredClone(state.diffPairs)},drc:advancedDrc,showDrc,refresh:mount,clear(){state.vias=[];state.zones=[];state.keepouts=[];state.diffPairs=[];save();emit();schedule()}};
