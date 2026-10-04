@@ -57,7 +57,7 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.21.0';
+  const version = '1.22.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
