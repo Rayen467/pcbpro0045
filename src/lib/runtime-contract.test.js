@@ -67,12 +67,13 @@ test('core UI no longer contains fake engineering measurements or stale engine w
     'ERC engine is not connected. Electrical connectivity has not been verified.'
   ]) assert.equal(page.includes(stale), false, `stale UI text found: ${stale}`);
   assert.match(page, /let nets = \[\];/);
+  assert.match(page, /Auto Route/);
   assert.equal(page.includes('manufacturing exporter is not implemented yet'), false);
 });
 
 test('workspace repair exposes implemented PCB tools instead of blocking them', () => {
   const repair = read('static/workspace-repair.js');
-  assert.match(repair, /pcb:new Set\(\['select','place','route','via','zone','keepout','pan'\]\)/);
+  assert.match(repair, /pcb:new Set\(\['select','place','route','auto route','via','zone','keepout','pan'\]\)/);
   assert.equal(repair.includes('PCB Route belum aktif'), false);
   assert.equal(repair.includes('PCB geometry DRC is not active yet'), false);
 });
