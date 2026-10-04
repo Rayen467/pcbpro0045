@@ -57,7 +57,7 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.22.0';
+  const version = '1.23.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
@@ -815,7 +815,7 @@
         {:else if activeView === 'Rules'}
           <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Deterministic geometry checks plus calibrated physical DRC in millimeters.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>GEOMETRY DRC</b><h3>Logical + board checks</h3><p>Connectivity, routing, outline, via/zone/keepout and implemented geometry rules.</p></article><article><b>PHYSICAL DRC</b><h3>mm-calibrated clearance</h3><p>Track width, copper clearance, via diameter/drill, annular ring and copper-to-edge checks using the physical board dimensions.</p></article><article><b>DOMAIN INTEGRITY</b><h3>Cross-engine source of truth</h3><p>Audits components, wires, nets, PCB tracks, placements, vias, zones, rules and manufacturing state for stale references.</p></article></div><div class="pp-actions"><button onclick={runDrc}>Run DRC</button><button onclick={() => window.PCBProPhysicalDRC?.show?.()}>Physical DRC</button><button class="primary" onclick={() => window.PCBProIntegrity?.show?.()}>Integrity Audit</button></div></section>
         {:else}
-          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Cross-engine integrity and calibrated physical DRC extend the manufacturing baseline.</p></div></div><div class="release"><article><b>v1.21.0</b><h3>Domain Integrity + Physical DRC</h3><p>Source-of-truth audit/repair, SHA-256 project fingerprint, mm-calibrated copper clearance, via/drill/annular-ring and copper-edge checks.</p></article><article><b>v1.20.0</b><h3>Manufacturing + 3D Geometry</h3><p>Persisted PCB geometry, interactive 3D viewer and traceable CAM package generation.</p></article></div></section>
+          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Professional learning, visible engineering explanations, preview-first autorouting, and live AI provider diagnostics.</p></div></div><div class="release"><article><b>v1.23.0</b><h3>Explain + Auto Route + AI Status + Pro Syllabus</h3><p>Immediate feature/error help, preview-first draft autorouter up to two copper layers, visible AI Gateway health/test, and 2026–2027 professional curriculum overlay.</p></article><article><b>v1.22.0</b><h3>PCB Workspace Layout Repair</h3><p>Non-overlapping PCB command dock and a single source of truth for route/via/zone/keepout controls.</p></article></div></section>
         {/if}
       </div>
 
