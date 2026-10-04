@@ -24,6 +24,9 @@ declare global {
     PCBProPhysicalDRC?: any;
     PCBProIntegrity?: any;
     PCBProPcbDock?: any;
+    PCBProProfessionalLearning?: any;
+    PCBProAutoRouter?: any;
+    PCBProHelp?: any;
   }
 }
 
