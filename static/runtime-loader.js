@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.22.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.23.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -80,12 +80,15 @@
     await load('/board-advanced-engine.js?v=1.2.0');
     await load('/board-workflow-bridge.js?v=1.0.0');
     await load('/explain-engine-v113.js?v=1.13.0');
+    await load('/learning-professional-v123.js?v=1.23.0');
+    await load('/engineering-help-v123.js?v=1.23.0');
     await load('/manufacturing-engine-v120.js?v=1.20.0');
     await load('/geometry-3d-engine-v120.js?v=1.20.0');
     await load('/database-engine-v117.js?v=1.21.0');
     await load('/professional-engine-v118.js?v=1.21.0');
     await load('/physical-drc-v121.js?v=1.21.0');
-    await load('/project-command-bus-v115.js?v=1.21.0');
+    await load('/autorouter-v123.js?v=1.23.0');
+    await load('/project-command-bus-v115.js?v=1.23.0');
     await load('/domain-integrity-v121.js?v=1.21.0');
     await load('/stability-engine-v122.js?v=1.22.0');
     window.PCBProWireEngine?.refresh?.(0);
@@ -98,12 +101,14 @@
     window.PCBProBoardWorkflowBridge?.install?.();
     window.PCBProLearningMergeV112?.merge?.();
     window.PCBProLearningCenter?.refresh?.();
+    window.PCBProProfessionalLearning?.ensure?.();
+    window.PCBProHelp?.scan?.();
     window.PCBProExplain?.refresh?.();
 
     // The AI engineering agent is deferred so editing remains responsive. It uses typed commands, local RAG/memory, and LLM planning/reasoning.
     idle(async () => {
-      await load('/assistant-brain-v115.js?v=1.18.0');
-      await load('/assistant-engine-v115.js?v=1.15.0');
+      await load('/assistant-brain-v115.js?v=1.23.0');
+      await load('/assistant-engine-v115.js?v=1.23.0');
       await load('/component-intel.js');
       window.PCBProCommand?.stamp?.();
       window.PCBProWorkspaceRepair?.repair?.();
@@ -130,6 +135,8 @@
       window.PCBProPatchV122?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
+      window.PCBProProfessionalLearning?.ensure?.();
+      window.PCBProHelp?.scan?.();
       window.PCBProExplain?.refresh?.();
       window.PCBProAssistantV115?.refresh?.();
       window.PCBProStability?.run?.();
