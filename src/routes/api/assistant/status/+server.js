@@ -42,6 +42,7 @@ export async function GET({ fetch }) {
       }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
     }
 
+    /** @type {string[]} */
     const ids = [];
     if (Array.isArray(data?.data)) {
       for (const model of data.data) {
