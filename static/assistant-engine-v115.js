@@ -2,11 +2,12 @@
   'use strict';
   if (window.PCBProAssistantV115) return;
 
-  const VERSION='1.15.0';
+  const VERSION='1.23.0';
   let root=null;
   let open=true;
   let sending=false;
   let refreshTimer=0;
+  let providerStatus={connected:null,code:'AI_CHECKING',auth_source:null,message:''};
   const session=[];
 
   const t=(id,en)=>(window.PCBProUX?.lang||localStorage.getItem('pcbpro0045-lang')||'id')==='id'?id:en;
@@ -32,6 +33,41 @@
     const b=window.PCBProAssistantBrain;const s=b?.projectSnapshot?.();if(!s)return null;
     const w=s.workflow;const next=w?.stages?.find(x=>x.id===w.next);const nextLabel=next?.label?.[(window.PCBProUX?.lang||'id')]||next?.label?.id||next?.id||w?.next||'—';
     return {view:s.view,selected:s.selected?.id||null,counts:s.counts,done:w?.done,total:w?.total,next:nextLabel,brain:b.snapshot?.()};
+  }
+
+  async function checkProvider(showMessage=false){
+    const pill=root?.querySelector('[data-state="ai"]');
+    if(pill){pill.textContent='AI CHECKING';pill.classList.remove('good','bad')}
+    try{
+      const r=await fetch('/api/assistant/status',{cache:'no-store'});
+      const data=await r.json().catch(()=>({}));
+      providerStatus={connected:!!data.connected,code:data.code||('HTTP_'+r.status),auth_source:data.auth_source||null,message:data.message||''};
+    }catch(error){
+      providerStatus={connected:false,code:'AI_STATUS_FAILED',auth_source:null,message:error?.message||String(error)};
+    }
+    if(pill){
+      pill.textContent=providerStatus.connected?('AI ✓ '+(providerStatus.auth_source==='VERCEL_OIDC_TOKEN'?'OIDC':'KEY')):('AI ✕ '+providerStatus.code);
+      pill.classList.toggle('good',!!providerStatus.connected);pill.classList.toggle('bad',providerStatus.connected===false);
+      pill.title=providerStatus.connected?t('AI Gateway terhubung. Klik untuk cek ulang.','AI Gateway connected. Click to recheck.'):t('AI Gateway belum terhubung. Klik untuk cek ulang.','AI Gateway is not connected. Click to recheck.');
+    }
+    if(showMessage)addMessage('assistant',providerStatus.connected?t('AI Gateway terhubung lewat '+providerStatus.auth_source+'. Sekarang tombol “Tes AI nyata” bisa memaksa satu request LLM supaya lu bisa bedain jawaban LOCAL vs model.','AI Gateway is connected through '+providerStatus.auth_source+'. “Real AI test” can now force one LLM request so you can distinguish LOCAL from model output.'):t('AI Gateway belum terhubung: '+providerStatus.code+'. '+(providerStatus.message||''),'AI Gateway is not connected: '+providerStatus.code+'. '+(providerStatus.message||'')),{route:'ai-status',tier:'local'});
+    return providerStatus;
+  }
+
+  async function forceAiTest(){
+    const status=await checkProvider(false);
+    if(!status.connected){
+      addMessage('assistant',t('Tes AI dibatalkan karena provider belum connected: '+status.code+'. Ini bukan jawaban LLM.','AI test cancelled because the provider is not connected: '+status.code+'. This is not an LLM response.'),{route:'ai-status',tier:'local'});
+      return;
+    }
+    const row=thinking();
+    try{
+      const result=await window.PCBProAssistantBrain?.forceModel?.(t('Tes koneksi AI nyata. Jawab singkat bahwa model terhubung, sebutkan model yang dipakai jika tersedia, lalu jelaskan satu kalimat fungsi DRC PCB.','Real AI connectivity test. Briefly confirm that the model is connected, name the model if available, then explain PCB DRC in one sentence.'),'fast');
+      if(!result)throw new Error('Assistant Brain forceModel unavailable');
+      replaceThinking(row,result.text,result.meta||{});
+    }catch(error){
+      replaceThinking(row,t('Tes AI gagal: '+(error?.message||error),'AI test failed: '+(error?.message||error)),{route:'ai-error',tier:'local'});
+    }
   }
 
   function refreshContext(){
@@ -96,19 +132,21 @@
       <button class="pa115-launch hidden" title="PCB Pro AI Assistant">AI</button>
       <section class="pa115-panel">
         <header class="pa115-head"><div class="pa115-orb">AI</div><div class="pa115-brand"><b>PCB Pro Engineering Assistant</b><small>AI ENGINEERING AGENT · TYPED COMMANDS + PREVIEW + RAG + MEMORY + LLM · v${VERSION}</small></div><button class="pa115-memory" title="${t('Reset working memory','Reset working memory')}">MEM</button><button class="close">×</button></header>
-        <section class="pa115-context"><div class="pa115-context-top"><span class="pa115-pill good" data-state="view">VIEW —</span><span class="pa115-pill" data-state="focus">FOCUS —</span><span class="pa115-pill" data-state="workflow">FLOW —</span></div><div class="pa115-state"></div><div class="pa115-chips"><button data-q="${t('Gue lagi ngapain sekarang?','What am I working on now?')}">${t('Context','Context')}</button><button data-q="${t('Apa langkah selanjutnya dari project ini?','What is the next step for this project?')}">${t('Next','Next')}</button><button data-q="${t('Analisa project aktif dan kasih masalah paling penting dulu.','Analyze the active project and prioritize the most important issue.')}">${t('Audit AI','AI Audit')}</button><button data-selected>${t('Jelaskan pilihan','Explain selected')}</button><button data-q="${t('Cek wiring dan netlist project ini. Jangan nebak koneksi yang tidak ada.','Check this project wiring and netlist. Do not guess missing connections.')}">Wiring</button></div></section>
+        <section class="pa115-context"><div class="pa115-context-top"><span class="pa115-pill good" data-state="view">VIEW —</span><span class="pa115-pill" data-state="focus">FOCUS —</span><span class="pa115-pill" data-state="workflow">FLOW —</span><button class="pa115-pill" data-state="ai" type="button">AI CHECKING</button></div><div class="pa115-state"></div><div class="pa115-chips"><button data-q="${t('Gue lagi ngapain sekarang?','What am I working on now?')}">${t('Context','Context')}</button><button data-q="${t('Apa langkah selanjutnya dari project ini?','What is the next step for this project?')}">${t('Next','Next')}</button><button data-q="${t('Analisa project aktif dan kasih masalah paling penting dulu.','Analyze the active project and prioritize the most important issue.')}">${t('Audit AI','AI Audit')}</button><button data-selected>${t('Jelaskan pilihan','Explain selected')}</button><button data-q="${t('Cek wiring dan netlist project ini. Jangan nebak koneksi yang tidak ada.','Check this project wiring and netlist. Do not guess missing connections.')}">Wiring</button><button data-ai-test>${t('Tes AI nyata','Real AI test')}</button></div></section>
         <main class="pa115-log"></main>
         <footer class="pa115-compose"><div class="pa115-input"><textarea placeholder="${t('Ngomong normal aja: apa yang lagi gue kerjain, kenapa DRC ini muncul, sambung mana, komponen ini cocok gak, bantu benerin…','Ask naturally: what am I working on, why did this DRC appear, what connects where, is this part suitable, help me fix it…')}"></textarea><button class="pa115-send">${t('Kirim','Send')}</button></div><div class="pa115-foot"><span>LIB — · MEMORY —</span><span>${t('TOOLS → LIBRARY → LLM → PREVIEW → EXECUTE','LOCAL first → RAG → LLM when needed')}</span></div></footer>
       </section>`;document.body.appendChild(root);
     const panel=root.querySelector('.pa115-panel'),launch=root.querySelector('.pa115-launch');root.querySelector('.close').addEventListener('click',()=>{open=false;panel.classList.add('hidden');launch.classList.remove('hidden')});launch.addEventListener('click',()=>{open=true;panel.classList.remove('hidden');launch.classList.add('hidden');refreshContext()});
     root.querySelector('.pa115-memory').addEventListener('click',()=>{window.PCBProAssistantBrain?.resetMemory?.();addMessage('assistant',t('Working memory assistant di-reset. Project design tidak diubah.','Assistant working memory reset. Project design was not changed.'),{route:'local',tier:'local'});refreshContext()});
     root.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>submit(b.dataset.q)));root.querySelector('[data-selected]').addEventListener('click',explainSelected);
+    root.querySelector('[data-state="ai"]')?.addEventListener('click',()=>checkProvider(true));
+    root.querySelector('[data-ai-test]')?.addEventListener('click',forceAiTest);
     const ta=root.querySelector('textarea');root.querySelector('.pa115-send').addEventListener('click',()=>{const q=ta.value;ta.value='';submit(q)});ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();const q=ta.value;ta.value='';submit(q)}});
     addMessage('assistant',t('Gue sekarang punya action planner + typed command bus. Gue baca project, cari library, pakai LLM buat reasoning/planning kalau perlu, lalu untuk aksi kompleks gue kasih preview yang harus lu jalankan—bukan pura-pura bilang sudah berubah.','I now have an action planner plus typed command bus. I read the project, retrieve local knowledge, use the LLM for reasoning/planning when needed, and show a validated preview before complex actions execute.'),{route:'boot',tier:'local'});
-    refreshContext();const obs=new MutationObserver(()=>{clearTimeout(refreshTimer);refreshTimer=setTimeout(refreshContext,160)});obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-pcb-view']});window.addEventListener('pcbpro:language',refreshContext)
+    refreshContext();checkProvider(false);const obs=new MutationObserver(()=>{clearTimeout(refreshTimer);refreshTimer=setTimeout(refreshContext,160)});obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-pcb-view']});window.addEventListener('pcbpro:language',refreshContext)
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
-  window.PCBProAssistantV115={version:VERSION,ask:submit,refresh:refreshContext,open(){root?.querySelector('.pa115-launch')?.click()},get session(){return session.slice()}};
-  window.PCBProAssistant={version:VERSION,ask:submit,refresh:refreshContext,open(){root?.querySelector('.pa115-launch')?.click()},get history(){return session.slice()}};
+  window.PCBProAssistantV115={version:VERSION,ask:submit,refresh:refreshContext,checkProvider,forceAiTest,open(){root?.querySelector('.pa115-launch')?.click()},get session(){return session.slice()}};
+  window.PCBProAssistant={version:VERSION,ask:submit,refresh:refreshContext,checkProvider,forceAiTest,open(){root?.querySelector('.pa115-launch')?.click()},get history(){return session.slice()}};
 })();
