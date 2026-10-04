@@ -72,7 +72,7 @@
     await load('/patch-v123.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
-    await load('/workspace-repair.js?v=1.3.0');
+    await load('/workspace-repair.js?v=1.4.0');
     await load('/learning-center.js?v=1.0.0');
     await load('/learning-merge-v112.js?v=1.12.0');
     await load('/kicad-behavior.js?v=1.0.0');
