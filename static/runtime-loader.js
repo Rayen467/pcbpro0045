@@ -68,6 +68,7 @@
     await load('/patch-v119.js');
     await load('/patch-v120.js');
     await load('/patch-v121.js');
+    await load('/patch-v122.js');
     window.PCBProCommand?.stamp?.();
     await load('/kicad-workflow.js');
     await load('/workspace-repair.js?v=1.3.0');
@@ -86,7 +87,7 @@
     await load('/physical-drc-v121.js?v=1.21.0');
     await load('/project-command-bus-v115.js?v=1.21.0');
     await load('/domain-integrity-v121.js?v=1.21.0');
-    await load('/stability-engine-v121.js?v=1.21.0');
+    await load('/stability-engine-v122.js?v=1.22.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProPcbDock?.refresh?.();
@@ -126,6 +127,7 @@
       window.PCBProPatchV119?.inject?.();
       window.PCBProPatchV120?.inject?.();
       window.PCBProPatchV121?.inject?.();
+      window.PCBProPatchV122?.inject?.();
       window.PCBProLearningMergeV112?.merge?.();
       window.PCBProLearningCenter?.refresh?.();
       window.PCBProExplain?.refresh?.();
