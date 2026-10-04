@@ -120,13 +120,14 @@
     libraryPromise=(async()=>{
       chunks=[];
       const jobs=await Promise.allSettled([
-        fetchJson('/learning-curriculum.json'),fetchJson('/learning-expansion-v112.json'),fetchJson('/explanation-registry-v113.json'),fetchJson('/component-db.json'),fetchJson('/patches.json')
+        fetchJson('/learning-curriculum.json'),fetchJson('/learning-expansion-v112.json'),fetchJson('/learning-professional-v123.json'),fetchJson('/explanation-registry-v113.json'),fetchJson('/component-db.json'),fetchJson('/patches.json')
       ]);
       if(jobs[0].status==='fulfilled')flattenLearning(jobs[0].value,'learning-atlas');
       if(jobs[1].status==='fulfilled')flattenLearning(jobs[1].value,'deep-learning');
-      if(jobs[2].status==='fulfilled')flattenExplanations(jobs[2].value);
-      if(jobs[3].status==='fulfilled')flattenParts(jobs[3].value);
-      if(jobs[4].status==='fulfilled')flattenPatches(jobs[4].value);
+      if(jobs[2].status==='fulfilled')flattenLearning(jobs[2].value,'professional-syllabus-2026');
+      if(jobs[3].status==='fulfilled')flattenExplanations(jobs[3].value);
+      if(jobs[4].status==='fulfilled')flattenParts(jobs[4].value);
+      if(jobs[5].status==='fulfilled')flattenPatches(jobs[5].value);
       if(window.PCBProComponentCatalog?.build)flattenExtendedCatalog(window.PCBProComponentCatalog.build());
       if(window.PCBProProfessional?.ragChunks){
         for(const x of window.PCBProProfessional.ragChunks()) addChunk(x.source,x.id,x.title,x.text,{type:'professional-evidence'});
