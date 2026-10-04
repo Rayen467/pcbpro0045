@@ -1,5 +1,29 @@
 [
   {
+    "version": "1.23.0",
+    "date": "2026-10-04",
+    "title": {
+      "id": "Explain + Auto Route + Live AI Status + Silabus Profesional 2026–2027",
+      "en": "Explain + Auto Route + Live AI Status + Professional Syllabus 2026–2027"
+    },
+    "changes": {
+      "id": [
+        "Hover help dan katalog Fungsi & Error menjelaskan fitur, penggunaan, arti error, penyebab dan fix.",
+        "Auto Route preview-first memakai netlist/pad geometry aktual, scope all/satu net, 1–2 layer, strategy speed/completion dan DRC review.",
+        "Autorouter v1.23 masih satu layer per koneksi; mid-route via/layer switching dan inner-layer production routing belum diklaim.",
+        "Assistant menampilkan status AI Gateway dan Tes AI nyata yang memaksa request LLM.",
+        "Silabus Profesional PCB 2026–2027 ditambahkan ke Learning Atlas dan RAG assistant."
+      ],
+      "en": [
+        "Hover help and the Features & Errors catalog explain feature purpose, usage, error meaning, causes, and fixes.",
+        "Preview-first Auto Route uses the actual netlist/pad geometry with all/one-net scope, 1–2 layers, speed/completion strategy, and DRC review.",
+        "The v1.23 autorouter still uses one layer per connection; mid-route via/layer switching and production inner-layer routing are not claimed.",
+        "Assistant exposes AI Gateway status and a Real AI test that forces an LLM request.",
+        "Professional PCB Syllabus 2026–2027 is merged into Learning Atlas and assistant RAG."
+      ]
+    }
+  },
+  {
     "version": "1.22.0",
     "date": "2026-10-04",
     "title": {
