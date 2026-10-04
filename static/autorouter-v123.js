@@ -195,7 +195,10 @@
   }
 
   function mountButton(){
-    installStyles();const host=window.PCBProPcbDock?.slot?.('routing');if(!host||document.querySelector('#pcbpro-autoroute-btn'))return;
+    installStyles();
+    const main=[...document.querySelectorAll('.tools button')].find(b=>/auto\s*route/i.test(b.dataset.pcbTool||b.querySelector('small')?.textContent||b.textContent||''));
+    if(main){main.classList.remove('pcb-tool-unavailable');main.removeAttribute('disabled');return}
+    const host=window.PCBProPcbDock?.slot?.('routing');if(!host||document.querySelector('#pcbpro-autoroute-btn'))return;
     const b=document.createElement('button');b.id='pcbpro-autoroute-btn';b.type='button';b.textContent='⚡ Auto Route';b.onclick=open;host.prepend(b);
   }
 
