@@ -135,11 +135,12 @@
     PHYSICAL_DRC:{severity:'blocker',meaning:'Physical DRC masih punya pelanggaran.',cause:'Width/clearance/via/edge rule gagal.',fix:'Buka Physical DRC, perbaiki findings, lalu preflight ulang.'}
   };
 
-  const byLabel=new Map(FEATURES.map(([label,category,what,use])=>[norm(label),{id:'help.'+norm(label).replace(/[^a-z0-9]+/g,'-'),label,category,what,use}]));
+  const featureObjects=FEATURES.map(([label,category,what,use])=>({id:'help.'+norm(label+'-'+category).replace(/[^a-z0-9]+/g,'-'),label,category,what,use}));
+  const byLabel=new Map();
+  for(const x of featureObjects)byLabel.set(norm(x.label),x);
 
   function featureRow(label,category){
-    const row=FEATURES.find(x=>norm(x[0])===norm(label)&&x[1]===category);
-    return row?{id:'help.'+norm(row[0]+'-'+row[1]).replace(/[^a-z0-9]+/g,'-'),label:row[0],category:row[1],what:row[2],use:row[3]}:null;
+    return featureObjects.find(x=>norm(x.label)===norm(label)&&x.category===category)||null;
   }
   function matchFeature(el){
     const raw=el?.dataset?.pcbTool||el?.dataset?.pcbView||el?.querySelector?.('small')?.textContent||el?.textContent||el?.getAttribute?.('aria-label')||el?.getAttribute?.('title')||'';
@@ -156,7 +157,7 @@
 
   function registerExplain(){
     const api=window.PCBProExplain;if(!api?.register)return;
-    for(const x of byLabel.values())api.register({
+    for(const x of featureObjects)api.register({
       id:x.id,match:[x.label],category:x.category,status:'documented',
       title:{id:x.label,en:x.label},
       what:{id:x.what,en:x.what},
@@ -190,10 +191,10 @@
     for(const el of els){
       if(el.closest?.('#pcbpro-help-modal,#pcbpro-explain-drawer'))continue;
       const x=matchFeature(el);if(!x)continue;
-      el.dataset.engineeringHelp=x.id;
+      el.dataset.engineeringHelp=x.id;el.dataset.explainKey=x.id;
       const tip=x.label+' — '+x.what+' '+x.use;
-      if(!el.title||/not implemented|unavailable/i.test(el.title))el.title=tip;
-      if(!el.getAttribute('aria-label'))el.setAttribute('aria-label',tip);
+      el.title=tip;
+      el.setAttribute('aria-label',tip);
     }
   }
 
@@ -214,7 +215,7 @@
       const rows=Object.entries(ERRORS).filter(([code,x])=>!q||norm(code+' '+x.meaning+' '+x.cause+' '+x.fix).includes(q));
       body.innerHTML='<div class="ph-grid">'+rows.map(([code,x])=>'<article class="ph-card ph-error '+esc(x.severity)+'"><em>'+esc(x.severity.toUpperCase())+'</em><b style="display:block;margin-top:4px">'+esc(code)+'</b><p><strong>'+t('Arti:','Meaning:')+'</strong> '+esc(x.meaning)+'</p><p><strong>'+t('Penyebab umum:','Common cause:')+'</strong> '+esc(x.cause)+'</p><small><strong>'+t('Perbaikan:','Fix:')+'</strong> '+esc(x.fix)+'</small></article>').join('')+'</div>';
     }else{
-      const rows=[...byLabel.values()].filter(x=>!q||norm(x.label+' '+x.what+' '+x.use).includes(q));
+      const rows=featureObjects.filter(x=>!q||norm(x.label+' '+x.what+' '+x.use).includes(q));
       body.innerHTML='<div class="ph-grid">'+rows.map(x=>'<article class="ph-card"><em>'+esc(x.category.toUpperCase())+'</em><b style="display:block;margin-top:4px">'+esc(x.label)+'</b><p>'+esc(x.what)+'</p><small>'+esc(x.use)+'</small></article>').join('')+'</div>';
     }
   }
@@ -242,6 +243,6 @@
     const mo=new MutationObserver(()=>{scan();registerExplain()});mo.observe(document.body,{childList:true,subtree:true});
   }
 
-  window.PCBProHelp={version:VERSION,open,scan,features:[...byLabel.values()],errors:ERRORS,lookupError(code){return ERRORS[String(code||'').toUpperCase()]||null}};
+  window.PCBProHelp={version:VERSION,open,scan,features:featureObjects,errors:ERRORS,lookupError(code){return ERRORS[String(code||'').toUpperCase()]||null}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
