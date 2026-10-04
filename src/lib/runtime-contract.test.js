@@ -211,11 +211,15 @@ test('professional syllabus covers current engineering workflow and is indexed b
   const syllabus = JSON.parse(raw);
   assert.equal(syllabus.version, '1.23.0');
   assert.ok(syllabus.branches.length >= 9);
+  const branchIds = new Set();
+  for (const branch of syllabus.branches) branchIds.add(branch.id);
   for (const id of ['pro-routing','pro-sipi','pro-manufacturing','pro-validation','pro-automation','pro-capstone-2026']) {
-    assert.ok(syllabus.branches.some((b) => b.id === id), id);
+    assert.ok(branchIds.has(id), id);
   }
-  assert.ok(syllabus.sources.some((s) => s.id === 'abet-2026'));
-  assert.ok(syllabus.sources.some((s) => s.id === 'ipc-pcb-curriculum'));
+  const sourceIds = new Set();
+  for (const source of syllabus.sources) sourceIds.add(source.id);
+  assert.ok(sourceIds.has('abet-2026'));
+  assert.ok(sourceIds.has('ipc-pcb-curriculum'));
   const brain = read('static/assistant-brain-v115.js');
   assert.match(brain, /learning-professional-v123\.json/);
   assert.match(brain, /professional-syllabus-2026/);
