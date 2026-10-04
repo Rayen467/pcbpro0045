@@ -338,13 +338,21 @@
     }
   }
 
+  async function forceModel(raw,tier='fast'){
+    const query=clean(raw);if(!query)return {text:'',meta:{route:'forced-llm',tier:'local',error:'empty query'}};
+    await buildLibrary();const snapshot=projectSnapshot();const hits=retrieve(query,snapshot);
+    const model=await callModel(query,snapshot,hits,['fast','standard','reason'].includes(tier)?tier:'fast');
+    const meta={route:'forced-llm',tier:model.tier,model:model.model,usage:model.usage,libraryHits:hits.length,librarySources:[...new Set(hits.map(h=>h.source))]};
+    lastMeta=meta;updateMemory(query,model.text,snapshot,meta);return {text:model.text,meta,retrieval:hits};
+  }
+
   function resetMemory(){try{localStorage.removeItem(MEMORY_KEY);localStorage.removeItem(HISTORY_KEY)}catch{};return true}
   function snapshot(){return {version:VERSION,libraryReady,libraryChunks:chunks.length,memory:getMemory(),history:getHistory(),project:projectSnapshot(),lastMeta}}
 
   buildLibrary();
   window.addEventListener('pcbpro:catalog-ready',()=>{libraryPromise=null;libraryReady=false;buildLibrary().catch(()=>{})});
   window.addEventListener('pcbpro:professional-evidence-ready',()=>{libraryPromise=null;libraryReady=false;buildLibrary().catch(()=>{})});
-  window.PCBProAssistantBrain={version:VERSION,ask,retrieve:(q)=>retrieve(q,projectSnapshot()),projectSnapshot,snapshot,resetMemory,rebuildLibrary:()=>{libraryPromise=null;libraryReady=false;return buildLibrary()},get lastMeta(){return lastMeta}};
+  window.PCBProAssistantBrain={version:VERSION,ask,forceModel,retrieve:(q)=>retrieve(q,projectSnapshot()),projectSnapshot,snapshot,resetMemory,rebuildLibrary:()=>{libraryPromise=null;libraryReady=false;return buildLibrary()},get lastMeta(){return lastMeta}};
 
   window.PCBProExplain?.register?.({
     id:'feature.hybrid-assistant-v114',match:['hybrid assistant','assistant brain','token budget','rag','library'],category:'assistant',status:'active',
