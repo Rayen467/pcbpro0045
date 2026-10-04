@@ -5,7 +5,7 @@ export function GET() {
 
   return Response.json({
     ok:true,
-    version:'1.21.0',
+    version:'1.22.0',
     deployment:{
       environment:process.env.VERCEL_ENV || 'unknown',
       commit:process.env.VERCEL_GIT_COMMIT_SHA || null
