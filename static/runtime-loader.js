@@ -90,7 +90,7 @@
     await load('/autorouter-v123.js?v=1.23.0');
     await load('/project-command-bus-v115.js?v=1.23.0');
     await load('/domain-integrity-v121.js?v=1.21.0');
-    await load('/stability-engine-v122.js?v=1.22.0');
+    await load('/stability-engine-v123.js?v=1.23.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
     window.PCBProPcbDock?.refresh?.();
