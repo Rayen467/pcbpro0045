@@ -1,0 +1,1128 @@
+{
+  "version": "1.23.0",
+  "updated": "2026-10-04",
+  "title": "PCB Pro Professional Syllabus 2026–2027",
+  "description": "Syllabus overlay untuk menjembatani Software Engineer ke PCB/Hardware Engineering: teori → ECAD → constraints → manufacturing → lab validation → automation. Disusun dari kurikulum/kompetensi resmi dan kebutuhan pekerjaan terkini; bukan pengganti akreditasi atau sertifikasi resmi.",
+  "evidencePolicy": "Materi membedakan teori, design rule, vendor capability, simulation, manufacturing check, dan physical measurement. Nilai spesifik yang bergantung vendor/MPN tidak boleh diasumsikan.",
+  "sources": [
+    {
+      "id": "abet-2026",
+      "type": "curriculum",
+      "title": "ABET Criteria for Accrediting Engineering Programs 2026–2027",
+      "url": "https://www.abet.org/accreditation/accreditation-criteria/criteria-for-accrediting-engineering-programs-2026-2027/",
+      "use": "Problem solving, engineering design, experimentation, communication, teamwork, modern tools, electrical/computer engineering breadth+depth."
+    },
+    {
+      "id": "ipc-pcb-curriculum",
+      "type": "industry-training",
+      "title": "IPC PCB Design Curriculum",
+      "url": "https://edu.ipc.org/pcb-design",
+      "use": "Schematic capture, library parts, PCB Design I/II, multilayer routing, SI, transmission lines, manufacturing/assembly, DFM."
+    },
+    {
+      "id": "ipc-cid",
+      "type": "industry-certification",
+      "title": "IPC CID/CID+ Designer Certification",
+      "url": "https://www.ipc.org/ipc-designer-certification-program",
+      "use": "Transform electrical circuit description into PCB design that can be manufactured, assembled, tested; materials, component/assembly/fabrication/documentation considerations."
+    },
+    {
+      "id": "ipc-apprentice",
+      "type": "workforce",
+      "title": "IPC PCB Designer Engineer Apprenticeship",
+      "url": "https://www.ipc.org/pcb-designer-engineer-apprenticeship",
+      "use": "158-hour pathway: Design I, DFM intro, Design II, DFM, advanced specialization, CID."
+    },
+    {
+      "id": "kicad-router",
+      "type": "tool-practice",
+      "title": "KiCad 9 PCB Editor routing documentation",
+      "url": "https://docs.kicad.org/9.0/en/pcbnew/pcbnew.html",
+      "use": "Interactive router, single-track automatic finish, rule-aware manual flow."
+    },
+    {
+      "id": "easyeda-autoroute",
+      "type": "tool-practice",
+      "title": "EasyEDA Pro Auto Routing",
+      "url": "https://prodocs.easyeda.com/en/pcb/route-auto-routing/",
+      "use": "Autoroute scope/settings, route layers, design-rule usage, iterations/preview/apply, external DSN/SES workflow."
+    },
+    {
+      "id": "apple-pcb-2026",
+      "type": "job-market",
+      "title": "Apple Hardware PCB Layout Engineer — Sep 2026",
+      "url": "https://jobs.apple.com/en-us/details/200682647-5490/hardware-pcb-layout-engineer",
+      "use": "PCB layout, SI/PI, HDI, BGA fan-out, impedance stackups, blind/buried vias, manufacturing/assembly, constraints, collaboration."
+    },
+    {
+      "id": "apple-sipi-2026",
+      "type": "job-market",
+      "title": "Apple Signal and Power Integrity Engineer — Oct 2026",
+      "url": "https://jobs.apple.com/en-gb/details/200686584-0836/signal-and-power-integrity-engineer-si-pi",
+      "use": "High-speed/low-speed interfaces, PCB stackup, placement/routing, PDN, decoupling, transient/frequency analysis, EMI, debug and validation."
+    },
+    {
+      "id": "apple-system-2026",
+      "type": "job-market",
+      "title": "Apple iPad Hardware Systems Design Engineer — 2026",
+      "url": "https://jobs.apple.com/en-us/details/200669916-0157/ipad-hardware-systems-design-engineer-signal-integrity",
+      "use": "Concept-to-production, simulation, bring-up, debug, lab instruments, rigid/flex PCB, interfaces, scripting and automation."
+    }
+  ],
+  "roleMap": [
+    {
+      "role": "PCB Layout Engineer",
+      "skills": [
+        "schematic review",
+        "constraint setup",
+        "placement",
+        "routing",
+        "HDI/BGA",
+        "stackup",
+        "DFM",
+        "release"
+      ]
+    },
+    {
+      "role": "Hardware Design Engineer",
+      "skills": [
+        "circuit design",
+        "component selection",
+        "schematic",
+        "power",
+        "interfaces",
+        "bring-up",
+        "debug",
+        "validation"
+      ]
+    },
+    {
+      "role": "SI/PI Engineer",
+      "skills": [
+        "transmission lines",
+        "impedance",
+        "crosstalk",
+        "PDN",
+        "decoupling",
+        "EMI",
+        "simulation",
+        "lab correlation"
+      ]
+    },
+    {
+      "role": "DFM/PCBA Engineer",
+      "skills": [
+        "fabrication",
+        "assembly",
+        "stencil",
+        "solderability",
+        "yield",
+        "defect analysis",
+        "supplier communication"
+      ]
+    },
+    {
+      "role": "EDA Automation Engineer",
+      "skills": [
+        "ECAD data models",
+        "Python/JS/TCL",
+        "rule automation",
+        "CI checks",
+        "BOM/CAM automation",
+        "design analytics"
+      ]
+    }
+  ],
+  "branches": [
+    {
+      "id": "pro-foundation",
+      "title": "P1. Engineering Foundation → Hardware Practice",
+      "summary": "Fondasi yang wajib supaya software engineer tidak cuma hafal tombol EDA: problem formulation, circuit reasoning, measurement, standards, documentation, dan safety.",
+      "topics": [
+        {
+          "id": "pro-problem-framing",
+          "title": "Requirements → Engineering Constraints",
+          "level": "professional-core",
+          "summary": "Ubah kebutuhan produk menjadi constraint terukur: supply, current, interfaces, dimensions, environment, cost, reliability, testability.",
+          "intuition": "PCB bagus dimulai sebelum routing. Requirement yang kabur menghasilkan rules dan layout yang salah.",
+          "concepts": [
+            "functional requirements",
+            "electrical limits",
+            "mechanical envelope",
+            "environment",
+            "cost",
+            "risk",
+            "verification plan"
+          ],
+          "formulas": [],
+          "design": [
+            "Buat requirement table sebelum schematic.",
+            "Pisahkan MUST/SHOULD/UNKNOWN.",
+            "Setiap UNKNOWN punya owner dan cara verifikasi."
+          ],
+          "limitations": [
+            "Tool EDA tidak bisa menebak requirement bisnis/safety yang tidak diberikan."
+          ],
+          "practice": [
+            "Tulis requirement board sensor 5 V → 3.3 V dengan I2C dan ukuran maksimum.",
+            "Bedakan constraint produk, constraint fabricator, dan preference designer."
+          ],
+          "next": [
+            "pro-measurement",
+            "pro-schematic-intent"
+          ]
+        },
+        {
+          "id": "pro-measurement",
+          "title": "Measurement, Lab Safety & Correlation",
+          "level": "professional-core",
+          "summary": "Gunakan DMM, oscilloscope, current probe, logic analyzer, spectrum analyzer/VNA sesuai kebutuhan dan korelasikan simulation dengan hardware.",
+          "intuition": "Simulation adalah model; produk nyata harus dikonfirmasi oleh pengukuran dengan setup probe yang benar.",
+          "concepts": [
+            "probe loading",
+            "ground lead inductance",
+            "bandwidth",
+            "aliasing",
+            "calibration",
+            "uncertainty",
+            "correlation"
+          ],
+          "formulas": [
+            "Bandwidth rise-time approximation: BW ≈ 0.35/tr"
+          ],
+          "design": [
+            "Dokumentasikan test point dan ground access.",
+            "Simpan expected vs measured vs tolerance."
+          ],
+          "limitations": [
+            "Measurement salah setup bisa lebih menyesatkan daripada simulation."
+          ],
+          "practice": [
+            "Rancang test plan untuk rail 3.3 V startup.",
+            "Jelaskan kenapa probe ground panjang bisa membuat ringing palsu."
+          ],
+          "next": [
+            "pro-bringup",
+            "pro-sipi-basics"
+          ]
+        },
+        {
+          "id": "pro-standards-doc",
+          "title": "Standards, Documentation & Technical Communication",
+          "level": "professional-core",
+          "summary": "Belajar membaca standar, datasheet, fab capability, assembly notes, drawing, release package dan engineering change.",
+          "intuition": "Di pekerjaan, desain harus bisa diproduksi, direview, ditest, dan diwariskan ke engineer lain.",
+          "concepts": [
+            "IPC design thinking",
+            "revision control",
+            "drawing notes",
+            "fabrication notes",
+            "assembly notes",
+            "ECO"
+          ],
+          "formulas": [],
+          "design": [
+            "Gunakan revision + manifest + checksum.",
+            "Catat assumptions dan evidence."
+          ],
+          "limitations": [
+            "PCB Pro tidak boleh menyatakan compliance ke standar yang belum benar-benar diimplementasikan/diuji."
+          ],
+          "practice": [
+            "Buat release checklist sederhana.",
+            "Tulis manufacturing note tanpa ambigu."
+          ],
+          "next": [
+            "pro-dfm",
+            "pro-release-automation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-schematic-library",
+      "title": "P2. Schematic, Library & Component Data",
+      "summary": "Dari electrical intent sampai reusable device data: symbol, pin, footprint, MPN, datasheet, ERC, power tree dan interface.",
+      "topics": [
+        {
+          "id": "pro-schematic-intent",
+          "title": "Schematic Architecture & Net Intent",
+          "level": "professional-core",
+          "summary": "Bangun schematic yang menunjukkan power domains, signal flow, interfaces, protection, debug, programming dan test points.",
+          "intuition": "Schematic adalah source-of-intent; layout seharusnya tidak menebak koneksi.",
+          "concepts": [
+            "hierarchy",
+            "net naming",
+            "power domains",
+            "interfaces",
+            "test points",
+            "design review"
+          ],
+          "formulas": [],
+          "design": [
+            "Nama net konsisten.",
+            "Kelompokkan block berdasarkan fungsi.",
+            "Sediakan test/debug access."
+          ],
+          "limitations": [
+            "Auto-connect tidak boleh membuat electrical intent yang tidak pernah didefinisikan."
+          ],
+          "practice": [
+            "Pecah board MCU menjadi power/input/MCU/output/debug blocks.",
+            "Buat checklist schematic review."
+          ],
+          "next": [
+            "pro-library-device",
+            "pro-erc"
+          ]
+        },
+        {
+          "id": "pro-library-device",
+          "title": "Device = Symbol + Footprint + Data + 3D",
+          "level": "professional-core",
+          "summary": "Kelola device sebagai satu paket data dengan pin mapping, footprint, MPN/vendor, lifecycle dan evidence.",
+          "intuition": "Kesalahan pin mapping/footprint bisa membuat board gagal walau schematic logic benar.",
+          "concepts": [
+            "symbol pins",
+            "pad numbers",
+            "footprint",
+            "MPN",
+            "datasheet provenance",
+            "lifecycle",
+            "3D body"
+          ],
+          "formulas": [],
+          "design": [
+            "Validasi pin-to-pad mapping.",
+            "Exact ratings hanya dari exact MPN/vendor."
+          ],
+          "limitations": [
+            "Generic template tidak cukup untuk rating kritis atau manufacturing release."
+          ],
+          "practice": [
+            "Audit satu IC: symbol ↔ datasheet ↔ footprint ↔ pin 1 marker.",
+            "Bedakan package name vs manufacturer land pattern."
+          ],
+          "next": [
+            "pro-erc",
+            "pro-placement"
+          ]
+        },
+        {
+          "id": "pro-erc",
+          "title": "ERC & Schematic Review",
+          "level": "professional-core",
+          "summary": "Cari duplicate references, floating pins, missing ground/reference, missing footprints, invalid power connections dan intent mismatch.",
+          "intuition": "ERC menyaring kesalahan struktural sebelum biaya layout meningkat.",
+          "concepts": [
+            "floating input",
+            "power pin",
+            "NC marker",
+            "reference designator",
+            "connectivity coverage"
+          ],
+          "formulas": [],
+          "design": [
+            "Jalankan ERC sebelum sync PCB.",
+            "Setiap warning harus disposition: fix / intentional / unsupported check."
+          ],
+          "limitations": [
+            "ERC clean tidak membuktikan analog performance atau datasheet compliance."
+          ],
+          "practice": [
+            "Klasifikasikan 10 contoh warning ERC.",
+            "Tentukan mana yang benar-benar blocker."
+          ],
+          "next": [
+            "pro-placement",
+            "pro-routing-manual"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-layout-stack",
+      "title": "P3. Board Stackup, Placement & Constraint Setup",
+      "summary": "Fondasi fisik PCB: board outline, layer stack, return path, impedance context, placement zones dan constraint classes.",
+      "topics": [
+        {
+          "id": "pro-stackup",
+          "title": "Layer Stackup & Reference Planes",
+          "level": "professional-core",
+          "summary": "Pilih jumlah layer, copper/plane arrangement, dielectric, thickness dan reference plane berdasarkan routing, EMC, impedance, power dan cost.",
+          "intuition": "Layer count bukan sekadar ruang routing; stackup menentukan return path dan coupling.",
+          "concepts": [
+            "signal layer",
+            "plane",
+            "dielectric",
+            "reference plane",
+            "impedance-controlled stackup",
+            "blind/buried via"
+          ],
+          "formulas": [
+            "Microstrip/stripline impedance requires geometry + dielectric model; use validated solver/fabricator stackup."
+          ],
+          "design": [
+            "Tetapkan stackup sebelum high-speed routing.",
+            "Jangan putus return path critical signal."
+          ],
+          "limitations": [
+            "PCB Pro current manufacturing release belum boleh mengarang dielectric/Dk atau impedance tanpa data."
+          ],
+          "practice": [
+            "Bandingkan 2-layer vs 4-layer untuk MCU + USB.",
+            "Tentukan return plane setiap high-speed layer."
+          ],
+          "next": [
+            "pro-placement",
+            "pro-sipi-basics"
+          ]
+        },
+        {
+          "id": "pro-placement",
+          "title": "Placement by Function, Flow & Return Current",
+          "level": "professional-core",
+          "summary": "Tempatkan connector, power, clocks, IC, decoupling, protection dan noisy/quiet blocks berdasarkan signal/power flow dan mechanical constraints.",
+          "intuition": "Routing yang sulit sering merupakan gejala placement yang buruk.",
+          "concepts": [
+            "functional clustering",
+            "decoupling loop",
+            "connector entry",
+            "thermal",
+            "keepout",
+            "mechanical"
+          ],
+          "formulas": [],
+          "design": [
+            "Place fixed mechanical items dulu.",
+            "Decoupling dekat power pin dengan loop kecil.",
+            "Pisahkan noisy power switching dari sensitive analog/RF."
+          ],
+          "limitations": [
+            "Auto-layout harus direview; connectivity saja tidak cukup untuk analog/RF/thermal intent."
+          ],
+          "practice": [
+            "Susun placement order untuk board MCU + buck + sensor.",
+            "Cari tiga alasan component tidak boleh ditempatkan hanya berdasarkan shortest wire."
+          ],
+          "next": [
+            "pro-routing-manual",
+            "pro-power-layout"
+          ]
+        },
+        {
+          "id": "pro-constraints",
+          "title": "Constraint Classes & Rule Strategy",
+          "level": "professional-core",
+          "summary": "Definisikan clearance, width, via, differential pair, length/skew, edge, keepout dan class per net.",
+          "intuition": "Router profesional tidak hanya mencari jalan; ia mencari jalan yang memenuhi constraint.",
+          "concepts": [
+            "net class",
+            "clearance matrix",
+            "width/current",
+            "via rules",
+            "length/skew",
+            "creepage"
+          ],
+          "formulas": [],
+          "design": [
+            "Pisahkan default rules dari critical-net overrides.",
+            "Trace setiap rule ke alasan: fab/current/impedance/safety."
+          ],
+          "limitations": [
+            "Rule angka tanpa fabricator/material/current/voltage context bisa salah."
+          ],
+          "practice": [
+            "Buat rule table untuk power, GPIO, I2C, USB differential.",
+            "Tentukan rule yang harus blocking vs warning."
+          ],
+          "next": [
+            "pro-routing-manual",
+            "pro-autoroute-review"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-routing",
+      "title": "P4. Routing, Autorouting & Multilayer Strategy",
+      "summary": "Interactive routing, obstacle handling, layer transitions, vias, differential routing, tuning dan bagaimana menilai autorouter secara profesional.",
+      "topics": [
+        {
+          "id": "pro-routing-manual",
+          "title": "Interactive Routing: Push / Walk-around / Shove Thinking",
+          "level": "professional-core",
+          "summary": "Route berdasarkan net intent, return path, clearance, current, coupling dan manufacturability—bukan sekadar garis terpendek.",
+          "intuition": "Manual routing tetap penting untuk critical nets dan untuk menilai hasil otomatis.",
+          "concepts": [
+            "ratsnest",
+            "corner style",
+            "push/shove",
+            "walk-around",
+            "neckdown",
+            "fanout",
+            "via transition"
+          ],
+          "formulas": [],
+          "design": [
+            "Route critical nets first.",
+            "Hindari unnecessary layer changes.",
+            "Review loop area."
+          ],
+          "limitations": [
+            "Canvas connectivity tidak otomatis menjamin signal integrity."
+          ],
+          "practice": [
+            "Route power + clock + bus dengan prioritas berbeda.",
+            "Jelaskan kapan via lebih buruk daripada detour."
+          ],
+          "next": [
+            "pro-autoroute-review",
+            "pro-diff-routing"
+          ]
+        },
+        {
+          "id": "pro-autoroute-review",
+          "title": "Autorouter: Preview, Cost, Layers & Human Review",
+          "level": "professional-core",
+          "summary": "Gunakan autorouter sebagai optimizer constrained: scope nets, layers, existing tracks, priorities, rules, iterations, preview/apply lalu DRC/manual cleanup.",
+          "intuition": "Autorouter yang baik mengurangi kerja repetitif; ia tidak menghilangkan engineering judgment.",
+          "concepts": [
+            "routing objective",
+            "cost function",
+            "completion rate",
+            "layer assignment",
+            "obstacle avoidance",
+            "iteration",
+            "preview/apply"
+          ],
+          "formulas": [],
+          "design": [
+            "Jangan auto-route critical nets tanpa constraint.",
+            "Review result by net class.",
+            "Run DRC after apply."
+          ],
+          "limitations": [
+            "PCB Pro v1.23 autorouter maksimum 2 layer, 90°, layer-per-connection; belum mid-route via switching/inner-layer production model."
+          ],
+          "practice": [
+            "Bandingkan speed vs completion strategy.",
+            "Jelaskan mengapa completion 100% belum berarti layout bagus."
+          ],
+          "next": [
+            "pro-diff-routing",
+            "pro-sipi-basics"
+          ]
+        },
+        {
+          "id": "pro-diff-routing",
+          "title": "Differential Pairs, Length & Skew",
+          "level": "advanced",
+          "summary": "Kelola pair membership, spacing, reference plane, skew, uncoupled length, via symmetry dan receiver/transmitter constraints.",
+          "intuition": "Dua trace bukan otomatis differential pair yang baik; field coupling + return path menentukan behavior.",
+          "concepts": [
+            "differential impedance",
+            "intra-pair skew",
+            "uncoupled region",
+            "via symmetry",
+            "reference plane"
+          ],
+          "formulas": [
+            "Delay ≈ length / propagation velocity"
+          ],
+          "design": [
+            "Keep pair geometry consistent.",
+            "Avoid asymmetrical stubs/vias."
+          ],
+          "limitations": [
+            "Exact impedance requires stackup/material + field solver/fabricator data."
+          ],
+          "practice": [
+            "Buat review checklist USB/PCIe-style differential routing.",
+            "Bedakan length matching dan impedance control."
+          ],
+          "next": [
+            "pro-sipi-basics",
+            "pro-highspeed-interfaces"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-sipi",
+      "title": "P5. Signal Integrity, Power Integrity & EMC",
+      "summary": "Skill yang muncul langsung di role 2026: transmission lines, high-speed links, PDN, decoupling, EMI/crosstalk dan simulation-to-lab correlation.",
+      "topics": [
+        {
+          "id": "pro-sipi-basics",
+          "title": "Transmission Lines & Return Paths",
+          "level": "advanced",
+          "summary": "Saat interconnect electrical length signifikan, trace harus dipandang sebagai transmission line dengan impedance, delay, reflection dan return current.",
+          "intuition": "High-speed ditentukan edge rate, bukan hanya clock frequency.",
+          "concepts": [
+            "characteristic impedance",
+            "reflection",
+            "termination",
+            "return path",
+            "reference discontinuity",
+            "via stub"
+          ],
+          "formulas": [
+            "Reflection coefficient Γ=(ZL−Z0)/(ZL+Z0)"
+          ],
+          "design": [
+            "Control geometry and return continuity.",
+            "Keep critical stubs short."
+          ],
+          "limitations": [
+            "Rule-of-thumb tidak menggantikan channel model untuk sign-off."
+          ],
+          "practice": [
+            "Tentukan kapan trace perlu transmission-line treatment.",
+            "Analisis dampak split plane di bawah high-speed trace."
+          ],
+          "next": [
+            "pro-highspeed-interfaces",
+            "pro-pi"
+          ]
+        },
+        {
+          "id": "pro-highspeed-interfaces",
+          "title": "High-Speed & Low-Speed Interface Layout",
+          "level": "advanced",
+          "summary": "Review interface seperti USB/PCIe/DisplayPort/MIPI/DDR serta I2C/SPI/JTAG/I2S berdasarkan spec, topology, length/skew, connector dan return path.",
+          "intuition": "Setiap interface punya electrical budget dan topology berbeda.",
+          "concepts": [
+            "SerDes",
+            "DDR topology",
+            "clock/data",
+            "termination",
+            "connector channel",
+            "compliance"
+          ],
+          "formulas": [],
+          "design": [
+            "Trace constraints berasal dari interface spec + silicon/vendor guidance.",
+            "Plan compliance/test access."
+          ],
+          "limitations": [
+            "PCB Pro tidak boleh membuat pass/fail protocol compliance tanpa spec/model/test yang relevan."
+          ],
+          "practice": [
+            "Buat constraint checklist satu high-speed interface.",
+            "Bandingkan point-to-point vs multi-drop."
+          ],
+          "next": [
+            "pro-pi",
+            "pro-validation"
+          ]
+        },
+        {
+          "id": "pro-pi",
+          "title": "Power Delivery Network & Decoupling",
+          "level": "advanced",
+          "summary": "Rancang regulator-to-load path, planes, vias, bulk/local decoupling dan target impedance untuk transient current.",
+          "intuition": "Supply rail adalah jaringan frekuensi-dependent, bukan ideal DC wire.",
+          "concepts": [
+            "PDN",
+            "target impedance",
+            "decoupling hierarchy",
+            "loop inductance",
+            "droop",
+            "anti-resonance"
+          ],
+          "formulas": [
+            "Target impedance approximation Ztarget = ΔVallowed / ΔIstep"
+          ],
+          "design": [
+            "Place local decoupling near load.",
+            "Use plane/via geometry to reduce loop inductance.",
+            "Correlate simulation with rail measurement."
+          ],
+          "limitations": [
+            "Cap ESR/ESL and package/plane parasitics require exact models for quantitative prediction."
+          ],
+          "practice": [
+            "Estimate target impedance from droop budget.",
+            "Design measurement plan for rail transient."
+          ],
+          "next": [
+            "pro-emc",
+            "pro-validation"
+          ]
+        },
+        {
+          "id": "pro-emc",
+          "title": "EMI, Crosstalk & Noise Immunity",
+          "level": "advanced",
+          "summary": "Minimalkan unintended coupling melalui placement, return paths, spacing, filtering, shielding strategy dan edge control.",
+          "intuition": "EMI adalah system problem: source-path-victim.",
+          "concepts": [
+            "common-mode",
+            "differential-mode",
+            "crosstalk",
+            "loop area",
+            "filter placement",
+            "shielding"
+          ],
+          "formulas": [],
+          "design": [
+            "Fix current-return geometry before adding random filtering.",
+            "Place protection/filter near entry points."
+          ],
+          "limitations": [
+            "EMC compliance requires defined standard/test setup and physical testing."
+          ],
+          "practice": [
+            "Trace source-path-victim pada kasus noise.",
+            "Review connector entry for ESD/EMI."
+          ],
+          "next": [
+            "pro-validation",
+            "pro-dfm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-manufacturing",
+      "title": "P6. DFM, Assembly, CAM & Supplier Handoff",
+      "summary": "Dari design rules menjadi board yang benar-benar bisa difabrikasi, dirakit, diperiksa dan diproduksi konsisten.",
+      "topics": [
+        {
+          "id": "pro-dfm",
+          "title": "PCB DFM & Fabricator Capability",
+          "level": "professional-core",
+          "summary": "Cocokkan width/spacing, drill, annular ring, copper-edge, solder mask, board thickness, finish, stackup dan tolerances ke capability fabricator.",
+          "intuition": "CAD-valid belum tentu manufacturable atau economical.",
+          "concepts": [
+            "minimum feature",
+            "drill aspect ratio",
+            "annular ring",
+            "mask dam",
+            "finish",
+            "panelization",
+            "tolerance"
+          ],
+          "formulas": [],
+          "design": [
+            "Gunakan capability table vendor sebagai input rule.",
+            "Pisahkan prototype-friendly dan mass-production rules."
+          ],
+          "limitations": [
+            "Capability berubah antar vendor/process; jangan hardcode sebagai universal truth."
+          ],
+          "practice": [
+            "Audit design terhadap fab capability sheet.",
+            "Klasifikasikan blocker/cost-adder/preference."
+          ],
+          "next": [
+            "pro-pcba",
+            "pro-cam-release"
+          ]
+        },
+        {
+          "id": "pro-pcba",
+          "title": "PCBA / DFA / Stencil / Assembly Reality",
+          "level": "professional-core",
+          "summary": "Pertimbangkan component spacing, orientation, fiducial, stencil/paste, reflow, hand-solder/rework, inspection, connector/mechanical access.",
+          "intuition": "Board bukan selesai saat Gerber jadi; assembly process menentukan yield dan reliability.",
+          "concepts": [
+            "SMT",
+            "THT",
+            "paste",
+            "stencil",
+            "fiducial",
+            "AOI",
+            "rework",
+            "DFA"
+          ],
+          "formulas": [],
+          "design": [
+            "Review assembly side/rotation/origin.",
+            "Plan fiducials and inspection access."
+          ],
+          "limitations": [
+            "Assembly rules bergantung CM/process/package."
+          ],
+          "practice": [
+            "Buat DFA review checklist.",
+            "Cari risiko assembly pada dense connector + tall components."
+          ],
+          "next": [
+            "pro-cam-release",
+            "pro-defect-analysis"
+          ]
+        },
+        {
+          "id": "pro-cam-release",
+          "title": "Gerber/Drill/BOM/CPL Release Discipline",
+          "level": "professional-core",
+          "summary": "Generate file dari source-of-truth, jalankan preflight, review CAM, checksum, revision, notes dan archive.",
+          "intuition": "Release engineering mencegah file lama/parsial masuk produksi.",
+          "concepts": [
+            "Gerber",
+            "Excellon",
+            "BOM",
+            "CPL",
+            "manifest",
+            "checksum",
+            "revision"
+          ],
+          "formulas": [],
+          "design": [
+            "Satu revision menghasilkan satu immutable release package.",
+            "Jangan mix file dari revision berbeda."
+          ],
+          "limitations": [
+            "PCB Pro output tanpa verified pad-stack coverage harus tetap Engineering Draft."
+          ],
+          "practice": [
+            "Susun manufacturing release checklist.",
+            "Jelaskan fungsi checksum dan manifest."
+          ],
+          "next": [
+            "pro-bringup",
+            "pro-release-automation"
+          ]
+        },
+        {
+          "id": "pro-defect-analysis",
+          "title": "Troubleshooting & Defect Analysis",
+          "level": "professional-core",
+          "summary": "Hubungkan defect assembly/fabrication dengan symptom electrical dan root cause: solder bridge/open, tombstone, wrong part, via/drill, delamination, contamination.",
+          "intuition": "Engineer lapangan harus bisa bergerak dari symptom → evidence → hypothesis → test → root cause.",
+          "concepts": [
+            "5-why",
+            "fault isolation",
+            "visual inspection",
+            "X-ray/AOI",
+            "rework",
+            "yield"
+          ],
+          "formulas": [],
+          "design": [
+            "Simpan failure evidence dan lot/revision.",
+            "Bedakan design defect dan process defect."
+          ],
+          "limitations": [
+            "Diagnosis remote tanpa measurement/inspection harus diberi confidence rendah."
+          ],
+          "practice": [
+            "Buat fault tree board tidak boot.",
+            "Bedakan open net, short, wrong value, bad solder."
+          ],
+          "next": [
+            "pro-bringup",
+            "pro-quality"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-validation",
+      "title": "P7. Bring-up, Debug, Validation & Quality",
+      "summary": "Tahap dari board pertama datang sampai design siap scale: safe power-up, interface debug, compliance, regression, failure tracking.",
+      "topics": [
+        {
+          "id": "pro-bringup",
+          "title": "First Power-Up & Bring-up Sequence",
+          "level": "professional-core",
+          "summary": "Pre-power inspection, resistance checks, current-limited supply, rail sequencing, clocks/reset, programming/debug, interface tests.",
+          "intuition": "Bring-up yang disiplin mencegah board rusak dan mempercepat root cause.",
+          "concepts": [
+            "current limit",
+            "rail resistance",
+            "sequencing",
+            "reset",
+            "clock",
+            "boot",
+            "test points"
+          ],
+          "formulas": [],
+          "design": [
+            "Buat bring-up checklist sebelum board datang.",
+            "Log setiap measured value dan anomaly."
+          ],
+          "limitations": [
+            "AI tidak boleh menyatakan board aman dipower tanpa kondisi measurement/safety yang memadai."
+          ],
+          "practice": [
+            "Buat sequence bring-up MCU board.",
+            "Tentukan stop-condition saat current abnormal."
+          ],
+          "next": [
+            "pro-validation",
+            "pro-quality"
+          ]
+        },
+        {
+          "id": "pro-validation",
+          "title": "Verification, Validation & Compliance Thinking",
+          "level": "professional-core",
+          "summary": "Pisahkan verification desain terhadap spec dan validation produk terhadap use-case; buat test matrix dan acceptance criteria.",
+          "intuition": "‘Berfungsi sekali’ bukan validation.",
+          "concepts": [
+            "verification",
+            "validation",
+            "test matrix",
+            "corner cases",
+            "margin",
+            "compliance",
+            "regression"
+          ],
+          "formulas": [],
+          "design": [
+            "Requirement harus punya verification method.",
+            "Automate repeatable tests where possible."
+          ],
+          "limitations": [
+            "Virtual simulation tidak menggantikan required compliance/lab certification."
+          ],
+          "practice": [
+            "Buat test matrix power + digital interface + thermal.",
+            "Tentukan pass/fail criteria."
+          ],
+          "next": [
+            "pro-quality",
+            "pro-release-automation"
+          ]
+        },
+        {
+          "id": "pro-quality",
+          "title": "Yield, Reliability & Design Feedback Loop",
+          "level": "advanced",
+          "summary": "Gunakan defect/yield/field data untuk memperbaiki design rules, footprint, placement, testability dan supplier process.",
+          "intuition": "Professional flow adalah closed loop, bukan design sekali lalu selesai.",
+          "concepts": [
+            "yield",
+            "Pareto",
+            "failure mode",
+            "reliability",
+            "derating",
+            "traceability",
+            "continuous improvement"
+          ],
+          "formulas": [],
+          "design": [
+            "Hubungkan failure ke revision + lot.",
+            "Masukkan lesson learned kembali ke library/rules."
+          ],
+          "limitations": [
+            "Reliability prediction perlu mission profile/material/process data."
+          ],
+          "practice": [
+            "Buat Pareto defect hipotetik.",
+            "Usulkan corrective/preventive action."
+          ],
+          "next": [
+            "pro-release-automation",
+            "pro-capstone"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-automation",
+      "title": "P8. EDA Automation, Data Engineering & AI-Assisted Workflow",
+      "summary": "Bagian yang sangat cocok untuk background Software Engineering: typed domain model, scripting, CI, rule engines, data provenance dan AI agent yang tidak mengarang.",
+      "topics": [
+        {
+          "id": "pro-eda-data",
+          "title": "Typed ECAD Domain Model & Source of Truth",
+          "level": "software-hardware",
+          "summary": "Represent component, pin, net, footprint, pad, track, via, zone, layer, rule dan release sebagai data terstruktur dengan schema/version.",
+          "intuition": "Automation profesional butuh data model yang konsisten, bukan DOM scraping/hardcoded UI.",
+          "concepts": [
+            "schema",
+            "graph",
+            "IDs",
+            "referential integrity",
+            "migration",
+            "event log"
+          ],
+          "formulas": [],
+          "design": [
+            "Single source-of-truth.",
+            "Validate every mutation.",
+            "Separate view state from engineering state."
+          ],
+          "limitations": [
+            "Model yang incomplete harus expose UNKNOWN, bukan isi nilai palsu."
+          ],
+          "practice": [
+            "Buat schema net/track/via minimal.",
+            "Desain migration v1→v2 tanpa kehilangan data."
+          ],
+          "next": [
+            "pro-scripting",
+            "pro-ai-agent"
+          ]
+        },
+        {
+          "id": "pro-scripting",
+          "title": "Python/JS/TCL Automation for Hardware",
+          "level": "software-hardware",
+          "summary": "Automate BOM checks, rule checks, data transforms, test parsing, release packaging, statistics dan CAD workflows.",
+          "intuition": "Current hardware roles increasingly value scripting untuk mempercepat design/validation.",
+          "concepts": [
+            "Python",
+            "JavaScript",
+            "TCL",
+            "CLI",
+            "CSV/JSON",
+            "CI",
+            "report generation"
+          ],
+          "formulas": [],
+          "design": [
+            "Automation harus deterministic dan auditable.",
+            "Unit-test transformations/checkers."
+          ],
+          "limitations": [
+            "Script tidak boleh bypass engineering review untuk safety/production-critical decisions."
+          ],
+          "practice": [
+            "Tulis parser BOM→risk report.",
+            "Buat CI yang fail pada missing MPN/DRC blocker."
+          ],
+          "next": [
+            "pro-ai-agent",
+            "pro-release-automation"
+          ]
+        },
+        {
+          "id": "pro-ai-agent",
+          "title": "AI Engineering Agent with Tools + RAG + Guardrails",
+          "level": "software-hardware",
+          "summary": "Gunakan LLM untuk reasoning, retrieval dan planning; gunakan deterministic tools untuk mutation/checks; tampilkan model/status/coverage.",
+          "intuition": "LLM bagus untuk reasoning dan bahasa, tetapi engineering state harus ditulis lewat typed commands yang tervalidasi.",
+          "concepts": [
+            "RAG",
+            "tool calling",
+            "planner",
+            "validator",
+            "permissions",
+            "fallback",
+            "provenance",
+            "token budget"
+          ],
+          "formulas": [],
+          "design": [
+            "Local deterministic path first.",
+            "LLM cannot claim an action executed.",
+            "Show provider status and model metadata."
+          ],
+          "limitations": [
+            "LLM output bukan measurement/datasheet/manufacturing evidence."
+          ],
+          "practice": [
+            "Bedakan query yang cukup local vs butuh LLM.",
+            "Desain action preview + atomic rollback."
+          ],
+          "next": [
+            "pro-release-automation",
+            "pro-capstone"
+          ]
+        },
+        {
+          "id": "pro-release-automation",
+          "title": "CI/CD for Hardware Data & Release",
+          "level": "software-hardware",
+          "summary": "Gunakan checks, tests, fingerprints, manifests dan release gates seperti software engineering tanpa menyamakan board dengan software semata.",
+          "intuition": "Hardware release dapat memperoleh disiplin software: reproducible, versioned, reviewable, automated.",
+          "concepts": [
+            "CI",
+            "regression test",
+            "artifact hash",
+            "release gate",
+            "audit trail",
+            "rollback"
+          ],
+          "formulas": [],
+          "design": [
+            "Build/test sebelum deploy.",
+            "Release package traceable ke source revision."
+          ],
+          "limitations": [
+            "CI tidak menggantikan physical validation."
+          ],
+          "practice": [
+            "Buat pipeline schematic→DRC→CAM→manifest.",
+            "Definisikan blocker production."
+          ],
+          "next": [
+            "pro-capstone"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pro-capstone-2026",
+      "title": "P9. Capstone Industri & Career Readiness 2026",
+      "summary": "Proyek akhir end-to-end yang menghasilkan portfolio setara workflow nyata, bukan sekadar screenshot PCB.",
+      "topics": [
+        {
+          "id": "pro-capstone",
+          "title": "Capstone: Requirement → Board → Bring-up → Release",
+          "level": "capstone",
+          "summary": "Bangun satu board nyata/realistis melalui requirement, schematic, library, ERC, stackup, placement, routing, DRC, CAM, assembly planning, bring-up/test dan revision.",
+          "intuition": "Portfolio kuat menunjukkan keputusan, trade-off, evidence dan debugging—bukan hanya board terlihat rapi.",
+          "concepts": [
+            "end-to-end ownership",
+            "review",
+            "trade-off",
+            "manufacturing",
+            "debug",
+            "documentation"
+          ],
+          "formulas": [],
+          "design": [
+            "Pilih project dengan power + digital interface + sensor/actuator.",
+            "Simpan design review notes dan test evidence."
+          ],
+          "limitations": [
+            "Tanpa physical fabrication, tandai tahap yang belum divalidasi sebagai virtual/pre-production."
+          ],
+          "practice": [
+            "Deliver: requirement, schematic, PCB, DRC report, BOM, CAM draft, test plan, failure log, revision note.",
+            "Present 10-minute design review."
+          ],
+          "next": [
+            "pro-career-map"
+          ]
+        },
+        {
+          "id": "pro-career-map",
+          "title": "Career Map: Layout / Hardware / SI-PI / DFM / EDA Automation",
+          "level": "career",
+          "summary": "Pilih jalur berdasarkan kekuatan: physical layout, circuit/system design, electromagnetic analysis, manufacturing, atau automation.",
+          "intuition": "Skill overlap tinggi, tetapi portfolio dan depth harus sesuai role target.",
+          "concepts": [
+            "role mapping",
+            "portfolio",
+            "tool transfer",
+            "standards",
+            "lab skill",
+            "collaboration"
+          ],
+          "formulas": [],
+          "design": [
+            "PCB Layout: depth routing/stackup/DFM.",
+            "Hardware: circuit+bringup.",
+            "SI/PI: transmission line+PDN+simulation/lab.",
+            "EDA Automation: domain model+scripting+CI."
+          ],
+          "limitations": [
+            "Job posting berubah; gunakan role map sebagai current snapshot, bukan jaminan hiring."
+          ],
+          "practice": [
+            "Audit gap skill terhadap satu role.",
+            "Buat 12-week learning plan berdasarkan gap."
+          ],
+          "next": []
+        }
+      ]
+    }
+  ]
+}
