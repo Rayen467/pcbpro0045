@@ -23,6 +23,7 @@ declare global {
     PCBProStepBodies?: any;
     PCBProPhysicalDRC?: any;
     PCBProIntegrity?: any;
+    PCBProPcbDock?: any;
   }
 }
 
