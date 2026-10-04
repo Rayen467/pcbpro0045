@@ -42,7 +42,12 @@ export async function GET({ fetch }) {
       }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const ids = Array.isArray(data?.data) ? data.data.map((m) => m?.id).filter(Boolean) : [];
+    const ids = [];
+    if (Array.isArray(data?.data)) {
+      for (const model of data.data) {
+        if (model && typeof model === 'object' && typeof model.id === 'string') ids.push(model.id);
+      }
+    }
     return Response.json({
       connected: true,
       code: 'AI_GATEWAY_OK',
