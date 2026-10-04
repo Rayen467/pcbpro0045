@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.PCBProWorkspaceRepair) return;
-  const VERSION = '1.3.0';
+  const VERSION = '1.4.0';
   const UI_KEY = 'pcbpro0045-layout-mode';
   let layoutMode = localStorage.getItem(UI_KEY) || 'flex';
   let repairTimer = 0;
@@ -128,7 +128,7 @@
     const view = currentView();
     const liveByView = {
       schematic:new Set(['select','place','wire','pan']),
-      pcb:new Set(['select','place','route','via','zone','keepout','pan']),
+      pcb:new Set(['select','place','route','auto route','via','zone','keepout','pan']),
       simulator:new Set(['run','stop','probe','cursor a','cursor b','trace','measure']),
       '3d':new Set(['orbit','pan','zoom','reset']), bom:new Set(['refresh','group','mpn','supplier','cost','export csv']), fabrication:new Set(['preflight','gerber','drill','pick & place','assembly','archive']), rules:new Set([]), release:new Set([])
     };
