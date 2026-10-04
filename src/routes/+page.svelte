@@ -69,7 +69,7 @@
   /** @type {Record<string, string[]>} */
   const toolsets = {
     Schematic: ['Select', 'Place', 'Wire', 'Bus', 'Net label', 'Junction', 'No connect', 'Power', 'Pan', 'Measure', 'Annotate'],
-    PCB: ['Select', 'Route', 'Via', 'Zone', 'Keepout', 'Dimension', 'Pan', 'Measure', 'Tune', 'Layer swap', 'Ratsnest'],
+    PCB: ['Select', 'Route', 'Auto Route', 'Via', 'Zone', 'Keepout', 'Dimension', 'Pan', 'Measure', 'Tune', 'Layer swap', 'Ratsnest'],
     Simulator: ['Run', 'Stop', 'Probe', 'Cursor A', 'Cursor B', 'Trace', 'Measure'],
     '3D': ['Orbit', 'Pan', 'Zoom', 'Measure', 'Section', 'Explode', 'Reset'],
     BOM: ['Refresh', 'Group', 'MPN', 'Supplier', 'Cost', 'Export CSV'],
@@ -680,6 +680,7 @@
     if (tool === 'Stop') window.PCBProCommandBus?.execute?.('simulation.pause', {});
     if (tool === 'Preflight') activeView === 'Fabrication' ? window.PCBProManufacturing?.preflight?.() : runDrc();
     if (tool === 'Electrical') runErc();
+    if (tool === 'Auto Route') window.PCBProAutoRouter?.open?.();
     if (['Clearance','Track width','Via','Differential','Mask','Silkscreen'].includes(tool)) window.PCBProProfessional?.open?.('constraints');
     if (tool === 'Gerber') window.PCBProManufacturing?.downloadGerbers?.();
     if (tool === 'Drill') window.PCBProManufacturing?.downloadDrill?.();
