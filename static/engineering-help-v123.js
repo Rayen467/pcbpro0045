@@ -137,9 +137,18 @@
 
   const byLabel=new Map(FEATURES.map(([label,category,what,use])=>[norm(label),{id:'help.'+norm(label).replace(/[^a-z0-9]+/g,'-'),label,category,what,use}]));
 
+  function featureRow(label,category){
+    const row=FEATURES.find(x=>norm(x[0])===norm(label)&&x[1]===category);
+    return row?{id:'help.'+norm(row[0]+'-'+row[1]).replace(/[^a-z0-9]+/g,'-'),label:row[0],category:row[1],what:row[2],use:row[3]}:null;
+  }
   function matchFeature(el){
     const raw=el?.dataset?.pcbTool||el?.dataset?.pcbView||el?.querySelector?.('small')?.textContent||el?.textContent||el?.getAttribute?.('aria-label')||el?.getAttribute?.('title')||'';
     const key=norm(raw);
+    const active=norm(document.querySelector('.tabs button.active')?.dataset?.pcbView||document.querySelector('.tabs button.active')?.textContent||'');
+    if(key==='via'){
+      if(active==='rules')return featureRow('Via','rule-tool');
+      if(active==='pcb')return featureRow('Via','pcb-tool');
+    }
     if(byLabel.has(key))return byLabel.get(key);
     for(const [k,v] of byLabel){if(k.length>2&&(key===k||key.startsWith(k+' ')||key.includes(' '+k+' ')))return v}
     return null;
