@@ -28,6 +28,8 @@
     const spice=testEngine('SPICE model coverage',()=>window.PCBProSpiceV125?.current?.());
     const physical=testEngine('Physical copper DRC',()=>window.PCBProPhysicalDRC?.run?.());
     const fabrication=testEngine('Manufacturing preflight',()=>window.PCBProManufacturing?.preflight?.());
+    const electrical=testEngine('Electrical load schedule',()=>window.PCBProElectrical?.calculate?.());
+    const electricalCircuits=window.PCBProElectrical?.snapshot?.()?.circuits?.length||0;
     const findings=[];
     function add(code,severity,details){
       findings.push({code,severity,details});
@@ -55,16 +57,23 @@
       for(const i of fabrication.result.warnings||[])add('FAB_'+i.code,'warning',i.message);
       if(!fabrication.result.readyForProduction)add('FAB_DRAFT_ONLY','warning','CAM status is not a production candidate; unverified footprint geometry and/or preflight checks remain.');
     }
+    if(electricalCircuits){
+      if(!electrical.available||!electrical.result.ok)add('ELECTRICAL_UNAVAILABLE','blocker','Electrical calculations are unavailable or invalid.');
+      else for(const e of electrical.result.findings||[])
+        add('ELEC_'+e.code,e.severity==='warning'?'warning':'warning',(e.ref?e.ref+': ':'')+e.message);
+    }
     const blockers=findings.filter(x=>x.severity==='blocker').length, warnings=findings.filter(x=>x.severity==='warning').length;
     const report={
       version:VERSION,
       generatedAt:new Date().toISOString(),
-      project:source,
+      project:{...source,electricalCircuits},
       verdict:blockers?'BLOCKED':warnings?'REVIEW_REQUIRED':'CHECKS_PASS_NOT_CERTIFIED',
       summary:{blockers,warnings,total:findings.length},
       findings,
       coverage:{
         integrity:integrity.available,
+        electrical:electrical.available,
+        electricalNotInstallationApproved:true,
         spice:spice.available,
         physicalDrc:physical.available && physical.result.calibrated===true,
         manufacturing:fabrication.available,

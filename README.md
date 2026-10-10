@@ -104,3 +104,18 @@ The toolbar now exposes **SPICE** and **VERIFY**. Both use live project objects,
 - CAM blocks boards with unexported copper zones. All packages are deliberately labeled ENGINEERING DRAFT while mask/paste/silkscreen, complete padstack, footprint and THT drill hole coverage remains unverified.
 
 **Still to build:** actual ngspice execution (WASM or service), vendor subcircuits, multilayer/rip-up autorouting, high-speed SI/PI parasitics, independent full-Gerber roundtrips, and HIL comparison. Exported SPICE input is not an executed simulation or fabrication sign-off.
+
+## Electrical Engineering Workspace — v1.26
+
+Open the native **Electrical** tab to draft a low-voltage AC distribution project alongside PCB design. Electrical state is stored independently inside the **same cloud project and portable full backup**. Starting a new SirkuitLab project clears the local electrical state.
+
+- Supply configurations: 1-phase line-to-neutral or 3-phase line-to-line.
+- Circuit load schedule: active power, quantity, utilization/demand factor, power factor, line assignment for single-phase branches, branch cable length, copper cross-section, conductor temperature, optional cable reactance and entered protective-breaker rating.
+- Calculated per-circuit current, VA and approximate voltage drop; total demanded W/VA; L1/L2/L3 line currents and heaviest phase; approximate feeder voltage drop.
+- SVG single-line overview, CSV load schedule, JSON calculation/report export. No bundled sample loads are inserted into an empty project.
+- Input and topology validation, unbalanced three-phase caveat, missing reactance, excessive illustrative voltage-drop review flag, breaker load-over-rating flag and non-verified installation-safety warnings.
+- Global VERIFY includes electrical calculations as additional review evidence when circuits exist.
+
+**Safety and coverage:** This tool is for **preliminary planning only**, not installation instructions or a certified electrical design. It does not determine conductor current-carrying capacity (KHA), installation method, derating/grouping, short-circuit levels (IEC 60909), breaker/RCD selection/coordination or disconnection, neutral/harmonics, motor starts, surge protection or site measurements. A contractor/qualified engineer must review site conditions and the relevant PUIL 2020 / SNI 0225 requirements before construction. Values are not connected to an actual digital-twin SPICE or power-flow solver.
+
+Indicative copper resistance is R20 (ohm/km) = 17.241 / conductor area (mm2), adjusted with alpha 0.00393 per deg C. Voltage drop uses 2 I L (R pf + X sin(phi)) for 1-phase and sqrt(3) I L (R pf + X sin(phi)) for balanced 3-phase. Unbalanced line current totals are displayed, but full phase/neutral phasors are not simulated.

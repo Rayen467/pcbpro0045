@@ -57,20 +57,21 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.23.0';
+  const version = '1.26.0';
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
   let projectDisplayName = 'LED Driver · Rev A';
   let dirty = false;
   $: dirty = JSON.stringify(components) !== savedContent;
-  const views = ['Schematic', 'PCB', 'Simulator', '3D', 'BOM', 'Fabrication', 'Rules', 'Release'];
+  const views = ['Schematic', 'PCB', 'Simulator', 'Electrical', '3D', 'BOM', 'Fabrication', 'Rules', 'Release'];
   const menus = ['File', 'Edit', 'View', 'Place', 'Route', 'Inspect', 'Tools', 'Manufacture'];
   /** @type {Record<string, string[]>} */
   const toolsets = {
     Schematic: ['Select', 'Place', 'Wire', 'Bus', 'Net label', 'Junction', 'No connect', 'Power', 'Pan', 'Measure', 'Annotate'],
     PCB: ['Select', 'Route', 'Auto Route', 'Via', 'Zone', 'Keepout', 'Dimension', 'Pan', 'Measure', 'Tune', 'Layer swap', 'Ratsnest'],
     Simulator: ['Run', 'Stop', 'Probe', 'Cursor A', 'Cursor B', 'Trace', 'Measure'],
+    Electrical: [],
     '3D': ['Orbit', 'Pan', 'Zoom', 'Measure', 'Section', 'Explode', 'Reset'],
     BOM: ['Refresh', 'Group', 'MPN', 'Supplier', 'Cost', 'Export CSV'],
     Fabrication: ['Preflight', 'Gerber', 'Drill', 'Pick & Place', 'Assembly', 'Archive'],
@@ -619,6 +620,7 @@
     if (!window.confirm('Create a new empty PCB project? The current project remains in encrypted database/history if it has been synced.')) return;
     try {
       localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ version, components:[], savedAt:'New project', leftWidth, rightWidth }));
+      localStorage.removeItem('pcbpro0045-electrical-v126');
       localStorage.setItem('pcbpro0045-cloud-create-new', '1');
       localStorage.setItem('pcbpro0045-cloud-project-name', 'Untitled PCB');
       window.dispatchEvent(new CustomEvent('pcbpro:reset-layout', { cancelable:true }));
@@ -711,8 +713,8 @@
 <svelte:window onpointermove={handleGlobalPointerMove} onpointerup={handleGlobalPointerUp} onpointercancel={cancelInteraction} onblur={cancelInteraction} onbeforeunload={beforeUnload} onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
 
 <svelte:head>
-  <title>PCB Pro 0045 — EDA Workspace</title>
-  <meta name="description" content="PCB Pro engineering workspace for schematic capture, PCB layout, rules, BOM and fabrication." />
+  <title>SirkuitLab — PCB & Electrical Engineering Workspace</title>
+  <meta name="description" content="SirkuitLab engineering workspace for electronic schematics, PCB design, low-voltage electrical planning, load calculations, rules, BOM and manufacturing." />
 </svelte:head>
 
 <div class:interacting={isInteracting} class="app">
@@ -807,6 +809,8 @@
           </section>
         {:else if activeView === 'Simulator'}
           <section class="panel"><div class="panel-title"><div><span>SIMULATION</span><h2>Live Circuit Solver</h2><p>The live solver mounts from the active netlist. No placeholder voltages/currents are shown.</p></div><button class="primary" onclick={runSimulation}>▶ Run</button></div><div class="cards"><article><b>LIVE</b><h3>Solver state</h3><p>Use Run/Stop/Probe after the runtime solver finishes loading. Unsupported device models are reported instead of guessed.</p></article><article><b>MODEL</b><h3>Current scope</h3><p>DC operating-point style solving is available for supported devices; this is not transient/SPICE sign-off.</p></article></div></section>
+        {:else if activeView === 'Electrical'}
+          <section class="el-root" data-electrical-root aria-label="Electrical engineering workspace"></section>
         {:else if activeView === '3D'}
           <section class="panel"><div class="panel-title"><div><span>3D ASSEMBLY</span><h2>Geometry-driven board viewer</h2><p>Interactive board geometry from the active project. STEP bodies remain explicitly unverified until a real body provider is connected.</p></div><button class="primary" onclick={() => window.PCBProGeometry3D?.mount?.()}>Refresh 3D</button></div><div class="cards"><article><b>LOADING 3D ENGINE</b><h3>Project geometry</h3><p>The runtime engine will mount the board outline, copper, vias and component placements here.</p></article></div></section>
         {:else if activeView === 'BOM'}
