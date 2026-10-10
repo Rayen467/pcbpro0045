@@ -204,7 +204,7 @@
       return;
     }
     const script = document.createElement('script');
-    script.src = '/reality-engine.js';
+    script.src = '/reality-engine.js?v=1.25.0';
     script.async = true;
     script.onload = () => setTimeout(() => window.PCBProReality?.rerun?.(), 80);
     document.body.appendChild(script);
