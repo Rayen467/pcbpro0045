@@ -10,6 +10,8 @@ const browserScripts = [
   'static/workspace-repair.js',
   'static/database-engine-v117.js',
   'static/portable-backup-v124.js',
+  'static/electrical-engine-v126.js',
+  'static/electrical-ui-v126.js',
   'static/spice-netlist-v125.js',
   'static/engineering-verification-v125.js',
   'static/sim-engine.js',
@@ -51,6 +53,8 @@ test('runtime loader includes critical production engines', () => {
     'learning-professional-v123.js',
     'database-engine-v117.js',
     'portable-backup-v124.js',
+    'electrical-engine-v126.js',
+    'electrical-ui-v126.js',
     'spice-netlist-v125.js',
     'engineering-verification-v125.js',
     'professional-engine-v118.js',
@@ -251,4 +255,18 @@ test('v1.25 fails closed on absent physical checks and missing CAM coverage', ()
   assert.match(read('static/live-sim-engine.js'),/const project=window.PCBProProject\?\.getComponents\?\.\(\)/);
   assert.equal(sim.includes('return structuredClone(DEFAULT_COMPONENTS);'),false);
   assert.equal(reality.includes('return structuredClone(runtimeNets?.length ? runtimeNets : DEFAULT_NETS);'),false);
+});
+
+test('v1.26 Electrical workspace is native, persistent and covered by backup', () => {
+ const page=read('src/routes/+page.svelte');
+ const db=read('static/database-engine-v117.js');
+ const backup=read('static/portable-backup-v124.js');
+ const verify=read('static/engineering-verification-v125.js');
+ assert.match(page,/activeView === 'Electrical'/);
+ assert.match(page,/pcbpro0045-electrical-v126/);
+ assert.match(db,/electrical:window\.PCBProElectrical/);
+ assert.match(db,/localStorage\.setItem\(ELECTRICAL_KEY/);
+ assert.match(backup,/\[KEY\.electrical/);
+ assert.match(backup,/window\.PCBProElectrical\.validate/);
+ assert.match(verify,/ELECTRICAL_UNAVAILABLE/);
 });
