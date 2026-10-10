@@ -6,7 +6,7 @@
   const newState=()=>({version:VERSION,completed:{},practiced:{},quizPassed:{},labs:{},selected:'M00-L1',track:'all'});
   let progress=newState(), curriculum=null, ready=false, lastError='';
   const truthMap=(v,max)=>v && typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length<=max&&
-    Object.entries(v).every(([k,x])=>/^[A-Za-z0-9_-]{1,60}$/.test(k) && x===true);
+    Object.entries(v).every(([k,x])=>!['__proto__','constructor','prototype'].includes(k)&&/^[A-Za-z0-9_-]{1,60}$/.test(k)&&x===true);
   function validate(value){
     if(!value||typeof value!=='object'||Array.isArray(value))return {ok:false,error:'Progress is not an object'};
     for(const field of ['completed','practiced','quizPassed','labs'])
@@ -160,7 +160,7 @@
     const courseTotal=stages.reduce((a,s)=>a+s.lessons.length,0);
     const done=stages.reduce((a,s)=>a+count(s),0);
     const total=curriculum.totalLessons||all.reduce((a,s)=>a+s.lessons.length,0);
-    const completion=Math.round((Object.keys(progress.completed).length/total)*100);
+    const completion=Math.min(100,Math.round((Object.keys(progress.completed).length/total)*100));
     const st=status(current.id);
     root.innerHTML=
       '<header class="ac-head"><div><span class="ac-kicker">SIRKUITLAB / ENGINEERING ACADEMY · 2026</span>'+
