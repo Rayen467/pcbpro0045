@@ -119,3 +119,19 @@ Open the native **Electrical** tab to draft a low-voltage AC distribution projec
 **Safety and coverage:** This tool is for **preliminary planning only**, not installation instructions or a certified electrical design. It does not determine conductor current-carrying capacity (KHA), installation method, derating/grouping, short-circuit levels (IEC 60909), breaker/RCD selection/coordination or disconnection, neutral/harmonics, motor starts, surge protection or site measurements. A contractor/qualified engineer must review site conditions and the relevant PUIL 2020 / SNI 0225 requirements before construction. Values are not connected to an actual digital-twin SPICE or power-flow solver.
 
 Indicative copper resistance is R20 (ohm/km) = 17.241 / conductor area (mm2), adjusted with alpha 0.00393 per deg C. Voltage drop uses 2 I L (R pf + X sin(phi)) for 1-phase and sqrt(3) I L (R pf + X sin(phi)) for balanced 3-phase. Unbalanced line current totals are displayed, but full phase/neutral phasors are not simulated.
+
+
+## Electrical energy & protection review — v1.27 (2026 update)
+
+The native Electrical tab now includes **Energy Intelligence & Proteksi** as a collapsible section (available inside the same local, cloud-encrypted and portable project):
+
+- User-entered start hour (0–23) and duty duration (0–24 h) per circuit; numerical 24-hour load curve with overnight/fractional-hour integration.
+- Optional PV AC hourly generation profile: exactly 24 input factors 0–1 and entered nameplate kWp. **No solar yield or weather is fabricated.**
+- Optional PV-surplus-to-battery dispatch model with *atomically entered* capacity (kWh), power (kW), round-trip efficiency and minimum SOC; hourly grid import, PV output, curtailment, hypothetical export and battery state. No grid export is assumed by default; grid export is only an explicitly enabled scenario.
+- Tariff entered by user only; projected daily grid bill and hypothetical export revenue remain unavailable when tariffs are unknown.
+- Fundamental-frequency phase-current phasor sum to estimate neutral current; no triplen harmonics, nonlinear currents or detailed neutral impedance model.
+- Inputs for prospective fault level **Ik** and protective device interrupting rating **Icu** in kA. The tool flags the case Icu below entered Ik; it **does not** determine fault levels, protection curves, coordination, or cable ampacity.
+- Motor inrush screens only with a user-entered starting multiplier, plus EVSE-specific protection warnings (no automatic breaker/RCD selection).
+- A combined JSON evidence report. Validation stays conservative; test cases include phase phasors, AC energy profiles, battery energy conservation, invalid values, missing PV profile, and protection warnings.
+
+Technical references include IEC 60364-8-81:2026 (replacing IEC 60364-8-1:2019), IEC 60364-8-82:2022 Amendment 1:2026 for prosumer installations, IEC 60364-7-722:2018 for EV supply, and applicable Indonesian PUIL 2020 / SNI 0225 editions. This is an **energy scenario estimator**, NOT a verified IEC compliance implementation or real measured energy/voltage fault protection model. Site study, smart meters, PLC/SCADA, grid approvals, AC power flow and protection coordination remain future integrations.
