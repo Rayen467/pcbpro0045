@@ -37,6 +37,11 @@
         if(c[key]!=null&&(!finite(c[key])||c[key]<(key==='breakerA'?0.001:0)||c[key]>10000))bad(at+key,'Invalid optional value');
       }
     }
+    // Enforce advanced schema for edits, full backups and cloud-restored designs.
+    if(p.advanced != null && window.PCBProElectricalAdvanced?.validate){
+      const advanced=window.PCBProElectricalAdvanced.validate(p);
+      if(!advanced.ok)for(const entry of advanced.errors)bad('advanced.'+entry.field,entry.message);
+    }
     return {ok:!errors.length,errors};
   }
   const resistance=(area,temp)=>17.241/area*(1+0.00393*(temp-20));
