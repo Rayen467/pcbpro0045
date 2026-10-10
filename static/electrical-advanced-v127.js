@@ -99,7 +99,8 @@
     if(cfg.batteryCapacityKWh>0)add('review','BATTERY_MODEL_SCOPE','Baterai memakai dispatch PV surplus dan model efisiensi sederhana; BMS, thermal runaway, fire safety dan lifetime tidak dimodelkan.');
     if(cfg.exportEnabled)add('review','EXPORT_PERMISSION','Ekspor energi ke jaringan bersifat hipotesis; izin, proteksi anti-islanding, dan aturan operator jaringan harus diverifikasi.');
     let profile=null;
-    const fullyScheduled=project.circuits.every(c=>c.hoursPerDay!=null&&c.startHour!=null);
+    if(!project.circuits.length)add('review','NO_LOAD_PROFILE','Tambah minimal satu circuit agar proyeksi energi memiliki data beban nyata.');
+    const fullyScheduled=project.circuits.length>0&&project.circuits.every(c=>c.hoursPerDay!=null&&c.startHour!=null);
     if(fullyScheduled && !(cfg.pvKWp>0&&cfg.pvHourlyFactors===null)){
       const eta=cfg.batteryCapacityKWh>0?Math.sqrt(cfg.roundtripEfficiency):1;
       const reserve=cfg.batteryCapacityKWh* ((cfg.reserveSocPercent??0)/100);
