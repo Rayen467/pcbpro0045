@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.28.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.29.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
