@@ -57,7 +57,13 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.28.0';
+  const version = '1.29.0';
+  let themeMode = 'light';
+  /** @param {'light'|'dark'|'system'} next */
+  function changeTheme(next) {
+    themeMode = next;
+    window.PCBProTheme?.setMode?.(next);
+  }
   /** @type {HTMLInputElement | undefined} */
   let importInput;
   let savedContent = '';
@@ -206,6 +212,10 @@
   $: isInteracting = Boolean(libraryDrag || nodeDrag || panDrag || resizeDrag);
 
   onMount(() => {
+    themeMode = window.PCBProTheme?.getMode?.() || 'light';
+    /** @param {CustomEvent} event */
+    const onThemeChange = (event) => { themeMode = event.detail?.preference || 'light'; };
+    window.addEventListener('sirkuitlab:theme-change', onThemeChange);
     loadExtendedCatalog();
     savedContent = JSON.stringify(components);
     try {
@@ -272,6 +282,7 @@
     return () => {
       window.removeEventListener('pcbpro:netlist-changed', onNetlist);
       window.removeEventListener('pcbpro:board-changed', onBoard);
+      window.removeEventListener('sirkuitlab:theme-change', onThemeChange);
     };
   });
 
@@ -722,12 +733,20 @@
   <header class="topbar">
     <div class="brand-group">
       <button class="icon-btn" onclick={() => leftOpen = !leftOpen}>☰</button>
-      <div class="logo">⌁</div><div class="brand"><strong>PCB Pro</strong><span>0045</span></div>
-      <span class="version">POINTER ENGINE · v{version}</span>
+      <div class="logo" aria-hidden="true">⌁</div><div class="brand"><strong>SirkuitLab</strong><span>PCB · Electrical · Robotics</span></div>
+      <span class="version">ENGINEERING STUDIO · v{version}</span>
       <button class="project-pill" onclick={() => { leftOpen = true; leftTab = 'Project'; }} title="Open project panel"><i></i><b>{projectDisplayName}</b><span>⌄</span></button>
     </div>
     <div class="top-actions">
       <span class="save-state">{dirty ? 'Unsaved changes' : savedAt}</span>
+      <label class="theme-control" title="Tema tampilan: Light, Dark, atau ikut perangkat">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        <select aria-label="Appearance theme" data-sirkuitlab-theme-select value={themeMode} onchange={(event)=>changeTheme(event.currentTarget.value)}>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="system">System</option>
+        </select>
+      </label>
       <button onclick={newProject}>New</button>
       <input hidden type="file" accept=".json,application/json" bind:this={importInput} onchange={importProject} aria-label="Import project JSON" />
       <button onclick={() => importInput?.click()}>Import layout</button>
@@ -823,7 +842,7 @@
         {:else if activeView === 'Rules'}
           <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Deterministic geometry checks plus calibrated physical DRC in millimeters.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>GEOMETRY DRC</b><h3>Logical + board checks</h3><p>Connectivity, routing, outline, via/zone/keepout and implemented geometry rules.</p></article><article><b>PHYSICAL DRC</b><h3>mm-calibrated clearance</h3><p>Track width, copper clearance, via diameter/drill, annular ring and copper-to-edge checks using the physical board dimensions.</p></article><article><b>DOMAIN INTEGRITY</b><h3>Cross-engine source of truth</h3><p>Audits components, wires, nets, PCB tracks, placements, vias, zones, rules and manufacturing state for stale references.</p></article></div><div class="pp-actions"><button onclick={runDrc}>Run DRC</button><button onclick={() => window.PCBProPhysicalDRC?.show?.()}>Physical DRC</button><button class="primary" onclick={() => window.PCBProIntegrity?.show?.()}>Integrity Audit</button></div></section>
         {:else}
-          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>PCB Pro v{version}</h2><p>Professional learning, visible engineering explanations, preview-first autorouting, and live AI provider diagnostics.</p></div></div><div class="release"><article><b>v1.23.0</b><h3>Explain + Auto Route + AI Status + Pro Syllabus</h3><p>Immediate feature/error help, preview-first draft autorouter up to two copper layers, visible AI Gateway health/test, and 2026–2027 professional curriculum overlay.</p></article><article><b>v1.22.0</b><h3>PCB Workspace Layout Repair</h3><p>Non-overlapping PCB command dock and a single source of truth for route/via/zone/keepout controls.</p></article></div></section>
+          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>SirkuitLab v{version}</h2><p>Professional learning, visible engineering explanations, preview-first autorouting, and live AI provider diagnostics.</p></div></div><div class="release"><article><b>v1.23.0</b><h3>Explain + Auto Route + AI Status + Pro Syllabus</h3><p>Immediate feature/error help, preview-first draft autorouter up to two copper layers, visible AI Gateway health/test, and 2026–2027 professional curriculum overlay.</p></article><article><b>v1.22.0</b><h3>PCB Workspace Layout Repair</h3><p>Non-overlapping PCB command dock and a single source of truth for route/via/zone/keepout controls.</p></article></div></section>
         {/if}
       </div>
 
