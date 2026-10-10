@@ -44,7 +44,8 @@ test('structured curriculum contains 14 modules / 42 substantive lessons / begin
    for(const l of s.lessons){
      assert.ok(!ids.has(l.id),'duplicate '+l.id);ids.add(l.id);
      for(const field of ['body','example','exercise','pass'])assert.ok(l[field].length>=35,l.id+' lacks '+field);
-     assert.equal(l.quiz.answer,0);
+     assert.ok(Number.isInteger(l.quiz.answer)&&l.quiz.answer>=0&&l.quiz.answer<l.quiz.options.length);
+     assert.equal(l.quiz.options.length,3);
      assert.ok(['Learning','Schematic','PCB','Electrical','Fabrication'].includes(l.view));
    }
  }
@@ -84,7 +85,7 @@ test('academy progress survives reload and merging portable state never erases p
 });
 test('academy rejects unsafe/unbounded progress and rejects unknown labs',async()=>{
  const h=academy();await h.ready();
- assert.equal(h.api.validate({completed:{'__proto__':true},selected:'a',track:'all'}).ok,false);
+ assert.equal(h.api.validate({completed:Object.fromEntries([['__proto__',true]]),selected:'a',track:'all'}).ok,false);
  assert.equal(h.api.validate({completed:[],selected:'a',track:'all'}).ok,false);
  assert.equal(h.api.validate({completed:{a:'YES'},selected:'a',track:'all'}).ok,false);
  assert.throws(()=>h.api.markLab('mains'),/Unknown/);
