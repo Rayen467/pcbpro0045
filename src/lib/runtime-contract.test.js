@@ -13,6 +13,7 @@ const browserScripts = [
   'static/spice-netlist-v125.js',
   'static/engineering-verification-v125.js',
   'static/sim-engine.js',
+  'static/live-sim-engine.js',
   'static/reality-engine.js',
   'static/stability-engine-v123.js',
   'static/project-command-bus-v115.js',
@@ -247,6 +248,7 @@ test('v1.25 fails closed on absent physical checks and missing CAM coverage', ()
   assert.match(spice,/PIN_MULTI_NET/);
   assert.match(sim,/const live = window\.PCBProWireEngine\?\.nets/);
   assert.match(reality,/window\.PCBProSpiceV125\.exportFile\(false\)/);
+  assert.match(read('static/live-sim-engine.js'),/const project=window.PCBProProject\?\.getComponents\?\.\(\)/);
   assert.equal(sim.includes('return structuredClone(DEFAULT_COMPONENTS);'),false);
   assert.equal(reality.includes('return structuredClone(runtimeNets?.length ? runtimeNets : DEFAULT_NETS);'),false);
 });
