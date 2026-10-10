@@ -154,6 +154,10 @@
     return analyze(next);
   }
   function configure(key,value){return patch(p=>{p.advanced ||= {};p.advanced.energy={...energyConfig(p),[key]:value};});}
+  function configureBattery(config){
+    // Capacity, power, efficiency and SOC reserve must be committed together.
+    return patch(p=>{p.advanced ||= {};p.advanced.energy={...energyConfig(p),...config};});
+  }
   function updateCircuit(id,key,value){return patch(p=>{
     const c=p.circuits.find(x=>x.id===id);
     if(!c)throw Error('Circuit not found');
@@ -230,7 +234,7 @@
       '<label class="ea-field"><span>Ekspor grid (hanya simulasi)</span><select data-energy="exportEnabled"><option value="false" '+(!cfg.exportEnabled?'selected':'')+'>Tidak, surplus dibatasi</option><option value="true" '+(cfg.exportEnabled?'selected':'')+'>Ya, hipotetis</option></select></label></div>'+
       '<label class="ea-field ea-profile"><span>24 faktor produksi PV AC per jam (0–1), berdasarkan data pengguna; pisahkan koma</span>'+
       '<textarea data-profile rows="2" placeholder="0,0,0,0,... (24 nilai)">'+esc(cfg.pvHourlyFactors?.join(',')??'')+'</textarea></label>'+
-      '<div class="ea-actions"><button data-ea="profile">Simpan profil PV 24 jam</button><button data-ea="report">Export energy & protection report JSON</button></div>'+
+      '<div class="ea-actions"><button data-ea="battery">Simpan parameter baterai bersama</button><button data-ea="profile">Simpan profil PV 24 jam</button><button data-ea="report">Export energy & protection report JSON</button></div>'+
       '<div class="ea-chart">'+energyChart(pf)+'</div>'+
       '<div class="ea-key"><span>■ Beban</span><span>■ PV</span><span>■ Impor grid</span></div>'+
       (pf?'<p class="ea-muted">PV produksi: '+fmt(pf.pvKWh)+' kWh · Ekspor (hipotetis): '+fmt(pf.gridExportKWh)+' kWh · Curtailed: '+fmt(pf.curtailedKWh)+
@@ -240,13 +244,25 @@
       '<p class="ea-muted">Referensi arah pengembangan: IEC 60364-8-81:2026 (efisiensi energi), IEC 60364-8-82:2022+A1:2026 (prosumer), IEC 60364-7-722:2018 (EV), dan PUIL/SNI yang berlaku di Indonesia. Ini belum model aliran daya AC, kajian fault-loop, sistem proteksi lengkap, data meter real-time, atau pengesahan instalasi.</p>'+
       '</details>';
     root.appendChild(section);
+    const batteryKeys=new Set(['batteryCapacityKWh','batteryMaxKW','roundtripEfficiency','reserveSocPercent']);
     section.querySelectorAll('[data-energy]').forEach(el=>el.addEventListener('change',()=>{
       try{
         const key=el.dataset.energy;
+        if(batteryKeys.has(key))return;
         const val=key==='exportEnabled'?el.value==='true':toNum(el.value.trim());
         configure(key,val);
       }catch(e){alert(String(e?.message||e));}
     }));
+    section.querySelector('[data-ea="battery"]').onclick=()=>{
+      try{
+        const values={};
+        for(const key of batteryKeys){
+          const el=section.querySelector('[data-energy="'+key+'"]');
+          values[key]=toNum(el.value.trim());
+        }
+        configureBattery(values);
+      }catch(e){alert(String(e?.message||e));}
+    };
     section.querySelectorAll('[data-advanced]').forEach(el=>el.addEventListener('change',()=>{
       try{
         const key=el.dataset.advanced;
@@ -284,7 +300,7 @@
     if(!document.getElementById(styles.id))document.head.appendChild(styles);
     mount();
   }
-  window.PCBProElectricalAdvanced={version:VERSION,validate,analyze,configure,updateCircuit,setProfile,mount,exportReport,overlap};
+  window.PCBProElectricalAdvanced={version:VERSION,validate,analyze,configure,configureBattery,updateCircuit,setProfile,mount,exportReport,overlap};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 })();
