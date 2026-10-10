@@ -79,3 +79,16 @@ npm run build
 ## Deployment
 
 Production source is `Rayen467/pcbpro0045` on branch `main`. Vercel should stay connected to this repository so every successful push to `main` produces a new deployment.
+
+## Portable full-project backup — v1.24.0
+
+The **BACKUP** control in the top toolbar exports or restores a local JSON archive with:
+- all components and schematic/PCB positions;
+- the wire graph;
+- board tracks, outline, placements and pads;
+- advanced board objects (vias, zones and keepouts);
+- professional rule settings and manufacturing calibration.
+
+Backup files include a SHA-256 checksum, format/version checks, size limits and structural validation. Import is **explicitly confirmed** before replacing the local project, and a storage error triggers best-effort rollback of the prior local state. A restored project is detached from the prior cloud project ID, so an import cannot silently overwrite that cloud project.
+
+**Important:** This is an unencrypted local JSON backup. Store it carefully. It does **not** include the private cloud recovery key; use the separate **Backup key** option for that. This archive does not reproduce cloud revision history, external data/library files, generated output packages or the last preflight/DRC result. Re-run simulation, ERC, physical DRC and manufacturing preflight before fabrication. The older "Export layout" remains layout-only.
