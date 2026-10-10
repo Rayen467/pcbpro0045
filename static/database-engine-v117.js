@@ -29,6 +29,7 @@
   const enc=new TextEncoder();
   const dec=new TextDecoder();
   const clean=v=>String(v??'').trim().replace(/\s+/g,' ');
+  const esc=v=>String(v??'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[m]));
 
   function bytesToB64(bytes){
     let s='';const a=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes);
@@ -285,7 +286,7 @@
     if(document.querySelector('#pcbpro-db-style'))return;
     const s=document.createElement('style');s.id='pcbpro-db-style';s.textContent=`
       #pcbpro-db-projects{margin:0 0 8px;padding:8px;border:1px solid #203643;background:#09151e;border-radius:8px}
-      .pdb-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px}.pdb-head b{font:900 7px ui-monospace;color:#62d7bf;letter-spacing:.08em}.pdb-state{font:800 7px ui-monospace;color:#7f96a3}.pdb-state.error{color:#ee977f}.pdb-actions{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}.pdb-actions button{border:1px solid #294553;background:#10212b;color:#b8cbd4;border-radius:6px;padding:5px 7px;font-size:7px;font-weight:850}.pdb-list{display:grid;gap:4px}.pdb-project{display:grid!important;grid-template-columns:1fr auto;gap:6px;align-items:center!important;padding:7px!important;border:1px solid transparent!important}.pdb-project.active{background:#12352f!important;color:#78e0ca!important;border-color:#285a50!important}.pdb-project small{display:block;font:700 6px ui-monospace;color:#6f8794;margin-top:2px}.pdb-lock{font-size:9px}.pdb-note{margin-top:7px;font-size:6.5px;line-height:1.45;color:#617986}.pdb-error{margin-top:6px;color:#e8927c;font-size:6.5px;line-height:1.4}
+      .pdb-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px}.pdb-head b{font:900 10px ui-monospace;color:#62d7bf;letter-spacing:.08em}.pdb-state{font:800 10px ui-monospace;color:#7f96a3}.pdb-state.error{color:#ee977f}.pdb-actions{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}.pdb-actions button{border:1px solid #294553;background:#10212b;color:#b8cbd4;border-radius:6px;padding:5px 7px;font-size:7px;font-weight:850}.pdb-list{display:grid;gap:4px}.pdb-project{display:grid!important;grid-template-columns:1fr auto;gap:6px;align-items:center!important;padding:7px!important;border:1px solid transparent!important}.pdb-project.active{background:#12352f!important;color:#78e0ca!important;border-color:#285a50!important}.pdb-project small{display:block;font:700 10px ui-monospace;color:#6f8794;margin-top:2px}.pdb-lock{font-size:12px}.pdb-note{margin-top:7px;font-size:10px;line-height:1.45;color:#617986}.pdb-error{margin-top:6px;color:#e8927c;font-size:10px;line-height:1.4}
     `;document.head.appendChild(s);
   }
 
@@ -305,11 +306,11 @@
         <button data-pdb-import-key>${t('Import key','Import key')}</button>
       </div>
       <div class="pdb-list">${projects.map(p=>`
-        <button class="pdb-project ${p.id===activeId?'active':''}" data-pdb-open="${p.id}" title="${p.name}">
-          <span><b>${p.name.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}</b><small>rev ${p.current_revision} · ${new Date(p.updated_at).toLocaleString('id-ID')}</small></span><span class="pdb-lock">🔒</span>
+        <button class="pdb-project ${p.id===activeId?'active':''}" data-pdb-open="${esc(p.id)}" title="${esc(p.name)}">
+          <span><b>${esc(p.name)}</b><small>rev ${esc(p.current_revision)} · ${new Date(p.updated_at).toLocaleString('id-ID')}</small></span><span class="pdb-lock">🔒</span>
         </button>`).join('')}</div>
       <div class="pdb-note">${t('Isi proyek dienkripsi di browser sebelum masuk database. RLS juga mengunci row ke token browser ini. Backup key diperlukan kalau browser/storage hilang.','Project contents are encrypted in the browser before database upload. RLS also binds rows to this browser token. Back up the key in case browser storage is lost.')}</div>
-      ${lastError?`<div class="pdb-error">${clean(lastError).slice(0,240)}</div>`:''}`;
+      ${lastError?`<div class="pdb-error">${esc(clean(lastError).slice(0,240))}</div>`:''}`;
 
     root.querySelector('[data-pdb-sync]')?.addEventListener('click',()=>saveRemote(activeId,projectName(),captureBundle()).catch(()=>{}));
     root.querySelector('[data-pdb-new]')?.addEventListener('click',async()=>{

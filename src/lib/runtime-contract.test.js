@@ -10,6 +10,11 @@ const browserScripts = [
   'static/workspace-repair.js',
   'static/database-engine-v117.js',
   'static/portable-backup-v124.js',
+  'static/spice-netlist-v125.js',
+  'static/engineering-verification-v125.js',
+  'static/sim-engine.js',
+  'static/live-sim-engine.js',
+  'static/reality-engine.js',
   'static/stability-engine-v123.js',
   'static/project-command-bus-v115.js',
   'static/professional-engine-v118.js',
@@ -46,6 +51,8 @@ test('runtime loader includes critical production engines', () => {
     'learning-professional-v123.js',
     'database-engine-v117.js',
     'portable-backup-v124.js',
+    'spice-netlist-v125.js',
+    'engineering-verification-v125.js',
     'professional-engine-v118.js',
     'project-command-bus-v115.js',
     'assistant-brain-v115.js',
@@ -226,4 +233,22 @@ test('professional syllabus covers current engineering workflow and is indexed b
   const brain = read('static/assistant-brain-v115.js');
   assert.match(brain, /learning-professional-v123\.json/);
   assert.match(brain, /professional-syllabus-2026/);
+});
+
+test('v1.25 fails closed on absent physical checks and missing CAM coverage', () => {
+  const mfg=read('static/manufacturing-engine-v120.js');
+  const spice=read('static/spice-netlist-v125.js');
+  const sim=read('static/sim-engine.js');
+  const reality=read('static/reality-engine.js');
+  assert.match(mfg,/PHYSICAL_DRC_UNVERIFIED/);
+  assert.match(mfg,/UNEXPORTED_COPPER_ZONES/);
+  assert.match(mfg,/const completeManufacturingLayers=false/);
+  assert.match(mfg,/ENGINEERING-DRAFT-NOT-FOR-FABRICATION/);
+  assert.match(spice,/MISSING_VENDOR_MODEL/);
+  assert.match(spice,/PIN_MULTI_NET/);
+  assert.match(sim,/const live = window\.PCBProWireEngine\?\.nets/);
+  assert.match(reality,/window\.PCBProSpiceV125\.exportFile\(false\)/);
+  assert.match(read('static/live-sim-engine.js'),/const project=window.PCBProProject\?\.getComponents\?\.\(\)/);
+  assert.equal(sim.includes('return structuredClone(DEFAULT_COMPONENTS);'),false);
+  assert.equal(reality.includes('return structuredClone(runtimeNets?.length ? runtimeNets : DEFAULT_NETS);'),false);
 });

@@ -92,3 +92,15 @@ The **BACKUP** control in the top toolbar exports or restores a local JSON archi
 Backup files include a SHA-256 checksum, format/version checks, size limits and structural validation. Import is **explicitly confirmed** before replacing the local project, and a storage error triggers best-effort rollback of the prior local state. A restored project is detached from the prior cloud project ID, so an import cannot silently overwrite that cloud project.
 
 **Important:** This is an unencrypted local JSON backup. Store it carefully. It does **not** include the private cloud recovery key; use the separate **Backup key** option for that. This archive does not reproduce cloud revision history, external data/library files, generated output packages or the last preflight/DRC result. Re-run simulation, ERC, physical DRC and manufacturing preflight before fabrication. The older "Export layout" remains layout-only.
+
+## Engineering verification — v1.25.0
+
+The toolbar now exposes **SPICE** and **VERIFY**. Both use live project objects, not sample circuits:
+
+- SPICE assembles a strictly checked ngspice-compatible .cir input from connected R/C/L/V/I sources and real nets. Invalid values, absent ground, unconnected pins, conflicting pin-to-net mappings, and unsupported types block export. Generic LED/diode models are available only by explicit opt-in and are labeled *illustrative only*. Vendor-model sign-off is not available.
+- VERIFY combines actual project integrity, SPICE model coverage, physical geometry DRC and manufacturing preflight into one auditable downloadable JSON report. It never claims hardware-certified readiness.
+- Physical DRC rejects copper without net identity, tracks/vias outside the board, and retains existing clearance/width/edge/via checks.
+- The simulation UI reads actual project components and nets rather than substituting demo hardware on empty designs.
+- CAM blocks boards with unexported copper zones. All packages are deliberately labeled ENGINEERING DRAFT while mask/paste/silkscreen, complete padstack, footprint and THT drill hole coverage remains unverified.
+
+**Still to build:** actual ngspice execution (WASM or service), vendor subcircuits, multilayer/rip-up autorouting, high-speed SI/PI parasitics, independent full-Gerber roundtrips, and HIL comparison. Exported SPICE input is not an executed simulation or fabrication sign-off.

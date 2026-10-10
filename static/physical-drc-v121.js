@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProPhysicalDRC) return;
 
-  const VERSION='1.21.0';
+  const VERSION='1.25.0';
   const EPS=1e-9;
 
   const lang=()=>window.PCBProUX?.lang||localStorage.getItem('pcbpro0045-lang')||'id';
@@ -57,6 +57,18 @@
     if(closed&&points.length>2)out.push([points.at(-1),points[0]]);
     return out;
   }
+  function insideOutline(point, polygon) {
+    if (!Array.isArray(polygon) || polygon.length < 3) return false;
+    let inside=false;
+    for (let i=0,j=polygon.length-1;i<polygon.length;j=i++){
+      const p=polygon[i],q=polygon[j];
+      if (((p.y>point.y)!==(q.y>point.y)) &&
+          point.x < (q.x-p.x)*(point.y-p.y)/(q.y-p.y)+p.x) inside=!inside;
+    }
+    return inside;
+  }
+  const validPoint = p => p && Number.isFinite(Number(p.x)) && Number.isFinite(Number(p.y));
+
   function trackPoints(tr){
     return [tr.start,...(Array.isArray(tr.corners)?tr.corners:[]),tr.end].filter(p=>p&&Number.isFinite(Number(p.x))&&Number.isFinite(Number(p.y)));
   }
@@ -93,11 +105,18 @@
     const tracks=[];
     for(const tr of b.tracks||[]){
       const pts=trackPoints(tr);
-      if(pts.length<2){
+      if(pts.length<2||!validPoint(tr.start)||!validPoint(tr.end)||
+        (Array.isArray(tr.corners)&&!tr.corners.every(validPoint))){
         findings.push(finding('TRACK_GEOMETRY','error',t('Track '+tr.id+' tidak punya geometri endpoint lengkap.','Track '+tr.id+' is missing complete endpoint geometry.'),{trackId:tr.id}));
         continue;
       }
+      if(!tr.net || typeof tr.net !== 'string'){
+        findings.push(finding('TRACK_UNASSIGNED_NET','error',t('Track '+tr.id+' belum punya net valid.','Track '+tr.id+' has no assigned net.'),{trackId:tr.id}));
+      }
       const mm=pts.map(cal.point),widthMm=num(tr.widthMm,0.25);
+      if(mm.some(point=>!insideOutline(point,outline))){
+        findings.push(finding('TRACK_OUTSIDE_OUTLINE','error',t('Track '+tr.id+' berada di luar Edge.Cuts.','Track '+tr.id+' has geometry outside Edge.Cuts.'),{trackId:tr.id}));
+      }
       tracks.push({...tr,pointsMm:mm,widthMm,segments:segs(mm,false)});
       coverage.tracks++;
       if(widthMm+EPS<num(r.trackWidthMm,0)){
@@ -113,7 +132,7 @@
 
     for(let i=0;i<tracks.length;i++)for(let j=i+1;j<tracks.length;j++){
       const A=tracks[i],B=tracks[j];
-      if((A.layer||'F.Cu')!==(B.layer||'F.Cu')||A.net===B.net)continue;
+      if((A.layer||'F.Cu')!==(B.layer||'F.Cu')||(A.net&&B.net&&A.net===B.net))continue;
       coverage.trackPairs++;
       let center=Infinity;
       for(const sa of A.segments)for(const sb of B.segments)center=Math.min(center,segDist(sa[0],sa[1],sb[0],sb[1]));
@@ -127,6 +146,11 @@
     coverage.vias=vias.length;
     const requiredRing=Math.max(0,(num(r.viaDiameterMm)-num(r.viaDrillMm))/2);
     for(const v of vias){
+      if(!validPoint(v)||!v.net||typeof v.net!=='string'){
+        findings.push(finding('VIA_UNASSIGNED_NET','error',t('Via '+v.id+' belum punya koordinat/net valid.','Via '+v.id+' has invalid coordinates or no assigned net.'),{viaId:v.id}));
+      } else if(!insideOutline(v.pointMm,outline)){
+        findings.push(finding('VIA_OUTSIDE_OUTLINE','error',t('Via '+v.id+' berada di luar Edge.Cuts.','Via '+v.id+' lies outside Edge.Cuts.'),{viaId:v.id}));
+      }
       if(v.diameterMm+EPS<num(r.viaDiameterMm,0))findings.push(finding('VIA_DIAMETER','error',t('Via '+v.id+' diameter '+v.diameterMm.toFixed(3)+' mm di bawah rule.','Via '+v.id+' diameter '+v.diameterMm.toFixed(3)+' mm is below rule.'),{viaId:v.id,actualMm:v.diameterMm,requiredMm:num(r.viaDiameterMm)}));
       if(v.drillMm+EPS<num(r.viaDrillMm,0))findings.push(finding('VIA_DRILL','error',t('Via '+v.id+' drill '+v.drillMm.toFixed(3)+' mm di bawah rule.','Via '+v.id+' drill '+v.drillMm.toFixed(3)+' mm is below rule.'),{viaId:v.id,actualMm:v.drillMm,requiredMm:num(r.viaDrillMm)}));
       const ring=(v.diameterMm-v.drillMm)/2;

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const VERSION = '0.5.0';
+  const VERSION = '0.6.0';
   let panel = null;
   let running = false;
   let timer = 0;
@@ -27,6 +27,17 @@
   }
 
   function captureDesign() {
+    // On the Simulation tab the Schematic DOM may not be mounted.
+    // Read the authoritative in-memory project and wire graph first.
+    const project=window.PCBProProject?.getComponents?.();
+    const graph=window.PCBProWireEngine?.nets;
+    if(Array.isArray(project)&&Array.isArray(graph)){
+      return {
+        components:structuredClone(project).map(c=>({...c,code:c.code||inferCode(c.name,c.id)})),
+        nets:structuredClone(graph)
+      };
+    }
+
     const components = [...document.querySelectorAll('.node')].map((node) => {
       const id = node.querySelector('.ref')?.textContent?.trim() || '';
       const name = node.querySelector('small')?.textContent?.trim() || '';
@@ -193,7 +204,7 @@
       return;
     }
     const script = document.createElement('script');
-    script.src = '/reality-engine.js';
+    script.src = '/reality-engine.js?v=1.25.0';
     script.async = true;
     script.onload = () => setTimeout(() => window.PCBProReality?.rerun?.(), 80);
     document.body.appendChild(script);
