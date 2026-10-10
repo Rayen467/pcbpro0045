@@ -2,7 +2,7 @@
   'use strict';
 
   if (window.__PCBPRO_RUNTIME_LOADER__) return;
-  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.29.0', loaded: new Set() };
+  window.__PCBPRO_RUNTIME_LOADER__ = { version: '1.30.0', loaded: new Set() };
   const state = window.__PCBPRO_RUNTIME_LOADER__;
 
   function load(src) {
@@ -89,9 +89,11 @@
     await load('/academy-hub-v128.js?v=1.28.0');
     await load('/routing-trainer-v128.js?v=1.28.0');
     await load('/electrical-advanced-v127.js?v=1.27.0');
-    await load('/database-engine-v117.js?v=1.28.0');
-    await load('/portable-backup-v124.js?v=1.28.0');
+    await load('/system-architect-v130.js?v=1.30.0');
+    await load('/database-engine-v117.js?v=1.30.0');
+    await load('/portable-backup-v124.js?v=1.30.0');
     await load('/electrical-ui-v126.js?v=1.27.0');
+    await load('/system-studio-v130.js?v=1.30.0');
     await load('/professional-engine-v118.js?v=1.21.0');
     await load('/physical-drc-v121.js?v=1.25.0');
     await load('/spice-netlist-v125.js?v=1.25.0');
