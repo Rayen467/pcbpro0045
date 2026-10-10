@@ -80,27 +80,26 @@
   }
 
   function loadComponents() {
+    const live = window.PCBProProject?.getComponents?.();
+    if (Array.isArray(live)) return structuredClone(live);
     captureFromDom();
     if (runtimeComponents?.length) return structuredClone(runtimeComponents);
     for (const key of STORAGE_KEYS) {
       try {
         const parsed = JSON.parse(localStorage.getItem(key) || 'null');
-        if (Array.isArray(parsed?.components) && parsed.components.length) {
-          return parsed.components.map((c) => ({ ...c, code: c.code || inferCode(c.name, c.id) }));
+        if (Array.isArray(parsed?.components)) {
+          return parsed.components.map(c => ({ ...c, code:c.code || inferCode(c.name, c.id) }));
         }
       } catch (_) {}
     }
-    return [
-      { id:'V1', code:'V', name:'DC Source', value:'5 V' },
-      { id:'R2', code:'R', name:'Resistor', value:'330 Ω' },
-      { id:'D3', code:'LED', name:'LED', value:'Red 2 V' },
-      { id:'G4', code:'GND', name:'Ground', value:'0 V' }
-    ];
+    return [];
   }
 
   function loadNets() {
+    const live = window.PCBProWireEngine?.nets;
+    if (Array.isArray(live)) return structuredClone(live);
     captureFromDom();
-    return structuredClone(runtimeNets?.length ? runtimeNets : DEFAULT_NETS);
+    return structuredClone(runtimeNets || []);
   }
 
   function normalizePins(raw) {
@@ -501,26 +500,14 @@
     });
   }
 
-  function exportSpice(panel) {
-    const components = loadComponents();
-    const nets = loadNets();
-    const pmap = pinMap(nets);
-    const lines = ['* PCB Pro 0045 Reality Lab export', '* Browser envelope model; replace generic models with vendor .model/.lib for sign-off'];
-    for (const c of components) {
-      const n1 = pmap.get(`${c.id}.1`) || 'NC1';
-      const n2 = pmap.get(`${c.id}.2`) || 'NC2';
-      if (c.code === 'R') lines.push(`${c.id} ${n1} ${n2} ${parseEng(c.value) || 1}`);
-      else if (c.code === 'C') lines.push(`${c.id} ${n1} ${n2} ${parseEng(c.value) || 1e-6}`);
-      else if (c.code === 'L') lines.push(`${c.id} ${n1} ${n2} ${parseEng(c.value) || 10e-6}`);
-      else if (c.code === 'V') lines.push(`${c.id} ${n1} ${n2} DC ${parseEng(c.value) || 5}`);
-      else if (c.code === 'D' || c.code === 'LED') lines.push(`${c.id} ${n1} ${n2} D_${c.code}`);
+  function exportSpice() {
+    // The shared exporter enforces grounded real nets, valid component values,
+    // and a declared SPICE model for every active device.
+    if (!window.PCBProSpiceV125?.exportFile) {
+      window.alert('SPICE validator is unavailable. Netlist export is blocked.');
+      return;
     }
-    lines.push('.model D_D D(Is=2.52n N=1.752 Rs=0.568 Cjo=4p M=0.4 tt=4n)');
-    lines.push('.model D_LED D(Is=1e-20 N=2 Rs=18 Cjo=25p)');
-    lines.push('.op', '.end');
-    const blob = new Blob([lines.join('\n')], { type:'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='pcbpro0045-reality.cir'; a.click(); URL.revokeObjectURL(url);
+    window.PCBProSpiceV125.exportFile(false);
   }
 
   function installStyles() {
