@@ -70,7 +70,7 @@ test('load schedule CSV prevents spreadsheet injection from user-supplied labels
   const h=harness();h.api.add();h.api.update('C1','name','=HYPERLINK("evil")');
   const csv=h.api.csv();
   assert.match(csv,/'=HYPERLINK/);
-  assert.match(csv,/ID,Beban/);
+  assert.match(csv,/"ID","Beban"/);
 });
 test('single-line SVG escapes user text and does not claim fabrication approval',()=>{
   const h=harness();h.api.add();
