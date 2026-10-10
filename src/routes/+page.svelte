@@ -59,10 +59,12 @@
 
   const version = '1.29.0';
   let themeMode = 'light';
-  /** @param {'light'|'dark'|'system'} next */
+  /** @param {string} next */
   function changeTheme(next) {
-    themeMode = next;
-    window.PCBProTheme?.setMode?.(next);
+    if (!['light','dark','system'].includes(next)) return;
+    const selected = /** @type {'light'|'dark'|'system'} */ (next);
+    themeMode = selected;
+    window.PCBProTheme?.setMode?.(selected);
   }
   /** @type {HTMLInputElement | undefined} */
   let importInput;
