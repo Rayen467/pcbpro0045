@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProPortableBackup) return;
 
-  const VERSION = '1.24.0';
+  const VERSION = '1.28.0';
   const FORMAT = 'pcbpro0045-portable-project';
   const MAX_BYTES = 8 * 1024 * 1024;
   const MAX_COMPONENTS = 5000;
@@ -14,6 +14,7 @@
     professional: 'pcbpro0045-professional-v118',
     manufacturing: 'pcbpro0045-manufacturing-v120',
     electrical: 'pcbpro0045-electrical-v126',
+    academy: 'pcbpro0045-academy-progress-v128',
     active: 'pcbpro0045-cloud-active-project',
     newCloud: 'pcbpro0045-cloud-create-new',
     name: 'pcbpro0045-cloud-project-name'
@@ -89,6 +90,10 @@
       const v=window.PCBProElectrical.validate(bundle.electrical);
       if(!v.ok)throw new Error('Invalid electrical installation project: '+v.errors.map(x=>x.field).join(', '));
     }
+    if(bundle.academyProgress!=null){
+      const v=window.PCBProAcademy?.validate?.(bundle.academyProgress);
+      if(!v?.ok)throw new Error('Invalid Academy learning progress: '+(v?.error||'validator missing'));
+    }
     validateTree(bundle);
   }
 
@@ -142,6 +147,16 @@
     const bundle = validated.bundle;
     const ui = bundle.core.ui || {};
     const clamp = (x, fallback, min, max) => Number.isFinite(x) ? Math.max(min, Math.min(max, x)) : fallback;
+    // Course progress is global: importing an older PCB archive must never reset it.
+    let mergedAcademy=null;
+    if(bundle.academyProgress){
+      const previous=(()=>{try{return JSON.parse(localStorage.getItem(KEY.academy)||'null')}catch{return null}})();
+      const safePrevious=window.PCBProAcademy?.validate?.(previous)?.ok?previous:null;
+      mergedAcademy={...bundle.academyProgress};
+      for(const field of ['completed','practiced','quizPassed','labs'])
+        mergedAcademy[field]={...(safePrevious?.[field]||{}),...(bundle.academyProgress[field]||{})};
+      if(safePrevious){mergedAcademy.selected=safePrevious.selected;mergedAcademy.track=safePrevious.track;}
+    }
     const replacements = new Map([
       [KEY.project, JSON.stringify({
         version: VERSION, components: bundle.core.components, savedAt: 'Portable project restore',
@@ -154,6 +169,7 @@
       [KEY.professional, bundle.professional ? JSON.stringify(bundle.professional) : null],
       [KEY.manufacturing, bundle.manufacturing ? JSON.stringify(bundle.manufacturing) : null],
       [KEY.electrical, bundle.electrical ? JSON.stringify(bundle.electrical) : null],
+      ...(mergedAcademy?[[KEY.academy,JSON.stringify(mergedAcademy)]]:[]),
       [KEY.active, null],
       [KEY.newCloud, '1'],
       [KEY.name, validated.projectName.slice(0, 120)]

@@ -1,0 +1,1125 @@
+{
+  "schema": "sirkuitlab-academy-v1",
+  "version": "1.28.0",
+  "updatedAt": "2026-10-11",
+  "policy": "Kurikulum edukasi bukan sertifikasi. Semua eksperimen pengguna pemula dibatasi DC tegangan rendah dengan sumber dibatasi arus. Kerja mains AC, baterai energi tinggi dan alat keselamatan kritis hanya lewat tenaga terlatih. Referensi standar harus diperiksa revisinya sebelum digunakan untuk sign-off.",
+  "stages": [
+    {
+      "id": "M00",
+      "title": "Mulai dengan benar",
+      "subtitle": "Orientasi & keselamatan",
+      "level": "beginner",
+      "goal": "4 minggu persiapan tidak wajib, mulai di sini",
+      "weeks": 1,
+      "sources": [
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        },
+        {
+          "title": "BSN: PUIL installation design",
+          "url": "https://pesta.bsn.go.id/produk/detail/12857-sni0225-22020"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M00-L1",
+          "title": "Apa yang sebenarnya akan kita bangun?",
+          "body": "Sistem nyata adalah gabungan input → proses → output. Sensor membaca keadaan, mikrokontroler menjalankan keputusan, dan aktuator bereaksi. Smart home dan robot berbeda bentuk, tetapi memakai pola yang sama. Skematik menunjukkan hubungan listrik, PCB menunjukkan jalur tembaga, dan kode menunjukkan perilaku sistem.",
+          "example": "Contoh: sensor pintu mendeteksi TERBUKA → ESP32 menilai keadaan → dashboard memperbarui status. Ini bukan robot, tetapi alur sistemnya sama.",
+          "exercise": "Gambar tiga kotak INPUT–PROSES–OUTPUT. Isi tiap kotak untuk lampu otomatis dan robot penghindar halangan.",
+          "pass": "Bisa menjelaskan input, proses, output tanpa menyebut teknologi sebagai kotak ajaib.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa susunan logika sebuah sistem sensor otomatis?",
+            "options": [
+              "Input → proses → output",
+              "Output → rangkaian tanpa input",
+              "PCB → server → kabel otomatis"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M00-L2",
+          "title": "Batas aman: USB, baterai, dan listrik rumah",
+          "body": "Mulai dengan breadboard, USB 5 V yang dibatasi arus, dan rangkaian DC rendah daya. Jangan bereksperimen langsung dengan stopkontak 220–230 V, panel PLN, jaringan listrik rumah, charger baterai lithium mentah, atau sambungan AC di breadboard. Tegangan rendah tetap bisa panas atau korslet bila arus besar.",
+          "example": "Bayangkan sumber USB 5 V lewat resistor menuju LED. Arus dibatasi oleh resistor; jika VCC langsung ke GND, itu korslet walaupun hanya 5 V.",
+          "exercise": "Catat lima risiko: polaritas terbalik, kabel longgar, sumber kelebihan arus, panas, serta baterai tak terlindungi. Tentukan mitigasinya.",
+          "pass": "Bisa menerangkan kenapa listrik rumah butuh teknisi berkompeten dan kenapa pengaman tidak bisa digantikan software.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Untuk belajar rangkaian LED pertama, pilihan paling aman apa?",
+            "options": [
+              "Kabel langsung ke 230 V",
+              "Baterai lithium tanpa BMS dan tanpa resistor",
+              "USB 5 V dibatasi arus + resistor"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M00-L3",
+          "title": "Peta profesi dan dokumen produk",
+          "body": "Electrical engineer memikirkan distribusi daya dan proteksi; electronics engineer menyusun komponen dan skematik; PCB designer mengatur footprint/routing; embedded engineer membuat firmware; robotics engineer menggabungkan mekanik, kontrol, dan sensor. Produk lapangan memerlukan kebutuhan, skematik, BOM, PCB, firmware, pengujian, dan revisi.",
+          "example": "Satu lampu sensor gerak membutuhkan skematik sensor/driver, layout board, kode, housing, rencana pengujian, serta catatan batasan.",
+          "exercise": "Buat folder proyek dengan README, requirements, schematic, pcb, firmware, tests, photos.",
+          "pass": "Bisa membedakan gambar konsep, hasil simulasi, prototipe teruji, dan produk siap dipasang.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Dokumen mana yang membedakan desain dari produk sudah diuji?",
+            "options": [
+              "Jumlah fitur yang diklaim",
+              "Laporan pengujian dan revisi",
+              "Logo produk yang menarik"
+            ],
+            "answer": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "title": "Listrik dasar",
+      "subtitle": "Tegangan, arus, daya",
+      "level": "beginner",
+      "goal": "Pahami sebelum menyentuh wiring",
+      "weeks": 2,
+      "sources": [
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        },
+        {
+          "title": "BSN: PUIL installation design",
+          "url": "https://pesta.bsn.go.id/produk/detail/12857-sni0225-22020"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M01-L1",
+          "title": "Tegangan, arus, hambatan",
+          "body": "Tegangan V adalah beda potensial yang mendorong muatan; arus I adalah laju aliran muatan; hambatan R membatasi arus. Hukum Ohm V = I × R berlaku untuk elemen ohmik dalam kondisi yang sesuai. Beda tegangan dan arus sangat penting sebelum membaca datasheet komponen.",
+          "example": "Pada resistor 1 kΩ diberi 5 V, arus ideal I=5/1000=0,005 A atau 5 mA.",
+          "exercise": "Hitung arus untuk 3,3 V dengan resistor 330 Ω. Jawab dalam A dan mA.",
+          "pass": "Bisa mengubah 1 kΩ→1000 Ω dan 0,01 A→10 mA tanpa tertukar.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Berapa arus ideal melalui 1 kΩ saat diberi 5 V?",
+            "options": [
+              "5 A",
+              "500 mA",
+              "5 mA"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M01-L2",
+          "title": "Daya, energi, dan panas",
+          "body": "Daya sesaat P=V×I diukur watt. Energi adalah daya sepanjang waktu, misalnya Wh atau kWh. Resistor punya rating daya sehingga rangkaian harus dicek disipasi, bukan sekadar nilai ohm. Efisiensi menghubungkan daya masuk dan keluar; energi yang hilang sering menjadi panas.",
+          "example": "Resistor 330 Ω dialiri 10 mA: P=I²R=0,01²×330≈0,033 W; 1/4 W cukup secara nominal, tetapi derating tetap dipertimbangkan.",
+          "exercise": "Hitung energi lampu 5 W yang menyala 4 jam; bedakan 20 Wh dan 20 W.",
+          "pass": "Bisa menghitung V, I, R, P dan menjelaskan mengapa komponen dapat panas.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Lampu 5 W hidup 4 jam memakai energi sebesar?",
+            "options": [
+              "1 Wh",
+              "20 Wh",
+              "20 W"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M01-L3",
+          "title": "Ground, polaritas, dan multimeter",
+          "body": "Ground DC pada rangkaian sederhana adalah titik referensi bersama, bukan otomatis sama dengan pembumian proteksi bangunan. Multimeter mengukur tegangan paralel, arus seri sesuai port/fuse, dan resistansi hanya ketika sumber mati. Jangan pernah memasang multimeter dalam mode arus langsung antara VCC dan GND.",
+          "example": "Mengukur 5 V antara USB VCC dan GND dilakukan pada mode DC V; mode A disambung salah bisa menjadi hubungan pendek.",
+          "exercise": "Buat gambar posisi probe untuk ukur tegangan dan gambar terpisah untuk ukur arus pada resistor.",
+          "pass": "Bisa menunjuk ground rangkaian dan membedakannya dari protective earth.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Bagaimana multimeter mengukur beda tegangan pada beban?",
+            "options": [
+              "Paralel pada dua terminal di mode V",
+              "Seri pada beban di mode A",
+              "Mode arus langsung pada VCC-GND"
+            ],
+            "answer": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "title": "Elektronika komponen",
+      "subtitle": "Dari LED sampai transistor",
+      "level": "beginner",
+      "goal": "Rangkaian pertama",
+      "weeks": 2,
+      "sources": [
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        },
+        {
+          "title": "KiCad: schematic to board workflow",
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M02-L1",
+          "title": "Resistor, LED, dan dioda",
+          "body": "LED hanya menghantar dengan polaritas yang benar dan perlu pembatas arus. Dioda biasa juga memiliki arah anoda/katoda; jangan menyamakan model teoretis dengan komponen fisik. Tentukan resistor dari tegangan sumber, tegangan maju LED (Vf), dan arus target dari datasheet.",
+          "example": "Untuk 5 V, Vf LED kira-kira 2 V dan arus target 9 mA, R=(5−2)/0,009≈333 Ω; nilai umum 330 Ω mendekati.",
+          "exercise": "Susun jalur logis VCC→R330→anoda LED→katoda→GND dalam Route Trainer. Hitung perkiraan arusnya.",
+          "pass": "Bisa menyatakan fungsi R, anoda, katoda dan menjelaskan risiko LED tanpa resistor.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Kenapa LED umumnya memakai resistor seri?",
+            "options": [
+              "Menghilangkan kebutuhan GND",
+              "Membatasi arus LED",
+              "Menaikkan tegangan tanpa batas"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M02-L2",
+          "title": "Kapasitor, induktor, dan noise",
+          "body": "Kapasitor menyimpan energi di medan listrik dan membantu meredam gangguan catu; induktor menyimpan energi di medan magnet dan banyak dipakai di power converter. Komponen nyata punya ESR, toleransi, tegangan kerja, dan karakteristik frekuensi. Kapasitor bukan pengganti sumber daya dan polaritas elektrolit penting.",
+          "example": "Kapasitor bypass 100 nF dekat pin suplai IC sering dipakai untuk transien cepat, namun ukuran dan penempatannya tetap mengikuti datasheet rangkaian.",
+          "exercise": "Cari datasheet satu kapasitor, catat rating V, toleransi, dielektrik dan footprint.",
+          "pass": "Bisa membedakan smoothing, decoupling, energi tersimpan, dan kebutuhan polaritas.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Di mana bypass capacitor IC umumnya ditempatkan?",
+            "options": [
+              "Dekat pin suplai IC",
+              "Sejauh mungkin dari IC",
+              "Hanya di konektor USB"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M02-L3",
+          "title": "Transistor, MOSFET, dan driver",
+          "body": "GPIO mikrokontroler hanya bisa memasok arus terbatas. Transistor atau MOSFET dapat bertindak sebagai sakelar untuk beban, tetapi harus dihitung arus gate/base, tegangan, panas, dan diode flyback bagi beban induktif. Motor tidak boleh langsung disambungkan ke GPIO.",
+          "example": "ESP32 3,3 V output mengendalikan input driver transistor; motor memakai catu terpisah dengan ground referensi sesuai rancangan driver.",
+          "exercise": "Gambarkan pemisahan jalur kontrol dan daya; tandai bagian yang membutuhkan pengaman.",
+          "pass": "Bisa menjelaskan mengapa PWM dari GPIO tidak boleh langsung memberi daya motor.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Mengapa motor tidak langsung tersambung ke GPIO?",
+            "options": [
+              "GPIO selalu bertegangan 230 V",
+              "Motor tidak butuh proteksi",
+              "GPIO tidak dirancang memasok arus motor"
+            ],
+            "answer": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "title": "Dasar coding",
+      "subtitle": "Dari logika ke program",
+      "level": "beginner",
+      "goal": "Tak perlu bisa HTML dulu",
+      "weeks": 2,
+      "sources": [
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        },
+        {
+          "title": "Espressif: ESP-IDF",
+          "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M03-L1",
+          "title": "Algoritma, variabel, dan kondisi",
+          "body": "Program adalah instruksi yang dijalankan komputer. Mulailah dari INPUT, pengolahan data, lalu OUTPUT. Variabel menyimpan nilai; if/else memilih aksi; loop mengulang pemeriksaan. Untuk robot, kemampuan membaca logika jauh lebih penting dibanding menghafal sintaks.",
+          "example": "Jika jarak sensor <20 cm, kecepatan roda = 0; jika tidak, roda maju. Angka jarak adalah input, perintah motor adalah output.",
+          "exercise": "Tuliskan pseudocode 5 baris: sensor gerak → jika ada gerakan nyalakan LED → bila tidak matikan.",
+          "pass": "Bisa membedakan variabel, kondisi, perulangan, fungsi.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa fungsi if/else dalam program?",
+            "options": [
+              "Memilih aksi berdasarkan kondisi",
+              "Menambah kapasitas baterai",
+              "Mengubah resistor menjadi sensor"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M03-L2",
+          "title": "Fungsi, debugging, dan Git",
+          "body": "Fungsi memecah program menjadi tugas kecil seperti readSensor(), decide(), driveMotor(). Bug diuji dengan log dan kasus input, bukan tebakan. Git menyimpan perubahan sehingga eksperimen aman; commit seharusnya menyatakan apa yang berubah dan mengapa.",
+          "example": "Program robot memiliki fungsi bacaSensor() dan pilihAksi(); log kondisi saat sensor tidak terhubung harus berbeda dari pembacaan nol.",
+          "exercise": "Buat pseudocode fungsi readTemperature() yang menghasilkan nilai atau status ERROR.",
+          "pass": "Bisa menjelaskan beda error program, error sensor, dan error listrik.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Bagaimana menguji fungsi pembacaan sensor yang gagal?",
+            "options": [
+              "Paksakan angka 25°C sebagai hasil",
+              "Hapus seluruh validasi",
+              "Kembalikan status/error dan cek log"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M03-L3",
+          "title": "Web sederhana untuk dashboard",
+          "body": "HTML adalah struktur halaman, CSS adalah tampilannya, JavaScript mengatur interaksi. IoT sering memakai web dashboard, tetapi lu tidak harus menguasai framework dulu. Mulailah dengan tombol dan teks status, lalu baru JSON, HTTP dan API setelah logika dasarnya paham.",
+          "example": "<button> menampilkan perintah pengguna, tetapi mikrokontroler tidak menerima perintah sebelum ada API/komunikasi yang benar.",
+          "exercise": "Buat mockup dashboard status lampu ON/OFF dan sensor suhu dalam dua kotak.",
+          "pass": "Bisa memisahkan UI, proses backend, API, serta firmware ESP32.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Manakah pembagian fungsi web yang tepat?",
+            "options": [
+              "JavaScript mengganti MCU tanpa firmware",
+              "HTML struktur, CSS tampilan, JS interaksi",
+              "HTML proteksi listrik, CSS ground"
+            ],
+            "answer": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "title": "Schematic & wiring",
+      "subtitle": "Net, pin, simbol, koneksi",
+      "level": "core",
+      "goal": "Menggambar listrik yang benar",
+      "weeks": 2,
+      "sources": [
+        {
+          "title": "KiCad: schematic to board workflow",
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+        },
+        {
+          "title": "BSN: PUIL installation design",
+          "url": "https://pesta.bsn.go.id/produk/detail/12857-sni0225-22020"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M04-L1",
+          "title": "Simbol bukan footprint",
+          "body": "Simbol skematik menjelaskan fungsi dan nomor pin; footprint adalah letak fisik pad saat disolder ke PCB. Nama pin dan nomor pad harus cocok. Gambar rapi tidak menjamin listrik terhubung: pastikan netlist dan pemeriksaan ERC.",
+          "example": "Resistor R1 dua pin, pad 1/2. Untuk IC 8 pin, nomor simbol harus dipetakan ke delapan pad footprint yang benar.",
+          "exercise": "Buka Schematic dan identifikasi VCC, GND, nomor pin, dan komponen punya footprint apa.",
+          "pass": "Bisa menjelaskan perbedaan skematik, netlist, footprint, dan BOM.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Apa perbedaan simbol dan footprint?",
+            "options": [
+              "Simbol = gerber, footprint = firmware",
+              "Keduanya adalah nama lain untuk resistor",
+              "Simbol = fungsi skematik, footprint = pad fisik"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M04-L2",
+          "title": "Wiring & routing terstruktur",
+          "body": "Wiring menghubungkan terminal listrik secara logis, skematik mengelompokkan pin dalam net, PCB routing merealisasikan koneksi memakai copper track. Jalur PCB juga harus mempertimbangkan layer, lebar tembaga, clearance dan return path. Jangan langsung routing sebelum tahu net harus tersambung ke mana.",
+          "example": "Net GND bisa mempunyai banyak pin: baterai negatif, sensor GND, ESP32 GND. Itu satu net, bukan satu kabel fisik tunggal.",
+          "exercise": "Kerjakan Route Trainer LED lalu I²C. Setelah lolos, lihat konsep serupa pada tab Schematic dan PCB.",
+          "pass": "Bisa membaca nama net, menghindari korslet, serta membedakan track dan airwire.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Hubungan net GND yang benar adalah?",
+            "options": [
+              "Setiap titik GND harus menjadi sumber positif",
+              "Semua pin pada net GND memiliki referensi listrik yang sama",
+              "GND berarti selalu proteksi bumi rumah"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M04-L3",
+          "title": "ERC dan kesalahan hubungan",
+          "body": "Electrical Rules Check mendeteksi beberapa kesalahan hubungan; tidak menjamin komponen cocok atau suplai benar. Kesalahan umum meliputi VCC tertukar dengan GND, input melayang, ground sensor tidak bersama, dan IC pin yang tidak didukung. Selalu cocokan ke datasheet.",
+          "example": "SDA sensor I²C butuh koneksi ke SDA mikrokontroler; salah sambung ke SCL bukan cuma salah gambar.",
+          "exercise": "Sebutkan tiga kesalahan yang bisa lolos dari pengecekan visual tetapi berbahaya saat dirakit.",
+          "pass": "Bisa menjelaskan keterbatasan ERC dan mengapa datasheet adalah sumber utama.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Mengapa ERC tidak cukup untuk memberi kepastian rangkaian?",
+            "options": [
+              "ERC tidak memvalidasi seluruh rating/datasheet komponen",
+              "ERC sudah pasti menguji produk fisik",
+              "ERC otomatis memilih IC yang sesuai"
+            ],
+            "answer": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "title": "PCB design & routing",
+      "subtitle": "Layout yang bisa diperiksa",
+      "level": "core",
+      "goal": "Praktik PCB yang tidak asal",
+      "weeks": 2,
+      "sources": [
+        {
+          "title": "KiCad: schematic to board workflow",
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+        },
+        {
+          "title": "IPC: PCB design and manufacturing",
+          "url": "https://www.ipc.org/design-manufacturing-confirmed-ipc-standards"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M05-L1",
+          "title": "Board, placement, dan orientasi",
+          "body": "Atur outline PCB, ukuran board, mounting hole, posisi konektor dan orientasi komponen berdasarkan fungsi. Komponen yang saling terhubung erat ditempatkan berdekatan; IC dekat decoupling cap, konektor mudah diakses. Footprint salah bisa membuat papan tidak dapat dirakit.",
+          "example": "Sensor di tepi papan agar terbuka ke lingkungan; mikrokontroler menjauh dari motor noisy, jalur suplai ditempatkan jelas.",
+          "exercise": "Buka PCB; buat urutan kerja outline→placement→net→route. Catat tiga keputusan penempatan.",
+          "pass": "Bisa menunjukkan alasan placement sebelum routing.",
+          "view": "PCB",
+          "quiz": {
+            "question": "Langkah PCB yang sebaiknya datang sebelum routing?",
+            "options": [
+              "Menghapus netlist",
+              "Outline, placement, pemetaan net",
+              "Mengirim Gerber langsung ke pabrik"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M05-L2",
+          "title": "Routing, ground return, DRC",
+          "body": "Track adalah tembaga; lebar track, jarak antartembaga, via dan plane tidak dipilih secara acak. Rute suplai dan arus balik sebaiknya dipikirkan bersama untuk mengurangi loop dan noise. DRC harus memakai batas yang sesuai pabrik dan netlist yang benar.",
+          "example": "Sensor analog kecil tidak seharusnya berdampingan dengan jalur arus motor; pemisahan power dan sinyal membantu menjaga integritas sinyal.",
+          "exercise": "Rute dua net sederhana di editor PCB, lalu baca semua temuan DRC tanpa menganggap DRC=sertifikasi.",
+          "pass": "Bisa menjelaskan track, via, plane, clearance, ground return, serta hasil DRC.",
+          "view": "PCB",
+          "quiz": {
+            "question": "Apa tujuan DRC PCB?",
+            "options": [
+              "Mendeteksi pelanggaran aturan geometri yang diimplementasikan",
+              "Mengukur semua suhu IC fisik",
+              "Memberi sertifikat kelistrikan bangunan"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M05-L3",
+          "title": "Gerber, BOM, assembly, test",
+          "body": "Output fabrikasi bisa mencakup copper, solder mask, silkscreen, drill, BOM, placement dan file order produksi. Ekspor file belum menjamin lapisan dan lubang benar; buka hasil di Gerber viewer independen. Pemeriksaan DFM mengikuti kemampuan produsen dan aturan IPC relevan.",
+          "example": "Pad THT yang tidak masuk file drill dapat membuat board tidak bisa dipasang; board outline yang salah dapat menggagalkan pemotongan.",
+          "exercise": "Baca peringatan Fabrication dan buat daftar data yang harus diverifikasi sebelum memesan papan.",
+          "pass": "Bisa membedakan DRC, DFM, inspeksi solder, dan pengujian listrik.",
+          "view": "Fabrication",
+          "quiz": {
+            "question": "File apa yang perlu diperiksa terpisah untuk manufaktur?",
+            "options": [
+              "Hanya screenshot 3D",
+              "Hanya HTML dashboard",
+              "Gerber, drill, mask, outline, BOM dan placement"
+            ],
+            "answer": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "M06",
+      "title": "Mikrokontroler",
+      "subtitle": "ESP32 dan firmware",
+      "level": "core",
+      "goal": "Komputer kecil di papan",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "Espressif: ESP-IDF",
+          "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html"
+        },
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M06-L1",
+          "title": "Mikrokontroler, GPIO, 3,3 V",
+          "body": "ESP32 membaca pin sensor dan mengontrol output dengan program firmware. Banyak GPIO bekerja di domain 3,3 V dan tidak boleh diasumsikan tahan 5 V; cek datasheet varian board. Sumber 5 V USB dan logika 3,3 V tidak otomatis sama. Saat mulai gunakan modul development board yang terjamin.",
+          "example": "USB dapat memberi daya board, tetapi kaki sensor SDA yang menarik 5 V perlu penyesuaian level bila GPIO tidak 5 V tolerant.",
+          "exercise": "Gambarkan USB→regulator board→3V3→sensor, dan GND bersama sesuai datasheet.",
+          "pass": "Bisa menjelaskan beda tegangan catu board dan level logika pin.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Tegangan logika GPIO ESP32 harus diperlakukan bagaimana?",
+            "options": [
+              "Ikuti datasheet; banyak keluarga ESP32 berlogika 3,3 V",
+              "Selalu aman menerima 12 V",
+              "Sama persis untuk semua board dan pin"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M06-L2",
+          "title": "Firmware: setup, loop, log",
+          "body": "Firmware dieksekusi ketika perangkat menyala. Untuk pemula, konsep setup/loop pada Arduino core memudahkan; untuk produksi ada ESP-IDF dan FreeRTOS. Tulis uji satu fungsi sebelum menambah konektivitas. Serial monitor adalah alat debugging, bukan bukti sistem aman.",
+          "example": "LED berkedip 1 kali per detik adalah tes aliran program awal. Jika LED tidak menyala, cek pin dan polaritas sebelum mengganti kode.",
+          "exercise": "Tuliskan pseudocode setup pin OUTPUT dan loop HIGH–delay–LOW. Catat status yang akan tampil di serial monitor.",
+          "pass": "Bisa membedakan masalah pin, kode, dan suplai.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Untuk debugging firmware, apa yang paling membantu?",
+            "options": [
+              "Ganti semua komponen tanpa mengukur",
+              "Menganggap setiap bug pasti salah jaringan",
+              "Serial log, tes satu fitur, cek pin dan catu"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M06-L3",
+          "title": "Firmware industri: watchdog, OTA, secure boot",
+          "body": "Untuk perangkat lapangan, pikirkan reset tak terduga, koneksi putus, pembaruan firmware dan rahasia Wi-Fi. Watchdog memulihkan hang; OTA perlu mekanisme rollback dan autentikasi; kunci tidak boleh disimpan di GitHub. Gunakan dokumentasi ESP-IDF untuk konfigurasi build dan secure boot sesuai perangkat.",
+          "example": "Lampu smart home harus memilih status default yang diketahui ketika Wi-Fi mati, bukan membiarkan aktuator berosilasi.",
+          "exercise": "Tuliskan acceptance criteria: perangkat hidup setelah reset, reconnect, tidak memakai password hardcoded, dan ada versi firmware.",
+          "pass": "Bisa menguraikan mengapa blink LED belum sama dengan produk IoT aman.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Manakah praktik firmware perangkat lapangan yang benar?",
+            "options": [
+              "OTA tanpa kontrol versi",
+              "OTA terautentikasi, rollback, watchdog, tanpa secret di repo",
+              "Password Wi-Fi disimpan di GitHub publik"
+            ],
+            "answer": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M07",
+      "title": "Sensor & bus data",
+      "subtitle": "GPIO, ADC, I²C, UART, SPI",
+      "level": "core",
+      "goal": "Mengenali dunia lewat sensor",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "Espressif: ESP-IDF",
+          "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html"
+        },
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M07-L1",
+          "title": "Digital, analog, debouncing",
+          "body": "Sensor digital memberi kondisi, analog memberi besaran yang dibaca ADC. Setiap sensor punya range, resolusi, toleransi, dan waktu respons. Tombol mekanis bisa bergetar kontak (bounce), jadi perlu filtering/debouncing. Nilai raw bukan langsung besaran fisika tanpa kalibrasi.",
+          "example": "ADC 12-bit menghasilkan kode digital, tetapi akurasi aktual tidak otomatis 12-bit; referensi dan karakter ADC harus diperiksa.",
+          "exercise": "Buat tabel input: gerak PIR digital, suhu digital I²C, potensiometer analog.",
+          "pass": "Bisa menyebut kenapa sensor harus dikalibrasi dan divalidasi.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa perbedaan data analog dan digital?",
+            "options": [
+              "Analog selalu 230 V",
+              "Digital tidak pernah membutuhkan ground",
+              "Analog besaran kontinu, digital status/kode sesuai antarmuka"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M07-L2",
+          "title": "I²C, SPI, UART: beda fungsinya",
+          "body": "I²C biasanya memakai SDA/SCL dengan alamat perangkat dan pull-up sesuai tegangan dan kapasitansi bus. SPI memakai clock, data, dan chip select, sementara UART memakai TX/RX sesuai konfigurasi. Jalur komunikasi bukan jalur listrik daya; sensor tetap membutuhkan suplai dan ground.",
+          "example": "Sensor I²C 3,3 V perlu VCC 3V3, GND, SDA dan SCL. Modul bisa punya pull-up sendiri; periksa skema modul.",
+          "exercise": "Kerjakan Route Trainer I²C, tandai SDA↔SDA dan SCL↔SCL serta common GND.",
+          "pass": "Bisa menggambar sambungan logis 4 terminal dan menjelaskan kenapa alamat I²C penting.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Pin data standar untuk I²C biasanya adalah?",
+            "options": [
+              "M+ dan M−",
+              "SDA dan SCL",
+              "RX dan TX saja"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M07-L3",
+          "title": "Kalibrasi dan validasi sensor",
+          "body": "Pengukuran lapangan dipengaruhi noise, penempatan, kelembapan, interferensi, suhu, dan suplai. Kalibrasi berarti membandingkan pembacaan dengan acuan; verifikasi memeriksa kinerja terhadap spesifikasi. Jangan mengarang nilai suhu ketika sensor timeout—laporkan missing/error.",
+          "example": "Sensor mengirim 25°C setiap detik; saat tidak ada data selama 10 detik dashboard harus menunjukkan stale, bukan '25°C aman'.",
+          "exercise": "Definisikan batas time-out dan status INVALID untuk sistem monitoring anak atau smart home.",
+          "pass": "Bisa menjelaskan beda sampling, filtering, kalibrasi, accuracy dan precision.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa yang dilakukan bila sensor berhenti memberi data?",
+            "options": [
+              "Tandai STALE/ERROR dan lakukan pemulihan",
+              "Pertahankan angka terakhir sebagai data real-time",
+              "Ubah status menjadi aman tanpa bukti"
+            ],
+            "answer": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "M08",
+      "title": "Motor & aktuator",
+      "subtitle": "Driver, PWM, mekanik",
+      "level": "core",
+      "goal": "Menggerakkan dunia nyata",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "Espressif: ESP-IDF",
+          "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/get-started/linux-macos-setup.html"
+        },
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M08-L1",
+          "title": "Motor DC, servo, stepper",
+          "body": "Motor mengubah listrik menjadi gerak. Jenis motor punya metode kontrol berbeda: brushed DC dengan driver/H-bridge, servo dengan sinyal kontrol tertentu, stepper dengan driver arus. Periksa arus stall karena bisa jauh di atas arus operasi. Pisahkan suplai kontrol dan suplai beban dengan ground referensi yang dirancang benar.",
+          "example": "Motor 6 V yang stall 1,5 A tidak boleh diberi langsung dari GPIO ESP32; driver dan sumber harus cukup terhadap beban dan surge.",
+          "exercise": "Tuliskan spesifikasi motor: tegangan, arus nominal, arus stall, rpm, torsi dan kebutuhan driver.",
+          "pass": "Bisa memberi alasan teknis kebutuhan motor driver.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Parameter motor apa yang kritis untuk rating driver?",
+            "options": [
+              "Label nama perangkat",
+              "Arus stall dan tegangan/arus kerja",
+              "Warna plastik motor"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M08-L2",
+          "title": "PWM, H-bridge, flyback",
+          "body": "PWM mengubah duty cycle, bukan menurunkan tegangan sumber secara analog. H-bridge memungkinkan pembalikan arah motor DC; switching induktif dapat menghasilkan lonjakan yang perlu jalur pelepasan energi dan proteksi sesuai driver. Motor bisa memicu brownout dan gangguan sensor.",
+          "example": "Duty PWM 25% pada driver motor tidak menjamin kecepatan tepat 25% karena beban dan karakter motor ikut memengaruhi.",
+          "exercise": "Gambar jalur ESP32 PWM→driver IN; daya motor melalui driver VM/GND; output driver→motor.",
+          "pass": "Bisa memisahkan jalur sinyal, daya, ground dan jalur arus besar.",
+          "view": "Schematic",
+          "quiz": {
+            "question": "Duty PWM 25% berarti?",
+            "options": [
+              "Rasio waktu sinyal aktif per siklus 25%, bukan kecepatan pasti 25%",
+              "Tegangan supply pasti turun menjadi 25%",
+              "Driver tidak butuh pengaman"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M08-L3",
+          "title": "Encoder, umpan balik, PID",
+          "body": "Robot yang hanya memberi PWM tetap bersifat open-loop. Encoder atau sensor posisi memberi umpan balik sehingga sistem bisa membandingkan target dan pembacaan; PID menghitung koreksi. Tuning dilakukan bertahap agar tidak menimbulkan osilasi; kondisi stop dan E-stop tetap dirancang di luar software bila diperlukan.",
+          "example": "Target motor 100 rpm, sensor membaca 80 rpm, pengendali menambah aksi sesuai aturan—bukan langsung menebak duty ideal.",
+          "exercise": "Tulis tiga istilah setpoint, measurement, error; hitung error jika target 90° dan sensor 75°.",
+          "pass": "Bisa membedakan loop terbuka dan tertutup.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa pengertian feedback dalam kontrol motor?",
+            "options": [
+              "Menjalankan PWM tetap tanpa sensor",
+              "Menghapus pengukuran agar cepat",
+              "Mengukur hasil lalu memperbaiki aksi berdasarkan error"
+            ],
+            "answer": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "M09",
+      "title": "Electrical system",
+      "subtitle": "DC distribusi, AC konsep, proteksi",
+      "level": "intermediate",
+      "goal": "Baca sistem daya dengan aman",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "BSN: PUIL installation design",
+          "url": "https://pesta.bsn.go.id/produk/detail/12857-sni0225-22020"
+        },
+        {
+          "title": "IPC: PCB design and manufacturing",
+          "url": "https://www.ipc.org/design-manufacturing-confirmed-ipc-standards"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M09-L1",
+          "title": "Distribusi daya: source ke load",
+          "body": "Distribusi daya memerlukan sumber, jalur, pengaman, dan beban. Di proyek robot, tegangan baterai ke motor berbeda dari tegangan logic ESP32; regulator atau DC-DC converter menyesuaikan suplai. Diagram satu garis menggambarkan struktur sistem, bukan layout kabel fisik semua detail.",
+          "example": "Baterai 12 V → fuse/rangkaian proteksi → motor driver 12 V; converter 12→5 V → controller board. Rating dan wiring harus diverifikasi berdasarkan perangkat.",
+          "exercise": "Rancang sketsa blok sumber, pengaman, konverter, MCU, driver, dan sensor untuk robot roda 2.",
+          "pass": "Bisa menunjukkan power tree dan alasan ground/pemisahan domain.",
+          "view": "Electrical",
+          "quiz": {
+            "question": "Pada robot dengan 12 V motor dan 3,3 V logika, apa yang perlu?",
+            "options": [
+              "Pemisahan domain daya dan regulator yang sesuai",
+              "Menghubungkan 12 V langsung ke semua GPIO",
+              "Mengabaikan rating kabel dan pengaman"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M09-L2",
+          "title": "AC rumah, RCD, MCB, PUIL",
+          "body": "Listrik rumah AC 230 V memiliki risiko sengatan dan kebakaran. MCB tidak otomatis melindungi semua jenis bahaya; RCD/RCCB/RCBO memiliki fungsi berbeda, bergantung sistem pembumian, instalasi dan spesifikasi. Standar PUIL/SNI dipakai untuk desain/verifikasi oleh tenaga kompeten. Materi di sini hanya pembacaan simbol dan analisis konseptual—bukan panduan pemasangan AC.",
+          "example": "MCB menjaga jalur terhadap kondisi arus lebih sesuai kurva/ratingnya; RCD memantau ketidakseimbangan arus sehingga tidak sama dengan MCB.",
+          "exercise": "Di tab Electrical buat load schedule simulasi peralatan rumah tanpa menghubungkan apa pun ke stopkontak.",
+          "pass": "Bisa membedakan MCB, RCD, isolator, fuse, serta batas kompetensi sendiri.",
+          "view": "Electrical",
+          "quiz": {
+            "question": "Apa perbedaan umum MCB dan RCD?",
+            "options": [
+              "Keduanya hanya sensor suhu",
+              "RCD adalah pengganti seluruh pembumian",
+              "MCB proteksi arus lebih, RCD deteksi arus residual"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M09-L3",
+          "title": "SLD, proteksi dan kelengkapan desain",
+          "body": "Single-line diagram menyajikan sumber, panel, feeder, circuit dan perangkat proteksi. Dokumen lapangan juga perlu penampang kabel, metode pemasangan, derating, kemampuan pemutusan, fault level, pembumian, dan pengujian. Kalkulator awal tidak dapat menentukan kesesuaian instalasi sendirian.",
+          "example": "Panel A memiliki arus nominal 10 A, tapi itu belum cukup untuk memilih breaker: perlu data kabel, lingkungan, Ik prospektif, standar dan karakteristik beban.",
+          "exercise": "Gunakan Electrical dan Verification untuk menemukan masukan yang masih kosong; tuliskan 'belum terverifikasi' secara eksplisit.",
+          "pass": "Bisa menyebut sedikitnya lima cek yang diperlukan sebelum gambar instalasi ditandatangani.",
+          "view": "Electrical",
+          "quiz": {
+            "question": "Apa yang belum dapat disimpulkan dari rating arus panel saja?",
+            "options": [
+              "Tegangan nominal tertulis",
+              "Pemilihan kabel/proteksi yang aman tanpa data instalasi",
+              "Jumlah nama circuit dalam panel"
+            ],
+            "answer": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M10",
+      "title": "IoT & smart home",
+      "subtitle": "Protokol dan automasi",
+      "level": "intermediate",
+      "goal": "Hubungkan perangkat secara benar",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "Home Assistant Assist",
+          "url": "https://www.home-assistant.io/voice_control/"
+        },
+        {
+          "title": "CSA: Matter 1.5",
+          "url": "https://csa-iot.org/newsroom/matter-1-5-introduces-cameras-closures-and-enhanced-energy-management-capabilities/"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M10-L1",
+          "title": "Wi-Fi, MQTT, API & jaringan",
+          "body": "IoT menghubungkan sensor/aktuator melalui jaringan. Wi-Fi memberi konektivitas; MQTT adalah protokol pesan publish/subscribe; HTTP/API dipakai antarlayanan. Setiap perangkat perlu identitas, izin, autentikasi, dan perilaku saat offline. Jangan menerbitkan port rumah ke internet hanya agar dashboard bisa diakses.",
+          "example": "Sensor mem-publish suhu ke broker; dashboard subscribe topik sensor/ruang/suhu. Jika broker offline, status harus stale bukan menampilkan angka seolah live.",
+          "exercise": "Buat diagram ESP32→Wi-Fi→broker→dashboard dan bedakan data dengan perintah.",
+          "pass": "Bisa menjelaskan tiga lapisan: perangkat, jaringan, aplikasi.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Bagaimana MQTT mengirim data sensor?",
+            "options": [
+              "Catu motor langsung ke browser",
+              "Gerber → ESPHome tanpa firmware",
+              "Publisher → broker → subscriber"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M10-L2",
+          "title": "ESPHome & Home Assistant",
+          "body": "ESPHome membantu mendefinisikan perangkat ESP32 dengan konfigurasi lalu terhubung ke Home Assistant; Home Assistant menyediakan entitas, dashboard dan automasi. Mulailah sensor non-kritis bertenaga USB. Aturan automasi perlu debounce, cooldown dan manual override agar tidak mengaktifkan aktuator tanpa sengaja.",
+          "example": "PIR mendeteksi gerak → HA menyalakan LED indikator USB selama 20 detik; tidak perlu menyentuh relay listrik rumah.",
+          "exercise": "Tentukan entity id, pemicu, aksi, kondisi dan timeout untuk lampu indikator virtual.",
+          "pass": "Bisa membedakan sensor, entity, automasi, dan firmware node.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa fungsi ESPHome dan Home Assistant masing-masing?",
+            "options": [
+              "Keduanya motor driver",
+              "ESPHome firmware perangkat; Home Assistant orkestrasi entitas/otomasi",
+              "ESPHome mesin pembuat PCB; HA DRC"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M10-L3",
+          "title": "Matter & interop perangkat",
+          "body": "Matter dirancang untuk interoperabilitas smart home lintas vendor. Spesifikasi 1.5 (rilis 2025) menambah kategori termasuk kamera dan sensor tanah serta kemampuan manajemen energi; dukungan perangkat tetap bergantung produk/controller aktual. Pilih Matter bila hardware dan ekosistem kompatibel, bukan karena semua perangkat otomatis mendukung fitur yang sama.",
+          "example": "ESPHome native API untuk Home Assistant berbeda dari perangkat Matter yang memakai fabric/controller dan commissioning.",
+          "exercise": "Bandingkan tabel satu sensor ESPHome dan satu perangkat Matter: pairing, data, keamanan, kompatibilitas.",
+          "pass": "Bisa menerangkan kenapa sertifikasi/protokol tidak sama dengan kompatibilitas otomatis.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa yang dijamin Matter?",
+            "options": [
+              "Standar interoperabilitas, dengan dukungan nyata tergantung perangkat/controller",
+              "Semua perangkat pasti mendukung semua fitur",
+              "Kabel AC menjadi aman tanpa proteksi"
+            ],
+            "answer": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "M11",
+      "title": "Voice & automasi",
+      "subtitle": "Perintah suara yang bisa diverifikasi",
+      "level": "intermediate",
+      "goal": "Smart home ala Google Home",
+      "weeks": 3,
+      "sources": [
+        {
+          "title": "Home Assistant Assist",
+          "url": "https://www.home-assistant.io/voice_control/"
+        },
+        {
+          "title": "CSA: Matter 1.5",
+          "url": "https://csa-iot.org/newsroom/matter-1-5-introduces-cameras-closures-and-enhanced-energy-management-capabilities/"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M11-L1",
+          "title": "Pipeline suara dari mikrofon ke aksi",
+          "body": "Voice control biasanya melibatkan wake word, audio capture, speech-to-text, intent parsing, action dispatch, dan respons. Mikrofon bising dan koneksi putus memengaruhi hasil. Home Assistant Assist dapat dipakai secara lokal dengan perangkat kompatibel; jangan berasumsi semua fitur bisa berjalan tanpa perangkat tambahan.",
+          "example": "'Nyalakan lampu meja' → intent terstruktur turn_on(device=lampu_meja) → otorisasi → perintah perangkat → konfirmasi status aktual.",
+          "exercise": "Buat diagram pipeline mic→STT→intent→policy→device→feedback; tunjukkan titik gagal.",
+          "pass": "Bisa membedakan transkripsi, intent, command dan hasil aktual.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Dalam perintah suara, apa yang datang setelah STT?",
+            "options": [
+              "Menghilangkan izin perangkat",
+              "Ekstraksi intent dan pemeriksaan aksi",
+              "Mencetak Gerber langsung"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M11-L2",
+          "title": "Local voice, privasi, otorisasi",
+          "body": "Pemrosesan suara lokal dapat mengurangi pengiriman data pribadi, tetapi perlu kapasitas perangkat dan konfigurasi tepat. Jangan membolehkan voice assistant memberi perintah berbahaya (misalnya membuka kunci luar rumah) tanpa kebijakan/autentikasi yang sesuai. Simpan log tanpa audio sensitif jika tidak perlu.",
+          "example": "Perintah 'nyalakan pompa' sebaiknya memerlukan pengecekan level air dan kondisi alat sebelum dieksekusi; voice tidak menggantikan interlock keselamatan.",
+          "exercise": "Rancang tiga jenis perintah: aman, perlu konfirmasi, dan dilarang oleh voice.",
+          "pass": "Bisa menjelaskan authentication, authorization, confirmation dan audit log.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Perintah suara membuka kunci perlu apa?",
+            "options": [
+              "Kebijakan otorisasi dan konfirmasi yang sesuai",
+              "Boleh dieksekusi tanpa autentikasi",
+              "Tidak perlu log keamanan"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M11-L3",
+          "title": "Bangun proyek voice smart desk",
+          "body": "Mulai dari lampu LED 5V, sensor gerak dan tombol manual yang terhubung ke ESP32/Home Assistant; kemudian tambahkan voice Assist setelah kontrol manual dan automasi stabil. Pertahankan tombol manual dan default safe state saat Wi-Fi atau voice service gagal.",
+          "example": "Perintah suara 'mode kerja' menyalakan indikator USB dan menampilkan status online; jika perangkat offline, UI menyebutnya offline, bukan berhasil.",
+          "exercise": "Buat spesifikasi 5 acceptance test: on, off, sensor, offline, manual override.",
+          "pass": "Bisa menunjukkan alur lengkap voice→otomasi→perangkat→status balik.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa yang seharusnya muncul jika device tidak respons?",
+            "options": [
+              "Konfirmasi berhasil palsu",
+              "Tidak ada timeout",
+              "Status offline/gagal, bukan konfirmasi berhasil"
+            ],
+            "answer": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "M12",
+      "title": "Robotika inti",
+      "subtitle": "Mekanik, sensor, kontrol",
+      "level": "advanced",
+      "goal": "Robot roda pertama",
+      "weeks": 4,
+      "sources": [
+        {
+          "title": "Arduino: Digital I/O",
+          "url": "https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/"
+        },
+        {
+          "title": "ROS 2 releases",
+          "url": "https://github.com/ros2/ros2_documentation/blob/rolling/source/Releases.rst"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M12-L1",
+          "title": "Struktur robot: mekanik dan elektronik",
+          "body": "Robot terdiri atas rangka, sumber energi, aktuator, driver, sensor, kontrol dan software. Pilih tugas kecil: robot dua roda yang berhenti saat mendeteksi penghalang. Gunakan tegangan DC rendah, roda kecil, dan area uji aman. Estimasi torsi, berat, pusat massa, serta waktu operasi baterai sebelum membeli banyak komponen.",
+          "example": "Motor kiri dan kanan harus bisa dikendalikan independen; bila semua kabel digabung, robot tidak dapat belok sebagaimana mestinya.",
+          "exercise": "Sketsa blok battery→proteksi→driver kiri/kanan, MCU, sensor jarak, dan dua motor.",
+          "pass": "Bisa menjabarkan komponen inti, batas arus, dan rencana tes robot.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa elemen inti robot bergerak?",
+            "options": [
+              "Rangka, daya, driver, motor, sensor, kontrol dan software",
+              "Hanya koneksi Wi-Fi",
+              "Hanya casing 3D"
+            ],
+            "answer": 0
+          }
+        },
+        {
+          "id": "M12-L2",
+          "title": "Kinematika diferensial dan odometri",
+          "body": "Robot diferensial memakai dua roda penggerak. Jika kecepatan sama, robot bergerak lurus; jika berbeda, robot berbelok. Kinematika menghubungkan kecepatan roda dengan kecepatan linear dan sudut. Odometri dari encoder terpengaruh slip; hasilnya estimasi, bukan posisi absolut yang pasti.",
+          "example": "Dengan radius roda r dan jarak antarroda L, kecepatan maju kira-kira v=r(ωR+ωL)/2 dan putar ω=r(ωR−ωL)/L.",
+          "exercise": "Untuk ωL=ωR, tentukan apakah robot lurus atau berputar; jelaskan alasannya.",
+          "pass": "Bisa membedakan kecepatan roda, kecepatan robot, slip dan odometri.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Dua roda penggerak dengan kecepatan sama menghasilkan?",
+            "options": [
+              "Putaran diam selalu",
+              "Tidak bergerak walaupun roda berputar",
+              "Gerak lurus ideal"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M12-L3",
+          "title": "ROS 2 dan sistem robot modular",
+          "body": "ROS 2 mendukung node, topic, service dan action untuk membangun sistem robot modular. Rilis Lyrical Luth hadir Mei 2026 dan didukung hingga 2031. ROS 2 bukan kebutuhan wajib untuk robot pertama berbasis ESP32; pelajari setelah sensor/motor dan Linux dasar matang. Dengan laptop sederhana, mulai dari turtlesim dan command-line sebelum simulator 3D berat.",
+          "example": "Node sensor menulis topik /distance, node controller berlangganan topik untuk menentukan berhenti atau maju.",
+          "exercise": "Gambar ROS graph dua node, satu topic, dan satu service sederhana.",
+          "pass": "Bisa menjelaskan publish/subscribe dan beda ROS 2 dari firmware MCU.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Dalam ROS 2, komunikasi publish/subscribe biasanya lewat?",
+            "options": [
+              "Gerber",
+              "Topic",
+              "Kabel PCB otomatis"
+            ],
+            "answer": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M13",
+      "title": "Integrasi & lapangan",
+      "subtitle": "Buktikan bekerja, baru naik kelas",
+      "level": "advanced",
+      "goal": "Dari prototipe ke sistem yang teruji",
+      "weeks": 4,
+      "sources": [
+        {
+          "title": "IPC: PCB design and manufacturing",
+          "url": "https://www.ipc.org/design-manufacturing-confirmed-ipc-standards"
+        },
+        {
+          "title": "BSN: PUIL installation design",
+          "url": "https://pesta.bsn.go.id/produk/detail/12857-sni0225-22020"
+        }
+      ],
+      "lessons": [
+        {
+          "id": "M13-L1",
+          "title": "Integrasi smart home/robot",
+          "body": "Integrasi menguji keseluruhan rantai: catu→firmware→sensor→komunikasi→logika→aktuator→UI. Gabungkan modul bertahap; setiap langkah punya acceptance test. Jangan menilai berhasil hanya dari demo satu kali. Catat versi board, firmware, dan konfigurasi agar bug bisa diulang.",
+          "example": "Sensor PIR berhasil saja belum cukup; sistem juga harus menangani false positive, Wi-Fi putus, pembacaan kadaluarsa, dan reboot perangkat.",
+          "exercise": "Buat tabel lima skenario gagal serta perilaku aman yang diharapkan.",
+          "pass": "Bisa menulis acceptance test positif, negatif, dan saat kegagalan perangkat.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Mengapa perlu integration test setelah modul individual benar?",
+            "options": [
+              "Integration test hanya membuat website cantik",
+              "Uji satu sensor sudah menjamin semua sistem",
+              "Masalah antar subsistem baru terlihat saat terhubung"
+            ],
+            "answer": 2
+          }
+        },
+        {
+          "id": "M13-L2",
+          "title": "Dokumentasi, PCB revision & manufacturing",
+          "body": "Produk bisa direproduksi bila kebutuhan, schematic/netlist, PCB layout, aturan pabrik, BOM, gerber/drill, firmware, dan test report tersimpan. Gerber exporter yang belum lengkap tidak boleh diklaim production-ready. Gunakan pembandingan terhadap KiCad, IPC dan pabrik untuk validasi terpisah.",
+          "example": "Perubahan resistor pada Rev B mengubah BOM dan potensi arus, sehingga pengujian listrik harus diulang.",
+          "exercise": "Susun folder release Rev A berisi build notes, wiring, BOM, firmware hash, checklist dan foto uji.",
+          "pass": "Bisa membedakan source file, output manufaktur, dan evidence pengujian.",
+          "view": "Fabrication",
+          "quiz": {
+            "question": "Kenapa output Gerber perlu pemeriksaan independen?",
+            "options": [
+              "Screenshot 3D menggantikan inspeksi CAM",
+              "File bisa kurang layer/drill atau salah konfigurasi walaupun berhasil diekspor",
+              "Setiap file .zip pasti benar"
+            ],
+            "answer": 1
+          }
+        },
+        {
+          "id": "M13-L3",
+          "title": "Final capstone: rumah pintar & robot",
+          "body": "Pilih capstone 1: voice smart desk (sensor PIR+ESP32+LED USB+HA Assist) atau capstone 2: robot 2 roda (sensor jarak, motor driver, ESP32, emergency stop). Produk akhir dinilai dari keterlacakan desain, pengujian, reliability, dokumentasi, dan batas pemakaian. Tambahkan PCB custom setelah prototipe breadboard tervalidasi.",
+          "example": "Checklist: kebutuhan jelas, wiring diuji, firmware memiliki fallback, data real dicatat, BOM benar, pengujian error berhasil dan pengguna paham batas operasi.",
+          "exercise": "Rangkum sistem final dalam satu lembar: blok, requirement, diagram, konsumsi daya, test plan, risiko dan revisi.",
+          "pass": "Bisa mendemonstrasikan satu sistem dengan laporan uji terulang tanpa klaim pengukuran yang tidak dilakukan.",
+          "view": "Learning",
+          "quiz": {
+            "question": "Apa syarat capstone bisa disebut didemonstrasikan secara bertanggung jawab?",
+            "options": [
+              "Skema, firmware, tes terulang, catatan kegagalan dan batas pemakaian",
+              "Cukup logo dan video AI",
+              "Cukup menyebut standar tanpa pengujian"
+            ],
+            "answer": 0
+          }
+        }
+      ]
+    }
+  ],
+  "totalLessons": 42,
+  "tracks": [
+    {
+      "name": "PCB & Elektronika",
+      "stages": [
+        "M00",
+        "M01",
+        "M02",
+        "M04",
+        "M05",
+        "M06",
+        "M07",
+        "M08",
+        "M13"
+      ]
+    },
+    {
+      "name": "Electrical & Daya",
+      "stages": [
+        "M00",
+        "M01",
+        "M02",
+        "M04",
+        "M09",
+        "M13"
+      ]
+    },
+    {
+      "name": "Smart Home & IoT",
+      "stages": [
+        "M00",
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M06",
+        "M07",
+        "M10",
+        "M11",
+        "M13"
+      ]
+    },
+    {
+      "name": "Robotika",
+      "stages": [
+        "M00",
+        "M01",
+        "M02",
+        "M03",
+        "M04",
+        "M05",
+        "M06",
+        "M07",
+        "M08",
+        "M12",
+        "M13"
+      ]
+    }
+  ],
+  "capstones": [
+    {
+      "name": "Smart Desk berbasis suara",
+      "deliverables": [
+        "Wiring LED USB + sensor",
+        "Firmware ESP32",
+        "Dashboard dan automasi HA",
+        "Kontrol suara Assist",
+        "Uji offline & manual override"
+      ]
+    },
+    {
+      "name": "Robot dua roda DC",
+      "deliverables": [
+        "Skema pemisahan power dan logic",
+        "Motor driver & sensor jarak",
+        "Firmware state machine",
+        "Uji obstacle stop",
+        "Enclosure, PCB revisi & tes"
+      ]
+    }
+  ]
+}
