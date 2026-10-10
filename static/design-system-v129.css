@@ -9,7 +9,7 @@
   --sl-sidebar:#fafbfc;
   --sl-ink:#172332;
   --sl-muted:#586b7f;
-  --sl-faint:#738597;
+  --sl-faint:#66788b;
   --sl-border:#e0e6ed;
   --sl-strong-border:#cbd7e2;
   --sl-accent:#087d80;
@@ -454,7 +454,8 @@ html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog)>section {
   border:1px solid var(--sl-border)!important;box-shadow:var(--sl-shadow)!important
 }
 html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog) :is(p,article) {
-  color:var(--sl-ink)!important
+  color:var(--sl-ink)!important;
+  background:var(--sl-surface-alt)!important
 }
 html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog) button {
   background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;border-color:var(--sl-border)!important
