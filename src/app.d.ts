@@ -27,6 +27,19 @@ declare global {
     PCBProProfessionalLearning?: any;
     PCBProAutoRouter?: any;
     PCBProHelp?: any;
+    PCBProTheme?: {
+      version: string;
+      getMode(): 'light' | 'dark' | 'system';
+      getResolved(): 'light' | 'dark';
+      setMode(next: 'light' | 'dark' | 'system'): string;
+      apply(): string;
+    };
+  }
+  interface WindowEventMap {
+    'sirkuitlab:theme-change': CustomEvent<{
+      preference: 'light' | 'dark' | 'system';
+      resolved: 'light' | 'dark';
+    }>;
   }
 }
 

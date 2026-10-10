@@ -1,0 +1,496 @@
+/* SirkuitLab · 2026 Clean Engineering UI v1.29
+   App surface only; technical geometry retains semantic copper/net colors.
+   Scoped tokens and high-specificity overrides intentionally supersede legacy dark injected styles. */
+:root {
+  color-scheme:light;
+  --sl-bg:#f5f7fa;
+  --sl-surface:#ffffff;
+  --sl-surface-alt:#f8fafc;
+  --sl-sidebar:#fafbfc;
+  --sl-ink:#172332;
+  --sl-muted:#586b7f;
+  --sl-faint:#66788b;
+  --sl-border:#e0e6ed;
+  --sl-strong-border:#cbd7e2;
+  --sl-accent:#087d80;
+  --sl-accent-hover:#096d71;
+  --sl-accent-soft:#e6f6f4;
+  --sl-accent-text:#056568;
+  --sl-grid:#e5ebf0;
+  --sl-shadow:0 2px 10px rgba(24,42,60,.035),0 12px 38px rgba(24,42,60,.055);
+  --sl-warn-bg:#fff7e6;
+  --sl-warn-ink:#805519;
+  --sl-warn-line:#ebd4a4;
+  --sl-canvas:#f7fafc;
+  --sl-selection:#0d8682;
+  --sl-rgb:8,125,128;
+  --ux-bg:var(--sl-bg);
+  --ux-surface:var(--sl-surface);
+  --ux-border:var(--sl-border);
+  --ux-text:var(--sl-ink);
+  --ux-muted:var(--sl-muted);
+  --ux-accent:var(--sl-accent);
+  accent-color:var(--sl-accent);
+}
+html[data-theme="dark"] {
+  color-scheme:dark;
+  --sl-bg:#101720;
+  --sl-surface:#18232f;
+  --sl-surface-alt:#1d2a37;
+  --sl-sidebar:#131f2a;
+  --sl-ink:#eff5f8;
+  --sl-muted:#bdccd6;
+  --sl-faint:#98aebc;
+  --sl-border:#304454;
+  --sl-strong-border:#3f5868;
+  --sl-accent:#5bd4c6;
+  --sl-accent-hover:#7fe4d8;
+  --sl-accent-soft:#193c41;
+  --sl-accent-text:#a0f0e7;
+  --sl-grid:#2a3c4b;
+  --sl-shadow:0 6px 22px rgba(0,0,0,.17),0 18px 42px rgba(0,0,0,.22);
+  --sl-warn-bg:#352b1b;
+  --sl-warn-ink:#f4d39b;
+  --sl-warn-line:#795c33;
+  --sl-canvas:#14212c;
+  --sl-selection:#6ce0d0;
+  --sl-rgb:91,212,198;
+}
+html[data-theme] {background:var(--sl-bg)!important;color:var(--sl-ink)}
+html[data-theme] body {background:var(--sl-bg)!important;color:var(--sl-ink)!important}
+html[data-theme] .app,
+html[data-theme] .shell,
+html[data-theme] .workbench,
+html[data-theme] .content {background:var(--sl-bg)!important;color:var(--sl-ink)!important}
+html[data-theme] .app {font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;letter-spacing:-.004em}
+html[data-theme] button,html[data-theme] input,html[data-theme] select,html[data-theme] textarea {font-family:inherit}
+html[data-theme] button:focus-visible,html[data-theme] input:focus-visible,html[data-theme] select:focus-visible,html[data-theme] textarea:focus-visible,html[data-theme] [tabindex]:focus-visible {
+  outline:2px solid var(--sl-accent)!important;outline-offset:2px
+}
+html[data-theme] button {transition:background-color .14s ease,border-color .14s ease,color .14s ease,box-shadow .14s ease}
+html[data-theme] ::selection {background:var(--sl-accent-soft);color:var(--sl-ink)}
+html[data-theme] :is(.topbar,.menubar,.tabs,.toolbar-scroll,.statusbar) {box-shadow:none!important}
+html[data-theme] .topbar{
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border-bottom:1px solid var(--sl-border)!important;
+  box-shadow:0 1px 5px rgba(15,35,48,.025)!important;
+  height:66px!important;flex-basis:66px!important;padding:0 16px!important;gap:12px!important
+}
+html[data-theme] .brand-group {gap:11px!important}
+html[data-theme] .logo{
+  border:1px solid rgba(var(--sl-rgb),.15)!important;
+  border-radius:12px!important;background:var(--sl-accent-soft)!important;
+  color:var(--sl-accent-text)!important;height:37px!important;width:37px!important;
+  font-size:22px!important
+}
+html[data-theme] .brand {display:flex;flex-direction:column;gap:0!important;align-items:start!important;line-height:1.15}
+html[data-theme] .brand strong {font-size:16px!important;letter-spacing:-.03em;color:var(--sl-ink)!important}
+html[data-theme] .brand span {font:650 10px system-ui!important;color:var(--sl-faint)!important;letter-spacing:.025em}
+html[data-theme] .version {
+  font-size:10px!important;letter-spacing:.035em!important;
+  color:var(--sl-faint)!important;background:var(--sl-surface-alt)!important;
+  border:1px solid var(--sl-border)!important;border-radius:8px!important;
+  padding:5px 9px!important
+}
+html[data-theme] .project-pill {
+  border:1px solid var(--sl-border)!important;
+  border-radius:10px!important;background:var(--sl-surface)!important;
+  color:var(--sl-ink)!important;max-width:230px;min-height:37px;padding:6px 10px!important
+}
+html[data-theme] .project-pill b {font-size:12px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-theme] .project-pill>span {color:var(--sl-faint)!important}
+html[data-theme] .project-pill i {background:var(--sl-accent)!important;flex:none}
+html[data-theme] .top-actions {gap:6px!important;flex:0 1 auto}
+html[data-theme] .save-state {font-size:11px!important;color:var(--sl-muted)!important;margin-right:7px;max-width:155px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+html[data-theme] :is(.top-actions>button,.icon-btn,.panel-title button) {
+  color:var(--sl-ink)!important;background:var(--sl-surface)!important;
+  border:1px solid var(--sl-border)!important;border-radius:9px!important;
+  min-height:36px;padding:8px 11px!important;font-size:11px!important;font-weight:650!important
+}
+html[data-theme] :is(.top-actions>button,.icon-btn,.panel-title button):hover {
+  background:var(--sl-surface-alt)!important;border-color:var(--sl-strong-border)!important
+}
+html[data-theme] .top-actions .primary,html[data-theme] .primary {
+  background:var(--sl-accent)!important;color:#fff!important;border-color:var(--sl-accent)!important;
+  font-weight:700!important;border-radius:9px!important
+}
+html[data-theme="dark"] .top-actions .primary,html[data-theme="dark"] .primary {color:#0b2426!important}
+html[data-theme] .top-actions .primary:hover,html[data-theme] .primary:hover {
+  background:var(--sl-accent-hover)!important;border-color:var(--sl-accent-hover)!important
+}
+html[data-theme] .theme-control {
+  display:inline-flex;align-items:center;gap:7px;flex:none;
+  background:var(--sl-surface-alt);border:1px solid var(--sl-border);
+  padding:4px 7px 4px 9px;border-radius:10px;min-height:36px
+}
+html[data-theme] .theme-control svg {height:16px;width:16px;color:var(--sl-accent);flex:none}
+html[data-theme] .theme-control select {
+  border:0!important;background:transparent!important;
+  color:var(--sl-ink)!important;font-size:11px!important;font-weight:700!important;
+  width:auto;max-width:93px;min-height:24px;cursor:pointer;
+  outline-offset:4px
+}
+html[data-theme] .menubar {
+  height:37px!important;flex-basis:37px!important;padding:0 12px!important;
+  border-bottom:1px solid var(--sl-border)!important;
+  background:var(--sl-surface)!important
+}
+html[data-theme] .menus {gap:3px}
+html[data-theme] .menus button {
+  padding:7px 11px!important;color:var(--sl-muted)!important;
+  font-size:12px!important;font-weight:550!important;border-radius:7px!important
+}
+html[data-theme] .menus button:hover {background:var(--sl-surface-alt)!important;color:var(--sl-ink)!important}
+html[data-theme] .workspace-state {color:var(--sl-faint)!important;font-size:10px!important}
+html[data-theme] .workspace-state i {background:var(--sl-accent)!important}
+html[data-theme] :is(.leftbar,.inspector){
+  background:var(--sl-sidebar)!important;color:var(--sl-ink)!important;
+  scrollbar-color:var(--sl-strong-border) transparent
+}
+html[data-theme] .leftbar {border-right:1px solid var(--sl-border)!important}
+html[data-theme] .inspector {border-left:1px solid var(--sl-border)!important}
+html[data-theme] .splitter {background:var(--sl-border)!important}
+html[data-theme] .splitter:hover,html[data-theme] .interacting .splitter {background:var(--sl-accent)!important}
+html[data-theme] .side-tabs {
+  background:var(--sl-sidebar)!important;border-bottom:1px solid var(--sl-border)!important;
+  padding:5px!important;gap:4px!important
+}
+html[data-theme] .side-tabs button {
+  border:1px solid transparent!important;border-radius:8px!important;
+  padding:8px 6px!important;font-size:11px!important;
+  color:var(--sl-muted)!important;background:transparent!important
+}
+html[data-theme] .side-tabs button.active {
+  background:var(--sl-surface)!important;color:var(--sl-accent-text)!important;
+  border:1px solid var(--sl-border)!important;box-shadow:0 1px 3px rgba(0,0,0,.035)!important
+}
+html[data-theme] .side-title{padding:17px 15px 11px!important}
+html[data-theme] .side-title h2{font-size:20px!important;letter-spacing:-.025em}
+html[data-theme] :is(.side-title span,.ins-title span,.panel-title span){color:var(--sl-faint)!important;font-size:10px!important;letter-spacing:.09em!important}
+html[data-theme] :is(.side-title>b,.ins-title>b){background:var(--sl-surface-alt)!important;border:1px solid var(--sl-border)!important;color:var(--sl-muted)!important;font-size:10px!important}
+html[data-theme] :is(.search,.library-filter select,.inspector input,.rules input,.ac-filter,.el-inputs input,.el-inputs select,.ea-field input,.ea-field select) {
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border:1px solid var(--sl-border)!important;border-radius:9px!important
+}
+html[data-theme] :is(.search input,.inspector input,.rules input) {
+  color:var(--sl-ink)!important;font-size:12px!important
+}
+html[data-theme] .search {padding:2px 9px!important;margin:5px 10px 10px!important}
+html[data-theme] .search input {background:transparent!important;border:0!important;outline:0!important;box-shadow:none!important}
+html[data-theme] .library-filter select {font-size:12px!important}
+html[data-theme] :is(.library-filter span,.part-copy small,.tree>span,.history p,.hint,.empty,.inspector label span) {
+  color:var(--sl-muted)!important;font-size:11px!important
+}
+html[data-theme] .part{
+  color:var(--sl-ink)!important;border:1px solid transparent!important;
+  border-radius:10px!important;padding:8px!important;min-height:57px!important
+}
+html[data-theme] .part:hover {
+  background:var(--sl-surface)!important;border-color:var(--sl-border)!important
+}
+html[data-theme] .part-symbol{
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;
+  border:1px solid rgba(var(--sl-rgb),.18)!important;border-radius:9px!important;
+  width:36px!important;height:36px!important;font-size:12px!important
+}
+html[data-theme] .part-copy b {font-size:12px!important;color:var(--sl-ink)!important}
+html[data-theme] .part em {color:var(--sl-faint)!important}
+html[data-theme] .hint {
+  background:var(--sl-accent-soft)!important;border:1px solid rgba(var(--sl-rgb),.16)!important;
+  color:var(--sl-accent-text)!important;padding:11px!important;border-radius:9px!important;
+  line-height:1.6!important
+}
+html[data-theme] .load-more{
+  background:var(--sl-surface)!important;color:var(--sl-accent-text)!important;
+  border:1px solid var(--sl-border)!important;font-size:11px!important
+}
+html[data-theme] :is(.tree button,.history article) {color:var(--sl-muted)!important}
+html[data-theme] .tree button {font-size:12px!important;border-radius:8px!important}
+html[data-theme] .tree button:hover,html[data-theme] .tree .root {
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important
+}
+html[data-theme] .tree button.active {
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;
+  box-shadow:inset 3px 0 0 var(--sl-accent)!important
+}
+html[data-theme] .history article{
+  background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  border-radius:11px!important;padding:12px!important
+}
+html[data-theme] .history :is(b,strong) {font-size:12px!important}
+html[data-theme] .history b {color:var(--sl-accent-text)!important}
+html[data-theme] .tabs {
+  height:51px!important;flex-basis:51px!important;align-items:center!important;
+  gap:5px!important;padding:0 12px!important;background:var(--sl-surface)!important;
+  border-bottom:1px solid var(--sl-border)!important
+}
+html[data-theme] .tabs button {
+  height:35px!important;flex:none!important;padding:0 13px!important;
+  border:1px solid transparent!important;border-radius:9px!important;
+  color:var(--sl-muted)!important;background:transparent!important;
+  font-size:12px!important;font-weight:650!important
+}
+html[data-theme] .tabs button:hover {
+  color:var(--sl-ink)!important;background:var(--sl-surface-alt)!important
+}
+html[data-theme] .tabs button.active {
+  background:var(--sl-accent-soft)!important;
+  color:var(--sl-accent-text)!important;border:1px solid rgba(var(--sl-rgb),.15)!important;
+  box-shadow:none!important
+}
+html[data-theme] .toolbar-scroll {
+  background:var(--sl-surface)!important;
+  border-bottom:1px solid var(--sl-border)!important;
+  height:55px!important;flex-basis:55px!important
+}
+html[data-theme] .toolbar {height:54px!important;padding:0 12px!important}
+html[data-theme] .tools,html[data-theme] .tool-right {gap:6px!important}
+html[data-theme] :is(.tools button,.tool-right button){
+  background:var(--sl-surface)!important;color:var(--sl-muted)!important;
+  border:1px solid var(--sl-border)!important;border-radius:8px!important;
+  height:35px!important;padding:0 10px!important
+}
+html[data-theme] :is(.tools button,.tool-right button):hover {background:var(--sl-surface-alt)!important;color:var(--sl-ink)!important}
+html[data-theme] .tools button.active {
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;
+  border-color:rgba(var(--sl-rgb),.3)!important
+}
+html[data-theme] .tools small,html[data-theme] .tool-right button {font-size:11px!important}
+html[data-theme] .stage {
+  background-color:var(--sl-canvas)!important;
+  background-image:radial-gradient(var(--sl-grid) 1px,transparent 1px)!important;
+  background-size:20px 20px!important
+}
+html[data-theme] .stage-info {color:var(--sl-muted)!important;font-size:11px!important}
+html[data-theme] .stage-info b{
+  background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  color:var(--sl-muted)!important;border-radius:7px!important;font-size:10px!important
+}
+html[data-theme] .node {
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border:1px solid var(--sl-strong-border)!important;border-radius:11px!important;
+  box-shadow:var(--sl-shadow)!important
+}
+html[data-theme] .node.selected {
+  border-color:var(--sl-selection)!important;box-shadow:0 0 0 3px rgba(var(--sl-rgb),.18)!important
+}
+html[data-theme] .node .symbol{color:var(--sl-accent-text)!important;font-size:16px!important}
+html[data-theme] .node .ref{color:var(--sl-muted)!important;font-size:10px!important}
+html[data-theme] .node b{color:var(--sl-ink)!important;font-size:12px!important}
+html[data-theme] .node small{color:var(--sl-muted)!important;font-size:10px!important}
+html[data-theme] .stage-help span {
+  color:var(--sl-muted)!important;background:var(--sl-surface)!important;
+  border:1px solid var(--sl-border)!important;border-radius:7px!important;font-size:10px!important;
+  padding:5px 8px!important
+}
+html[data-theme] .floating-card {
+  background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  border-radius:12px!important;padding:14px!important;box-shadow:var(--sl-shadow)!important;width:220px!important
+}
+html[data-theme] .floating-card span{color:var(--sl-faint)!important;font-size:10px!important}
+html[data-theme] .floating-card strong{color:var(--sl-accent-text)!important}
+html[data-theme] .floating-card small{color:var(--sl-muted)!important;font-size:11px!important;line-height:1.5!important}
+html[data-theme] .floating-card button{
+  background:var(--sl-accent)!important;border-color:var(--sl-accent)!important;
+  color:#fff!important;font-size:11px!important;border-radius:8px!important;padding:9px!important
+}
+html[data-theme="dark"] .floating-card button {color:#0b2426!important}
+html[data-theme] .layer-strip button {
+  background:var(--sl-surface)!important;color:var(--sl-muted)!important;
+  border:1px solid var(--sl-border)!important;padding:7px 9px!important;font-size:10px!important;border-radius:8px!important
+}
+html[data-theme] .layer-strip button.active {border-color:var(--sl-accent)!important;color:var(--sl-accent-text)!important}
+html[data-theme] .panel {
+  background:var(--sl-bg)!important;color:var(--sl-ink)!important;padding:24px!important
+}
+html[data-theme] .panel-title h2 {font-size:23px!important;letter-spacing:-.03em!important;color:var(--sl-ink)!important}
+html[data-theme] .panel-title p {color:var(--sl-muted)!important;font-size:12px!important;max-width:700px}
+html[data-theme] :is(.cards article,.release article,.table-wrap){
+  background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  border-radius:13px!important;box-shadow:var(--sl-shadow)!important
+}
+html[data-theme] :is(.cards article,.release article) {padding:19px!important}
+html[data-theme] :is(.cards b,.release b){color:var(--sl-accent-text)!important;font-size:10px!important}
+html[data-theme] :is(.cards h3,.release h3){color:var(--sl-ink)!important;font-size:16px!important}
+html[data-theme] :is(.cards p,.release p){color:var(--sl-muted)!important;font-size:12px!important;line-height:1.65!important}
+html[data-theme] .table-wrap table {background:var(--sl-surface)!important}
+html[data-theme] .table-wrap :is(th,td){
+  border-bottom:1px solid var(--sl-border)!important;color:var(--sl-ink)!important;
+  font-size:12px!important;padding:12px!important
+}
+html[data-theme] .table-wrap th{
+  color:var(--sl-muted)!important;font-weight:700!important;background:var(--sl-surface-alt)!important
+}
+html[data-theme] .statusbar{
+  background:var(--sl-surface)!important;border-top:1px solid var(--sl-border)!important;
+  height:36px!important;flex-basis:36px!important
+}
+html[data-theme] .statusbar>div,html[data-theme] .statusbar button {
+  color:var(--sl-muted)!important;font-size:11px!important
+}
+html[data-theme] .statusbar i {background:var(--sl-accent)!important}
+html[data-theme] .console {background:var(--sl-surface-alt)!important;color:var(--sl-muted)!important;border-top:1px solid var(--sl-border)!important}
+html[data-theme] .inspector section {
+  border-bottom:1px solid var(--sl-border)!important;padding:15px!important
+}
+html[data-theme] :is(.inspector input,.rules input){
+  font-size:12px!important;min-height:37px;padding:8px 10px!important
+}
+html[data-theme] .inspector .ins-title {margin-bottom:13px!important}
+html[data-theme] :is(.prop-actions button,.workspace-controls button,.check,.net) {
+  color:var(--sl-ink)!important;background:var(--sl-surface)!important;
+  border:1px solid var(--sl-border)!important;border-radius:9px!important;
+  font-size:11px!important;padding:10px!important
+}
+html[data-theme] .check small,html[data-theme] .net small,html[data-theme] .empty{
+  color:var(--sl-muted)!important;font-size:10px!important
+}
+html[data-theme] .net>i {background:var(--sl-accent)!important}
+html[data-theme] .drag-ghost,html[data-theme] .toast {
+  border:1px solid var(--sl-strong-border)!important;background:var(--sl-surface)!important;
+  color:var(--sl-ink)!important;box-shadow:var(--sl-shadow)!important
+}
+/* Existing comfort dock is a utility, not an overlay over the workspace header. */
+html[data-theme] #pcbpro-ux-dock {
+  background:var(--sl-surface)!important;
+  border:1px solid var(--sl-border)!important;box-shadow:var(--sl-shadow)!important;
+  top:166px!important;right:12px!important;border-radius:11px!important
+}
+html[data-theme] #pcbpro-ux-dock :is(button,span){
+  color:var(--sl-muted)!important;background:var(--sl-surface-alt)!important;
+  border-color:var(--sl-border)!important;border-radius:7px!important
+}
+html[data-theme] #pcbpro-ux-dock button.active{
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important
+}
+html[data-theme] #pcbpro-ux-dock .ux-patches{color:var(--sl-accent-text)!important;background:var(--sl-accent-soft)!important}
+html[data-theme] .ux-modal-card,html[data-theme] .ux-modal-body article {
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border:1px solid var(--sl-border)!important;border-radius:12px!important
+}
+html[data-theme] .ux-modal-title {border-bottom-color:var(--sl-border)!important}
+html[data-theme] .ux-modal-title small,html[data-theme] .ux-patch-head {color:var(--sl-accent-text)!important}
+html[data-theme] .ux-modal-body ul{color:var(--sl-muted)!important}
+html[data-theme] .ux-modal-close{
+  color:var(--sl-ink)!important;background:var(--sl-surface-alt)!important;border-color:var(--sl-border)!important
+}
+/* Academy */
+html[data-theme] .ac-root {background:var(--sl-bg)!important;color:var(--sl-ink)!important}
+html[data-theme] .ac-head h1,html[data-theme] .ac-card :is(h2,h3),html[data-theme] .ac-root strong{color:var(--sl-ink)!important}
+html[data-theme] .ac-head p,html[data-theme] .ac-head .ac-progress,
+html[data-theme] .ac-card p,html[data-theme] .ac-root .ac-note{color:var(--sl-muted)!important}
+html[data-theme] .ac-root :is(.ac-nav,.ac-card,.ac-box,.ac-concept,.rt-hints){
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;border:1px solid var(--sl-border)!important;
+  border-radius:13px!important;box-shadow:var(--sl-shadow)!important
+}
+html[data-theme] .ac-root :is(.ac-kicker,.ac-section-tag,.ac-concept strong,.ac-stage em){color:var(--sl-accent-text)!important}
+html[data-theme] .ac-root :is(.ac-stage,.ac-pill,.ac-quiz button,.ac-actions button,.ac-filter,.rt-scenarios button,.rt-results button,.rt-head button){
+  color:var(--sl-ink)!important;background:var(--sl-surface)!important;
+  border:1px solid var(--sl-border)!important;border-radius:9px!important
+}
+html[data-theme] .ac-root :is(.ac-stage.active,.ac-pill.active,.rt-scenarios button.active){
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;
+  border-color:rgba(var(--sl-rgb),.3)!important
+}
+html[data-theme] .ac-root :is(.ac-pill,.ac-stage,.ac-quiz button,.ac-actions button){font-size:12px!important;line-height:1.45!important}
+html[data-theme] .ac-root .ac-stage small {color:var(--sl-muted)!important}
+html[data-theme] .ac-root .ac-check {color:var(--sl-ink)!important}
+html[data-theme] .ac-root .ac-quiz button:hover {border-color:var(--sl-accent)!important;background:var(--sl-accent-soft)!important}
+html[data-theme] .ac-root .ac-links a {color:var(--sl-accent-text)!important}
+html[data-theme] .ac-root .ac-alert {
+  color:var(--sl-warn-ink)!important;background:var(--sl-warn-bg)!important;border:1px solid var(--sl-warn-line)!important
+}
+html[data-theme] .ac-root .ac-meter{background:var(--sl-border)!important}
+html[data-theme] .ac-root .ac-meter i {background:var(--sl-accent)!important}
+html[data-theme] .ac-root .rt-canvas{
+  background:var(--sl-canvas)!important;border:1px solid var(--sl-border)!important
+}
+html[data-theme] .ac-root :is(.rt-intro,.rt-note,.rt-head p,.rt-results span){color:var(--sl-muted)!important}
+html[data-theme] .ac-root .rt-message {color:var(--sl-accent-text)!important}
+html[data-theme] .ac-root .rt-hints summary {color:var(--sl-accent-text)!important}
+/* Electrical */
+html[data-theme] .el-root {
+  background:var(--sl-bg)!important;color:var(--sl-ink)!important;font-size:13px!important
+}
+html[data-theme] .el-root :is(.el-header h2,.el-panel h3,.el-cards b,.el-review b){color:var(--sl-ink)!important}
+html[data-theme] .el-root :is(.el-header p,.el-foot,.el-cards small,.el-inputs label,.el-tag,.el-review p){
+  color:var(--sl-muted)!important
+}
+html[data-theme] .el-root :is(.el-panel,.el-cards article,.el-review article){
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border:1px solid var(--sl-border)!important;border-radius:13px!important;box-shadow:var(--sl-shadow)!important
+}
+html[data-theme] .el-root :is(.el-inputs input,.el-inputs select,.el-scroller td input,.el-scroller td select){
+  background:var(--sl-surface-alt)!important;color:var(--sl-ink)!important;border:1px solid var(--sl-border)!important;
+  border-radius:8px!important;font-size:12px!important;min-height:35px
+}
+html[data-theme] .el-root .el-scroller {border-color:var(--sl-border)!important;background:var(--sl-surface)!important}
+html[data-theme] .el-root :is(th,td) {color:var(--sl-ink)!important;border-bottom:1px solid var(--sl-border)!important}
+html[data-theme] .el-root th{background:var(--sl-surface-alt)!important;color:var(--sl-muted)!important}
+html[data-theme] .el-root button{
+  color:var(--sl-ink)!important;background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  border-radius:9px!important;font-size:12px!important;min-height:35px!important
+}
+html[data-theme] .el-root button.primary {background:var(--sl-accent)!important;color:#fff!important;border-color:var(--sl-accent)!important}
+html[data-theme] .el-root .el-warn {
+  background:var(--sl-warn-bg)!important;color:var(--sl-warn-ink)!important;
+  border:1px solid var(--sl-warn-line)!important
+}
+html[data-theme] #ea-v127 {
+  background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;color:var(--sl-ink)!important
+}
+html[data-theme] #ea-v127 :is(.ea-muted,.ea-metrics span,.ea-issue span,.ea-h4){color:var(--sl-muted)!important}
+html[data-theme] #ea-v127 :is(.ea-metrics article,.ea-chart,.ea-issue){
+  background:var(--sl-surface-alt)!important;border-color:var(--sl-border)!important;color:var(--sl-ink)!important
+}
+html[data-theme] #ea-v127 :is(.ea-metrics strong,.ea-issue b){color:var(--sl-ink)!important}
+html[data-theme] #ea-v127 :is(input,select,textarea){
+  color:var(--sl-ink)!important;background:var(--sl-surface)!important;border:1px solid var(--sl-border)!important;
+  border-radius:8px!important
+}
+/* Preserve physically meaningful engineering overlays; restyle only modal shell */
+html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog)>section {
+  background:var(--sl-surface)!important;color:var(--sl-ink)!important;
+  border:1px solid var(--sl-border)!important;box-shadow:var(--sl-shadow)!important
+}
+html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog) :is(p,article) {
+  color:var(--sl-ink)!important;
+  background:var(--sl-surface-alt)!important
+}
+html[data-theme] :is(#pcbpro-spice-dialog,#pcbpro-verification-dialog) button {
+  background:var(--sl-accent-soft)!important;color:var(--sl-accent-text)!important;border-color:var(--sl-border)!important
+}
+@media(max-width:1250px){
+  html[data-theme] .version {display:none!important}
+  html[data-theme] .project-pill {max-width:180px!important}
+  html[data-theme] .topbar {padding:0 9px!important}
+}
+@media(max-width:1050px){
+  html[data-theme] .save-state {display:none!important}
+  html[data-theme] .top-actions>button:not(.primary):not(.icon-btn){display:none!important}
+  html[data-theme] .theme-control {margin-left:auto}
+}
+@media(max-width:760px){
+  html[data-theme] .theme-control {padding:3px 6px;min-height:32px}
+  html[data-theme] .theme-control select {font-size:11px!important}
+  html[data-theme] .topbar {height:59px!important;flex-basis:59px!important}
+  html[data-theme] .brand strong {font-size:14px!important}
+  html[data-theme] .brand span {font-size:9px!important}
+  html[data-theme] .logo {height:32px!important;width:32px!important}
+  html[data-theme] #pcbpro-ux-dock{top:auto!important;right:8px!important;bottom:8px!important}
+  html[data-theme] .panel {padding:12px!important}
+}
+@media(max-width:520px) {
+  html[data-theme] .project-pill {display:none!important}
+  html[data-theme] .brand-group {gap:6px!important}
+  html[data-theme] .top-actions {gap:4px!important}
+  html[data-theme] .theme-control svg {display:none}
+  html[data-theme] .theme-control select {max-width:67px}
+  html[data-theme] .topbar {padding:0 6px!important}
+  html[data-theme] .tabs {padding:0 6px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-theme] *,html[data-theme] *::before,html[data-theme] *::after{
+    scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important
+  }
+}

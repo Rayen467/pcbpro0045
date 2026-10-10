@@ -149,3 +149,23 @@ SirkuitLab adds a native **Learning** tab with an integrated, evidence-based rou
 - The **48-week example study plan** and first detailed LED lesson are at [docs/ACADEMY_ROADMAP_2026.md](docs/ACADEMY_ROADMAP_2026.md). This is a plan, not a promise of proficiency within a fixed time.
 
 The existing old Learning Center modal is retained for backward compatibility and does not claim to duplicate the new native Learning tab. Electrical installation and high-current robotics must be assessed by qualified personnel; **no mains AC experimentation** is taught in the routing exercises. Full SPICE, physical wiring CAD, routing continuity-to-net verification with real footprints, board fab compliance, hardware debug telemetry and certification remain work to do, not features advertised by the Academy.
+
+
+## v1.29 — Clean Engineering UI (Light / Dark / System)
+
+SirkuitLab now uses a modern, **light-first** engineering workspace. The update is appearance-only: PCB copper, net connectivity, DRC findings, manufacturing restrictions, and all other engineering rules remain unchanged.
+
+- **Light**: white surfaces, neutral grey separators, dark high-legibility text and restrained teal accents. This is the default for new users.
+- **Dark**: a matching dark palette built from the same semantic design tokens, without crude full-page inversion that could alter critical layer or error colors.
+- **System**: respects OS/browser dark preference via \`matchMedia('(prefers-color-scheme: dark)')\`; reacts to live changes. User preference persists as \`sirkuitlab-theme-v129\` in localStorage, and is synchronized between tabs via the storage event.
+- A visible **Light / Dark / System** dropdown is integrated into the top toolbar, with a keyboard-accessible label. Theme is applied before SvelteKit hydration to reduce the appearance flash, and updates the browser theme-color meta.
+- Topbar, menu bar, active workspace tabs, search, library, property sidebar, schematic canvas, routing UI, command controls, cards, status bar, Academy, Electrical and verification dialogs are refreshed with consistent color, spacing, radii, typography and focus styles. The *PCB board itself* keeps meaningful green solder mask and copper-related color semantics.
+- Responsive reductions preserve essential Save/Simulate/Theme controls on smaller displays. \`prefers-reduced-motion\` is honored. No added UI framework or large runtime dependency.
+
+### Test / boundaries
+
+Automated tests cover default Light, explicit Dark, System OS changes, persistence/reload, cross-tab sync, invalid mode rejection, storage-disabled fallback, and app/CSS integration. CI also runs all earlier project tests, Svelte checks, and a production build.
+
+Because older dynamic runtime engines may inject module-specific UI styles, this release modernizes the main workspace and high-use Academy/Electrical views first; some specialized legacy dialogs still have their original engineering visuals and require browser-level visual QA. Automated checks are not an end-to-end visual contrast or keyboard audit; test in real browsers before claiming full WCAG conformance.
+
+The implementation follows [MDN color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/color-scheme) and [MDN prefers-color-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/%40media/prefers-color-scheme) browser guidance.
