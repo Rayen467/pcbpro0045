@@ -75,6 +75,7 @@
       '<div class="el-bottom"><section class="el-panel"><h3>03 / Diagram satu garis (SLD preview)</h3><div class="el-svg">'+core().sld()+'</div></section>'+
       '<section class="el-panel"><h3>04 / Engineering review</h3><div class="el-review">'+report.findings.map(x=>'<article><b>'+esc(x.code)+(x.ref?' · '+esc(x.ref):'')+
       '</b><p>'+esc(x.message)+'</p></article>').join('')+'</div><p class="el-foot">Acuan pengembangan: PUIL 2020 / SNI 0225 dan prinsip IEC 60364. Asumsi konduktor Cu ρ20=0,017241 Ω·mm²/m, α=0,00393/°C. Bila X kabel kosong, estimasi drop belum memperhitungkan reaktansi. Penanda 5% adalah flag tinjauan ilustratif, bukan batas standar yang diverifikasi.</p></section></div>';
+    window.PCBProElectricalAdvanced?.mount?.(root);
     if(root.dataset.listener==='1')return;
     root.dataset.listener='1';
     root.addEventListener('click',ev=>{
