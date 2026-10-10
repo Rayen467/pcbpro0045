@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProManufacturing) return;
 
-  const VERSION='1.20.0';
+  const VERSION='1.25.0';
   const KEY='pcbpro0045-manufacturing-v120';
   const enc=new TextEncoder();
   let state={widthMm:null,heightMm:null,origin:'outline-min',lastPreflight:null,lastPackage:null};
@@ -82,15 +82,25 @@
     const base=window.PCBProBoardModel?.drc?.()||[],adv=window.PCBProAdvancedBoard?.drc?.()||[];
     if(base.length||adv.length)findings.push({code:'DRC',message:t(`DRC masih punya ${base.length+adv.length} temuan.`,`DRC still has ${base.length+adv.length} finding(s).`)});
     const physicalDrc=window.PCBProPhysicalDRC?.run?.()||null;
+    if(!physicalDrc || physicalDrc.calibrated!==true || physicalDrc.ready!==true){
+      findings.push({code:'PHYSICAL_DRC_UNVERIFIED',message:t('Physical DRC belum tersedia/lulus dengan kalibrasi mm yang valid.','Physical DRC is not available/passing with a valid mm calibration.')});
+    }
     const physicalErrors=physicalDrc?.findings?.filter?.(x=>x.severity==='error'||x.severity==='blocker')||[];
     if(physicalErrors.length)findings.push({code:'PHYSICAL_DRC',message:t(`Physical DRC masih punya ${physicalErrors.length} pelanggaran.`,`Physical DRC still has ${physicalErrors.length} violation(s).`)});
+    if((a.zones||[]).length){
+      findings.push({code:'UNEXPORTED_COPPER_ZONES',message:t('Copper zones belum dirender ke Gerber; ekspor diblokir agar area copper tidak hilang.','Copper zones are not rendered to Gerber; export is blocked to prevent missing copper.')});
+    }
+    warnings.push({code:'CAM_LAYER_COVERAGE',message:t('Mask, paste, silkscreen, dan lubang footprint/THT belum memiliki cakupan manufaktur terverifikasi. Paket tetap engineering draft.','Mask, paste, silkscreen and footprint/THT drill coverage are not verified. Package remains an engineering draft.')});
     const placements=b.placements||[];
     const physical=c.filter(x=>x.footprint&&x.footprint!=='—');
     const missingPlacement=physical.filter(x=>!placements.some(p=>p.ref===x.id));
     if(missingPlacement.length)warnings.push({code:'CPL',message:t(`${missingPlacement.length} footprint belum punya placement capture untuk CPL.`,`${missingPlacement.length} footprint(s) are missing placement capture for CPL.`)});
     if(!(a.vias||[]).every(v=>Number.isFinite(Number(v.x))&&Number.isFinite(Number(v.y))))findings.push({code:'VIA_GEOMETRY',message:t('Ada via dengan koordinat invalid.','A via has invalid coordinates.')});
     const readyForDraft=findings.length===0;
-    const readyForProduction=readyForDraft&&physicalPads.ready;
+    // Until mask/paste/silkscreen, footprint drill holes and full padstack/zone
+    // generation are verified, this exporter must not claim a fabrication release.
+    const completeManufacturingLayers=false;
+    const readyForProduction=readyForDraft&&physicalPads.ready&&completeManufacturingLayers;
     const report={
       version:VERSION,time:new Date().toISOString(),readyForDraft,readyForProduction,
       findings,warnings,coverage:{
@@ -285,8 +295,10 @@
       preflight:report,
       professionalRules:professional(),
       limitations:report.readyForProduction?[]:[
-        'Verified per-footprint physical pad geometry is incomplete or unavailable.',
-        'Copper Gerbers include only verified/known copper geometry; this package must not be sent to fabrication as a production release.'
+        'Mask, paste, silkscreen, plated/non-plated footprint holes and complete padstack coverage are not independently verified.',
+        'Copper zones are not exported; zone-containing boards are blocked by preflight.',
+        'Copper Gerbers contain only known geometry and are an ENGINEERING DRAFT, not an accepted fabrication release.',
+        'Run copper, drill and artwork checks against an independent Gerber viewer and fabricator rules before manufacturing.'
       ],
       files:[]
     };
