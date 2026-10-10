@@ -82,8 +82,8 @@ test('deterministic PV + battery hourly balance conserves energy and respects ca
   const h=harness();h.core.add();update(h,'C1','watts',1000);schedule(h,'C1',12,1);
   cfg(h,'pvKWp',2);const factors=Array(24).fill(0);factors[11]=1;
   h.adv.setProfile(factors.join(','));
-  cfg(h,'batteryCapacityKWh',1);cfg(h,'batteryMaxKW',1);
-  cfg(h,'roundtripEfficiency',1);cfg(h,'reserveSocPercent',0);
+  h.adv.configureBattery({batteryCapacityKWh:1,batteryMaxKW:1,
+    roundtripEfficiency:1,reserveSocPercent:0});
   const r=h.adv.analyze(),p=r.profile;
   assert.equal(r.ok,true);
   near(p.pvKWh,2);near(p.loadKWh,1);near(p.gridImportKWh,0);
@@ -94,8 +94,8 @@ test('deterministic PV + battery hourly balance conserves energy and respects ca
 test('battery roundtrip loss reduces delivered energy and cost requires explicit tariff',()=>{
   const h=harness();h.core.add();update(h,'C1','watts',1000);schedule(h,'C1',12,1);
   cfg(h,'pvKWp',1);const factors=Array(24).fill(0);factors[11]=1;h.adv.setProfile(factors.join(','));
-  cfg(h,'batteryCapacityKWh',1);cfg(h,'batteryMaxKW',1);
-  cfg(h,'roundtripEfficiency',.81);cfg(h,'reserveSocPercent',0);
+  h.adv.configureBattery({batteryCapacityKWh:1,batteryMaxKW:1,
+    roundtripEfficiency:.81,reserveSocPercent:0});
   cfg(h,'tariffRpKWh',1500);
   const p=h.adv.analyze().profile;
   near(p.gridImportKWh,.19);
@@ -141,4 +141,14 @@ test('export permission defaults off and hypothetical export never assumes feed-
   near(p.gridExportKWh,1.9);near(p.curtailedKWh,0);
   assert.equal(p.hypotheticalExportRevenueRp,null);
   assert.ok(h.adv.analyze().issues.some(x=>x.code==='EXPORT_PERMISSION'));
+});
+
+test('battery form can only be saved atomically with all required specs',()=>{
+ const h=harness();
+ assert.throws(()=>h.adv.configureBattery({batteryCapacityKWh:3}),/batteryMaxKW/);
+ assert.equal(h.core.snapshot().advanced,undefined);
+ h.adv.configureBattery({batteryCapacityKWh:3,batteryMaxKW:1,
+   roundtripEfficiency:.9,reserveSocPercent:20});
+ assert.equal(h.core.snapshot().advanced.energy.batteryCapacityKWh,3);
+ assert.equal(h.core.snapshot().advanced.energy.reserveSocPercent,20);
 });
