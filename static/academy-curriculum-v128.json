@@ -31,11 +31,11 @@
           "pass": "Bisa menjelaskan input, proses, output tanpa menyebut teknologi sebagai kotak ajaib.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Apa susunan logika sebuah sistem sensor otomatis?",
             "options": [
-              "Bisa menjelaskan input, proses, output tanpa menyebut teknologi sebagai kotak ajaib.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Input → proses → output",
+              "Output → rangkaian tanpa input",
+              "PCB → server → kabel otomatis"
             ],
             "answer": 0
           }
@@ -49,13 +49,13 @@
           "pass": "Bisa menerangkan kenapa listrik rumah butuh teknisi berkompeten dan kenapa pengaman tidak bisa digantikan software.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Untuk belajar rangkaian LED pertama, pilihan paling aman apa?",
             "options": [
-              "Bisa menerangkan kenapa listrik rumah butuh teknisi berkompeten dan kenapa pengaman tidak bisa digantikan software.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Kabel langsung ke 230 V",
+              "Baterai lithium tanpa BMS dan tanpa resistor",
+              "USB 5 V dibatasi arus + resistor"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -67,13 +67,13 @@
           "pass": "Bisa membedakan gambar konsep, hasil simulasi, prototipe teruji, dan produk siap dipasang.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Dokumen mana yang membedakan desain dari produk sudah diuji?",
             "options": [
-              "Bisa membedakan gambar konsep, hasil simulasi, prototipe teruji, dan produk siap dipasang.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Jumlah fitur yang diklaim",
+              "Laporan pengujian dan revisi",
+              "Logo produk yang menarik"
             ],
-            "answer": 0
+            "answer": 1
           }
         }
       ]
@@ -105,13 +105,13 @@
           "pass": "Bisa mengubah 1 kΩ→1000 Ω dan 0,01 A→10 mA tanpa tertukar.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Berapa arus ideal melalui 1 kΩ saat diberi 5 V?",
             "options": [
-              "Bisa mengubah 1 kΩ→1000 Ω dan 0,01 A→10 mA tanpa tertukar.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "5 A",
+              "500 mA",
+              "5 mA"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -123,13 +123,13 @@
           "pass": "Bisa menghitung V, I, R, P dan menjelaskan mengapa komponen dapat panas.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Lampu 5 W hidup 4 jam memakai energi sebesar?",
             "options": [
-              "Bisa menghitung V, I, R, P dan menjelaskan mengapa komponen dapat panas.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "1 Wh",
+              "20 Wh",
+              "20 W"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -141,11 +141,11 @@
           "pass": "Bisa menunjuk ground rangkaian dan membedakannya dari protective earth.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Bagaimana multimeter mengukur beda tegangan pada beban?",
             "options": [
-              "Bisa menunjuk ground rangkaian dan membedakannya dari protective earth.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Paralel pada dua terminal di mode V",
+              "Seri pada beban di mode A",
+              "Mode arus langsung pada VCC-GND"
             ],
             "answer": 0
           }
@@ -166,7 +166,7 @@
         },
         {
           "title": "KiCad: schematic to board workflow",
-          "url": "https://docs.kicad.org/7.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
         }
       ],
       "lessons": [
@@ -179,13 +179,13 @@
           "pass": "Bisa menyatakan fungsi R, anoda, katoda dan menjelaskan risiko LED tanpa resistor.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Kenapa LED umumnya memakai resistor seri?",
             "options": [
-              "Bisa menyatakan fungsi R, anoda, katoda dan menjelaskan risiko LED tanpa resistor.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Menghilangkan kebutuhan GND",
+              "Membatasi arus LED",
+              "Menaikkan tegangan tanpa batas"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -197,11 +197,11 @@
           "pass": "Bisa membedakan smoothing, decoupling, energi tersimpan, dan kebutuhan polaritas.",
           "view": "Schematic",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Di mana bypass capacitor IC umumnya ditempatkan?",
             "options": [
-              "Bisa membedakan smoothing, decoupling, energi tersimpan, dan kebutuhan polaritas.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Dekat pin suplai IC",
+              "Sejauh mungkin dari IC",
+              "Hanya di konektor USB"
             ],
             "answer": 0
           }
@@ -215,13 +215,13 @@
           "pass": "Bisa menjelaskan mengapa PWM dari GPIO tidak boleh langsung memberi daya motor.",
           "view": "Schematic",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Mengapa motor tidak langsung tersambung ke GPIO?",
             "options": [
-              "Bisa menjelaskan mengapa PWM dari GPIO tidak boleh langsung memberi daya motor.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "GPIO selalu bertegangan 230 V",
+              "Motor tidak butuh proteksi",
+              "GPIO tidak dirancang memasok arus motor"
             ],
-            "answer": 0
+            "answer": 2
           }
         }
       ]
@@ -253,11 +253,11 @@
           "pass": "Bisa membedakan variabel, kondisi, perulangan, fungsi.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Apa fungsi if/else dalam program?",
             "options": [
-              "Bisa membedakan variabel, kondisi, perulangan, fungsi.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Memilih aksi berdasarkan kondisi",
+              "Menambah kapasitas baterai",
+              "Mengubah resistor menjadi sensor"
             ],
             "answer": 0
           }
@@ -271,13 +271,13 @@
           "pass": "Bisa menjelaskan beda error program, error sensor, dan error listrik.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Bagaimana menguji fungsi pembacaan sensor yang gagal?",
             "options": [
-              "Bisa menjelaskan beda error program, error sensor, dan error listrik.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Paksakan angka 25°C sebagai hasil",
+              "Hapus seluruh validasi",
+              "Kembalikan status/error dan cek log"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -289,13 +289,13 @@
           "pass": "Bisa memisahkan UI, proses backend, API, serta firmware ESP32.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Manakah pembagian fungsi web yang tepat?",
             "options": [
-              "Bisa memisahkan UI, proses backend, API, serta firmware ESP32.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "JavaScript mengganti MCU tanpa firmware",
+              "HTML struktur, CSS tampilan, JS interaksi",
+              "HTML proteksi listrik, CSS ground"
             ],
-            "answer": 0
+            "answer": 1
           }
         }
       ]
@@ -310,7 +310,7 @@
       "sources": [
         {
           "title": "KiCad: schematic to board workflow",
-          "url": "https://docs.kicad.org/7.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
         },
         {
           "title": "BSN: PUIL installation design",
@@ -327,13 +327,13 @@
           "pass": "Bisa menjelaskan perbedaan skematik, netlist, footprint, dan BOM.",
           "view": "Schematic",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Apa perbedaan simbol dan footprint?",
             "options": [
-              "Bisa menjelaskan perbedaan skematik, netlist, footprint, dan BOM.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Simbol = gerber, footprint = firmware",
+              "Keduanya adalah nama lain untuk resistor",
+              "Simbol = fungsi skematik, footprint = pad fisik"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -345,13 +345,13 @@
           "pass": "Bisa membaca nama net, menghindari korslet, serta membedakan track dan airwire.",
           "view": "Schematic",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Hubungan net GND yang benar adalah?",
             "options": [
-              "Bisa membaca nama net, menghindari korslet, serta membedakan track dan airwire.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Setiap titik GND harus menjadi sumber positif",
+              "Semua pin pada net GND memiliki referensi listrik yang sama",
+              "GND berarti selalu proteksi bumi rumah"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -363,11 +363,11 @@
           "pass": "Bisa menjelaskan keterbatasan ERC dan mengapa datasheet adalah sumber utama.",
           "view": "Schematic",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Mengapa ERC tidak cukup untuk memberi kepastian rangkaian?",
             "options": [
-              "Bisa menjelaskan keterbatasan ERC dan mengapa datasheet adalah sumber utama.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "ERC tidak memvalidasi seluruh rating/datasheet komponen",
+              "ERC sudah pasti menguji produk fisik",
+              "ERC otomatis memilih IC yang sesuai"
             ],
             "answer": 0
           }
@@ -384,7 +384,7 @@
       "sources": [
         {
           "title": "KiCad: schematic to board workflow",
-          "url": "https://docs.kicad.org/7.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
+          "url": "https://docs.kicad.org/10.0/en/getting_started_in_kicad/getting_started_in_kicad.html"
         },
         {
           "title": "IPC: PCB design and manufacturing",
@@ -401,13 +401,13 @@
           "pass": "Bisa menunjukkan alasan placement sebelum routing.",
           "view": "PCB",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Langkah PCB yang sebaiknya datang sebelum routing?",
             "options": [
-              "Bisa menunjukkan alasan placement sebelum routing.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Menghapus netlist",
+              "Outline, placement, pemetaan net",
+              "Mengirim Gerber langsung ke pabrik"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -419,11 +419,11 @@
           "pass": "Bisa menjelaskan track, via, plane, clearance, ground return, serta hasil DRC.",
           "view": "PCB",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Apa tujuan DRC PCB?",
             "options": [
-              "Bisa menjelaskan track, via, plane, clearance, ground return, serta hasil DRC.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Mendeteksi pelanggaran aturan geometri yang diimplementasikan",
+              "Mengukur semua suhu IC fisik",
+              "Memberi sertifikat kelistrikan bangunan"
             ],
             "answer": 0
           }
@@ -437,13 +437,13 @@
           "pass": "Bisa membedakan DRC, DFM, inspeksi solder, dan pengujian listrik.",
           "view": "Fabrication",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "File apa yang perlu diperiksa terpisah untuk manufaktur?",
             "options": [
-              "Bisa membedakan DRC, DFM, inspeksi solder, dan pengujian listrik.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Hanya screenshot 3D",
+              "Hanya HTML dashboard",
+              "Gerber, drill, mask, outline, BOM dan placement"
             ],
-            "answer": 0
+            "answer": 2
           }
         }
       ]
@@ -475,11 +475,11 @@
           "pass": "Bisa menjelaskan beda tegangan catu board dan level logika pin.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Tegangan logika GPIO ESP32 harus diperlakukan bagaimana?",
             "options": [
-              "Bisa menjelaskan beda tegangan catu board dan level logika pin.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Ikuti datasheet; banyak keluarga ESP32 berlogika 3,3 V",
+              "Selalu aman menerima 12 V",
+              "Sama persis untuk semua board dan pin"
             ],
             "answer": 0
           }
@@ -493,13 +493,13 @@
           "pass": "Bisa membedakan masalah pin, kode, dan suplai.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Untuk debugging firmware, apa yang paling membantu?",
             "options": [
-              "Bisa membedakan masalah pin, kode, dan suplai.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Ganti semua komponen tanpa mengukur",
+              "Menganggap setiap bug pasti salah jaringan",
+              "Serial log, tes satu fitur, cek pin dan catu"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -511,13 +511,13 @@
           "pass": "Bisa menguraikan mengapa blink LED belum sama dengan produk IoT aman.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Manakah praktik firmware perangkat lapangan yang benar?",
             "options": [
-              "Bisa menguraikan mengapa blink LED belum sama dengan produk IoT aman.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "OTA tanpa kontrol versi",
+              "OTA terautentikasi, rollback, watchdog, tanpa secret di repo",
+              "Password Wi-Fi disimpan di GitHub publik"
             ],
-            "answer": 0
+            "answer": 1
           }
         }
       ]
@@ -549,13 +549,13 @@
           "pass": "Bisa menyebut kenapa sensor harus dikalibrasi dan divalidasi.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Apa perbedaan data analog dan digital?",
             "options": [
-              "Bisa menyebut kenapa sensor harus dikalibrasi dan divalidasi.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Analog selalu 230 V",
+              "Digital tidak pernah membutuhkan ground",
+              "Analog besaran kontinu, digital status/kode sesuai antarmuka"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -567,13 +567,13 @@
           "pass": "Bisa menggambar sambungan logis 4 terminal dan menjelaskan kenapa alamat I²C penting.",
           "view": "Schematic",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Pin data standar untuk I²C biasanya adalah?",
             "options": [
-              "Bisa menggambar sambungan logis 4 terminal dan menjelaskan kenapa alamat I²C penting.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "M+ dan M−",
+              "SDA dan SCL",
+              "RX dan TX saja"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -585,11 +585,11 @@
           "pass": "Bisa menjelaskan beda sampling, filtering, kalibrasi, accuracy dan precision.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa yang dilakukan bila sensor berhenti memberi data?",
             "options": [
-              "Bisa menjelaskan beda sampling, filtering, kalibrasi, accuracy dan precision.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Tandai STALE/ERROR dan lakukan pemulihan",
+              "Pertahankan angka terakhir sebagai data real-time",
+              "Ubah status menjadi aman tanpa bukti"
             ],
             "answer": 0
           }
@@ -623,13 +623,13 @@
           "pass": "Bisa memberi alasan teknis kebutuhan motor driver.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Parameter motor apa yang kritis untuk rating driver?",
             "options": [
-              "Bisa memberi alasan teknis kebutuhan motor driver.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Label nama perangkat",
+              "Arus stall dan tegangan/arus kerja",
+              "Warna plastik motor"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -641,11 +641,11 @@
           "pass": "Bisa memisahkan jalur sinyal, daya, ground dan jalur arus besar.",
           "view": "Schematic",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Duty PWM 25% berarti?",
             "options": [
-              "Bisa memisahkan jalur sinyal, daya, ground dan jalur arus besar.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Rasio waktu sinyal aktif per siklus 25%, bukan kecepatan pasti 25%",
+              "Tegangan supply pasti turun menjadi 25%",
+              "Driver tidak butuh pengaman"
             ],
             "answer": 0
           }
@@ -659,13 +659,13 @@
           "pass": "Bisa membedakan loop terbuka dan tertutup.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa pengertian feedback dalam kontrol motor?",
             "options": [
-              "Bisa membedakan loop terbuka dan tertutup.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Menjalankan PWM tetap tanpa sensor",
+              "Menghapus pengukuran agar cepat",
+              "Mengukur hasil lalu memperbaiki aksi berdasarkan error"
             ],
-            "answer": 0
+            "answer": 2
           }
         }
       ]
@@ -697,11 +697,11 @@
           "pass": "Bisa menunjukkan power tree dan alasan ground/pemisahan domain.",
           "view": "Electrical",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Pada robot dengan 12 V motor dan 3,3 V logika, apa yang perlu?",
             "options": [
-              "Bisa menunjukkan power tree dan alasan ground/pemisahan domain.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Pemisahan domain daya dan regulator yang sesuai",
+              "Menghubungkan 12 V langsung ke semua GPIO",
+              "Mengabaikan rating kabel dan pengaman"
             ],
             "answer": 0
           }
@@ -715,13 +715,13 @@
           "pass": "Bisa membedakan MCB, RCD, isolator, fuse, serta batas kompetensi sendiri.",
           "view": "Electrical",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Apa perbedaan umum MCB dan RCD?",
             "options": [
-              "Bisa membedakan MCB, RCD, isolator, fuse, serta batas kompetensi sendiri.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Keduanya hanya sensor suhu",
+              "RCD adalah pengganti seluruh pembumian",
+              "MCB proteksi arus lebih, RCD deteksi arus residual"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -733,13 +733,13 @@
           "pass": "Bisa menyebut sedikitnya lima cek yang diperlukan sebelum gambar instalasi ditandatangani.",
           "view": "Electrical",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa yang belum dapat disimpulkan dari rating arus panel saja?",
             "options": [
-              "Bisa menyebut sedikitnya lima cek yang diperlukan sebelum gambar instalasi ditandatangani.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Tegangan nominal tertulis",
+              "Pemilihan kabel/proteksi yang aman tanpa data instalasi",
+              "Jumlah nama circuit dalam panel"
             ],
-            "answer": 0
+            "answer": 1
           }
         }
       ]
@@ -771,13 +771,13 @@
           "pass": "Bisa menjelaskan tiga lapisan: perangkat, jaringan, aplikasi.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Bagaimana MQTT mengirim data sensor?",
             "options": [
-              "Bisa menjelaskan tiga lapisan: perangkat, jaringan, aplikasi.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Catu motor langsung ke browser",
+              "Gerber → ESPHome tanpa firmware",
+              "Publisher → broker → subscriber"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -789,13 +789,13 @@
           "pass": "Bisa membedakan sensor, entity, automasi, dan firmware node.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Apa fungsi ESPHome dan Home Assistant masing-masing?",
             "options": [
-              "Bisa membedakan sensor, entity, automasi, dan firmware node.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Keduanya motor driver",
+              "ESPHome firmware perangkat; Home Assistant orkestrasi entitas/otomasi",
+              "ESPHome mesin pembuat PCB; HA DRC"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -807,11 +807,11 @@
           "pass": "Bisa menerangkan kenapa sertifikasi/protokol tidak sama dengan kompatibilitas otomatis.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa yang dijamin Matter?",
             "options": [
-              "Bisa menerangkan kenapa sertifikasi/protokol tidak sama dengan kompatibilitas otomatis.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Standar interoperabilitas, dengan dukungan nyata tergantung perangkat/controller",
+              "Semua perangkat pasti mendukung semua fitur",
+              "Kabel AC menjadi aman tanpa proteksi"
             ],
             "answer": 0
           }
@@ -845,13 +845,13 @@
           "pass": "Bisa membedakan transkripsi, intent, command dan hasil aktual.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Dalam perintah suara, apa yang datang setelah STT?",
             "options": [
-              "Bisa membedakan transkripsi, intent, command dan hasil aktual.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Menghilangkan izin perangkat",
+              "Ekstraksi intent dan pemeriksaan aksi",
+              "Mencetak Gerber langsung"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -863,11 +863,11 @@
           "pass": "Bisa menjelaskan authentication, authorization, confirmation dan audit log.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Perintah suara membuka kunci perlu apa?",
             "options": [
-              "Bisa menjelaskan authentication, authorization, confirmation dan audit log.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Kebijakan otorisasi dan konfirmasi yang sesuai",
+              "Boleh dieksekusi tanpa autentikasi",
+              "Tidak perlu log keamanan"
             ],
             "answer": 0
           }
@@ -881,13 +881,13 @@
           "pass": "Bisa menunjukkan alur lengkap voice→otomasi→perangkat→status balik.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa yang seharusnya muncul jika device tidak respons?",
             "options": [
-              "Bisa menunjukkan alur lengkap voice→otomasi→perangkat→status balik.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Konfirmasi berhasil palsu",
+              "Tidak ada timeout",
+              "Status offline/gagal, bukan konfirmasi berhasil"
             ],
-            "answer": 0
+            "answer": 2
           }
         }
       ]
@@ -919,11 +919,11 @@
           "pass": "Bisa menjabarkan komponen inti, batas arus, dan rencana tes robot.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Apa elemen inti robot bergerak?",
             "options": [
-              "Bisa menjabarkan komponen inti, batas arus, dan rencana tes robot.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Rangka, daya, driver, motor, sensor, kontrol dan software",
+              "Hanya koneksi Wi-Fi",
+              "Hanya casing 3D"
             ],
             "answer": 0
           }
@@ -937,13 +937,13 @@
           "pass": "Bisa membedakan kecepatan roda, kecepatan robot, slip dan odometri.",
           "view": "Learning",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Dua roda penggerak dengan kecepatan sama menghasilkan?",
             "options": [
-              "Bisa membedakan kecepatan roda, kecepatan robot, slip dan odometri.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Putaran diam selalu",
+              "Tidak bergerak walaupun roda berputar",
+              "Gerak lurus ideal"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -955,13 +955,13 @@
           "pass": "Bisa menjelaskan publish/subscribe dan beda ROS 2 dari firmware MCU.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Dalam ROS 2, komunikasi publish/subscribe biasanya lewat?",
             "options": [
-              "Bisa menjelaskan publish/subscribe dan beda ROS 2 dari firmware MCU.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Gerber",
+              "Topic",
+              "Kabel PCB otomatis"
             ],
-            "answer": 0
+            "answer": 1
           }
         }
       ]
@@ -993,13 +993,13 @@
           "pass": "Bisa menulis acceptance test positif, negatif, dan saat kegagalan perangkat.",
           "view": "Learning",
           "quiz": {
-            "question": "Pernyataan paling tepat untuk materi ini adalah?",
+            "question": "Mengapa perlu integration test setelah modul individual benar?",
             "options": [
-              "Bisa menulis acceptance test positif, negatif, dan saat kegagalan perangkat.",
-              "Menghafal istilah saja tanpa mencoba",
-              "Menganggap demo dan perangkat nyata pasti identik"
+              "Integration test hanya membuat website cantik",
+              "Uji satu sensor sudah menjamin semua sistem",
+              "Masalah antar subsistem baru terlihat saat terhubung"
             ],
-            "answer": 0
+            "answer": 2
           }
         },
         {
@@ -1011,13 +1011,13 @@
           "pass": "Bisa membedakan source file, output manufaktur, dan evidence pengujian.",
           "view": "Fabrication",
           "quiz": {
-            "question": "Apa langkah yang paling benar sebelum melanjutkan praktik?",
+            "question": "Kenapa output Gerber perlu pemeriksaan independen?",
             "options": [
-              "Bisa membedakan source file, output manufaktur, dan evidence pengujian.",
-              "Mengabaikan batas komponen demi cepat selesai",
-              "Menyatakan hasil simulasi setara sertifikasi"
+              "Screenshot 3D menggantikan inspeksi CAM",
+              "File bisa kurang layer/drill atau salah konfigurasi walaupun berhasil diekspor",
+              "Setiap file .zip pasti benar"
             ],
-            "answer": 0
+            "answer": 1
           }
         },
         {
@@ -1029,11 +1029,11 @@
           "pass": "Bisa mendemonstrasikan satu sistem dengan laporan uji terulang tanpa klaim pengukuran yang tidak dilakukan.",
           "view": "Learning",
           "quiz": {
-            "question": "Cara membuktikan kamu menguasai materi ini?",
+            "question": "Apa syarat capstone bisa disebut didemonstrasikan secara bertanggung jawab?",
             "options": [
-              "Bisa mendemonstrasikan satu sistem dengan laporan uji terulang tanpa klaim pengukuran yang tidak dilakukan.",
-              "Menyimpan gambar tanpa uji/keterangan",
-              "Menganggap semua pengukuran selalu benar"
+              "Skema, firmware, tes terulang, catatan kegagalan dan batas pemakaian",
+              "Cukup logo dan video AI",
+              "Cukup menyebut standar tanpa pengujian"
             ],
             "answer": 0
           }
