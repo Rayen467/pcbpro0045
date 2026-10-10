@@ -29,6 +29,7 @@
     const physical=testEngine('Physical copper DRC',()=>window.PCBProPhysicalDRC?.run?.());
     const fabrication=testEngine('Manufacturing preflight',()=>window.PCBProManufacturing?.preflight?.());
     const electrical=testEngine('Electrical load schedule',()=>window.PCBProElectrical?.calculate?.());
+    const electricalAdvanced=testEngine('Electrical energy and protection',()=>window.PCBProElectricalAdvanced?.analyze?.());
     const electricalCircuits=window.PCBProElectrical?.snapshot?.()?.circuits?.length||0;
     const findings=[];
     function add(code,severity,details){
@@ -62,6 +63,11 @@
       else for(const e of electrical.result.findings||[])
         add('ELEC_'+e.code,e.severity==='warning'?'warning':'warning',(e.ref?e.ref+': ':'')+e.message);
     }
+    if(electricalCircuits){
+      if(!electricalAdvanced.available)add('ELEC_ADVANCED_UNAVAILABLE','blocker',electricalAdvanced.error||'Advanced electrical verifier unavailable.');
+      else for(const f of electricalAdvanced.result.issues||[])
+        add('ELEC_ADV_'+f.code,f.severity==='blocker'?'blocker':'warning',(f.ref?f.ref+': ':'')+f.message);
+    }
     const blockers=findings.filter(x=>x.severity==='blocker').length, warnings=findings.filter(x=>x.severity==='warning').length;
     const report={
       version:VERSION,
@@ -74,6 +80,9 @@
         integrity:integrity.available,
         electrical:electrical.available,
         electricalNotInstallationApproved:true,
+        electricalAdvanced:electricalAdvanced.available,
+        hourlyEnergyEvidence:electricalAdvanced.result?.analysisAvailable===true,
+        electricalStandardComplianceCertified:false,
         spice:spice.available,
         physicalDrc:physical.available && physical.result.calibrated===true,
         manufacturing:fabrication.available,
