@@ -110,20 +110,25 @@
   }
 
   function loadComponents() {
+    // Always prefer the live source of truth; never fabricate a demo circuit.
+    const live = window.PCBProProject?.getComponents?.();
+    if (Array.isArray(live)) return structuredClone(live);
     captureFromDom();
     if (runtimeComponents?.length) return structuredClone(runtimeComponents);
     for (const key of STORAGE_KEYS) {
       try {
         const parsed = JSON.parse(localStorage.getItem(key) || 'null');
-        if (Array.isArray(parsed?.components) && parsed.components.length) return parsed.components;
+        if (Array.isArray(parsed?.components)) return parsed.components;
       } catch (_) {}
     }
-    return structuredClone(DEFAULT_COMPONENTS);
+    return [];
   }
 
   function loadNets() {
+    const live = window.PCBProWireEngine?.nets;
+    if (Array.isArray(live)) return structuredClone(live);
     captureFromDom();
-    return structuredClone(runtimeNets?.length ? runtimeNets : DEFAULT_NETS);
+    return structuredClone(runtimeNets || []);
   }
 
   function buildPinMap(nets) {
