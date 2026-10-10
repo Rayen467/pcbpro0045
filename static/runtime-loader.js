@@ -86,6 +86,7 @@
     await load('/manufacturing-engine-v120.js?v=1.20.0');
     await load('/geometry-3d-engine-v120.js?v=1.20.0');
     await load('/database-engine-v117.js?v=1.21.0');
+    await load('/portable-backup-v124.js?v=1.24.0');
     await load('/professional-engine-v118.js?v=1.21.0');
     await load('/physical-drc-v121.js?v=1.21.0');
     await load('/autorouter-v123.js?v=1.23.0');
