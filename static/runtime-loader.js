@@ -34,8 +34,8 @@
 
   async function maybeLoadLiveSimulation() {
     if (!simulatorVisible() && !document.querySelector('.panel[data-real-sim-mounted="1"]')) return;
-    await load('/sim-engine.js');
-    await load('/live-sim-engine.js');
+    await load('/sim-engine.js?v=1.25.0');
+    await load('/live-sim-engine.js?v=1.25.0');
     window.PCBProWorkspaceRepair?.repair?.();
     window.PCBProExplain?.refresh?.();
     window.PCBProAssistantV115?.refresh?.();
@@ -83,12 +83,12 @@
     await load('/explain-engine-v113.js?v=1.13.0');
     await load('/learning-professional-v123.js?v=1.23.0');
     await load('/engineering-help-v123.js?v=1.23.0');
-    await load('/manufacturing-engine-v120.js?v=1.20.0');
+    await load('/manufacturing-engine-v120.js?v=1.25.0');
     await load('/geometry-3d-engine-v120.js?v=1.20.0');
-    await load('/database-engine-v117.js?v=1.21.0');
+    await load('/database-engine-v117.js?v=1.25.0');
     await load('/portable-backup-v124.js?v=1.24.0');
     await load('/professional-engine-v118.js?v=1.21.0');
-    await load('/physical-drc-v121.js?v=1.21.0');
+    await load('/physical-drc-v121.js?v=1.25.0');
     await load('/spice-netlist-v125.js?v=1.25.0');
     await load('/autorouter-v123.js?v=1.23.0');
     await load('/project-command-bus-v115.js?v=1.23.0');
