@@ -14,6 +14,7 @@
   const PROFESSIONAL_KEY='pcbpro0045-professional-v118';
   const MANUFACTURING_KEY='pcbpro0045-manufacturing-v120';
   const ELECTRICAL_KEY='pcbpro0045-electrical-v126';
+  const ACADEMY_KEY='pcbpro0045-academy-progress-v128';
 
   let secret=null;
   let status='boot';
@@ -131,6 +132,7 @@
       professional:localJson(PROFESSIONAL_KEY,null),
       manufacturing:localJson(MANUFACTURING_KEY,null),
       electrical:window.PCBProElectrical?.snapshot?.()??localJson(ELECTRICAL_KEY,null),
+      academyProgress:window.PCBProAcademy?.snapshot?.()??localJson(ACADEMY_KEY,null),
       workflow:window.PCBProWorkflow?.snapshot?.()||null
     };
   }
@@ -220,6 +222,18 @@
       if(bundle.advancedBoard)localStorage.setItem(ADV_BOARD_KEY,JSON.stringify(bundle.advancedBoard));
       if(bundle.professional)localStorage.setItem(PROFESSIONAL_KEY,JSON.stringify(bundle.professional));
       if(bundle.manufacturing)localStorage.setItem(MANUFACTURING_KEY,JSON.stringify(bundle.manufacturing));
+      if(bundle.academyProgress){
+        const valid=window.PCBProAcademy?.validate?.(bundle.academyProgress);
+        if(!valid?.ok)throw new Error('Cloud learning progress is invalid.');
+        // Global learning progress is cumulative, not tied to the cloud PCB project.
+        const previous=localJson(ACADEMY_KEY,null);
+        const safePrevious=window.PCBProAcademy?.validate?.(previous)?.ok?previous:null;
+        const merge={...bundle.academyProgress};
+        for(const field of ['completed','practiced','quizPassed','labs'])
+          merge[field]={...(safePrevious?.[field]||{}),...(bundle.academyProgress[field]||{})};
+        if(safePrevious){merge.selected=safePrevious.selected;merge.track=safePrevious.track;}
+        localStorage.setItem(ACADEMY_KEY,JSON.stringify(merge));
+      }
       if(bundle.electrical)localStorage.setItem(ELECTRICAL_KEY,JSON.stringify(bundle.electrical));
       else localStorage.removeItem(ELECTRICAL_KEY);
       activeId=row.id;localStorage.setItem(ACTIVE_KEY,row.id);
@@ -357,6 +371,7 @@
     window.addEventListener('pcbpro:netlist-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:board-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:electrical-changed',()=>scheduleSave());
+    window.addEventListener('pcbpro:academy-changed',()=>scheduleSave(550));
     window.addEventListener('pcbpro:professional-rules-changed',()=>scheduleSave(350));
     window.addEventListener('pcbpro:manufacturing-preflight',()=>scheduleSave(450));
     window.addEventListener('pcbpro:manufacturing-calibration-changed',()=>scheduleSave(450));
