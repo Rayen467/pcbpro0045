@@ -13,6 +13,7 @@
     advanced: 'pcbpro0045-board-advanced-v1',
     professional: 'pcbpro0045-professional-v118',
     manufacturing: 'pcbpro0045-manufacturing-v120',
+    electrical: 'pcbpro0045-electrical-v126',
     active: 'pcbpro0045-cloud-active-project',
     newCloud: 'pcbpro0045-cloud-create-new',
     name: 'pcbpro0045-cloud-project-name'
@@ -83,6 +84,11 @@
         throw new Error('Invalid ' + key + ' settings.');
       }
     }
+    if(bundle.electrical != null){
+      if(!window.PCBProElectrical?.validate)throw new Error('Electrical validator unavailable.');
+      const v=window.PCBProElectrical.validate(bundle.electrical);
+      if(!v.ok)throw new Error('Invalid electrical installation project: '+v.errors.map(x=>x.field).join(', '));
+    }
     validateTree(bundle);
   }
 
@@ -147,6 +153,7 @@
       [KEY.advanced, bundle.advancedBoard ? JSON.stringify(bundle.advancedBoard) : null],
       [KEY.professional, bundle.professional ? JSON.stringify(bundle.professional) : null],
       [KEY.manufacturing, bundle.manufacturing ? JSON.stringify(bundle.manufacturing) : null],
+      [KEY.electrical, bundle.electrical ? JSON.stringify(bundle.electrical) : null],
       [KEY.active, null],
       [KEY.newCloud, '1'],
       [KEY.name, validated.projectName.slice(0, 120)]
