@@ -12,6 +12,7 @@ const browserScripts = [
   'static/portable-backup-v124.js',
   'static/electrical-engine-v126.js',
   'static/electrical-ui-v126.js',
+  'static/electrical-advanced-v127.js',
   'static/spice-netlist-v125.js',
   'static/engineering-verification-v125.js',
   'static/sim-engine.js',
@@ -55,6 +56,7 @@ test('runtime loader includes critical production engines', () => {
     'portable-backup-v124.js',
     'electrical-engine-v126.js',
     'electrical-ui-v126.js',
+    'electrical-advanced-v127.js',
     'spice-netlist-v125.js',
     'engineering-verification-v125.js',
     'professional-engine-v118.js',
@@ -269,4 +271,21 @@ test('v1.26 Electrical workspace is native, persistent and covered by backup', (
  assert.match(backup,/\[KEY\.electrical/);
  assert.match(backup,/window\.PCBProElectrical\.validate/);
  assert.match(verify,/ELECTRICAL_UNAVAILABLE/);
+});
+
+test('advanced electrical remains in cloud/portable backup and uses actual user-provided load profiles',()=>{
+  const advanced=read('static/electrical-advanced-v127.js');
+  const core=read('static/electrical-engine-v126.js');
+  const ui=read('static/electrical-ui-v126.js');
+  const db=read('static/database-engine-v117.js');
+  const backup=read('static/portable-backup-v124.js');
+  assert.match(advanced,/PV_PROFILE_MISSING/);
+  assert.match(advanced,/BREAKING_CAPACITY_BELOW_FAULT/);
+  assert.match(advanced,/EV_PROTECTION_REQUIRED/);
+  assert.match(advanced,/configureBattery/);
+  assert.match(advanced,/batteryEndingSOCkWh/);
+  assert.match(core,/PCBProElectricalAdvanced\?\.validate/);
+  assert.match(ui,/PCBProElectricalAdvanced\?\.mount/);
+  assert.match(db,/electrical:window\.PCBProElectrical/);
+  assert.match(backup,/\[KEY\.electrical/);
 });
