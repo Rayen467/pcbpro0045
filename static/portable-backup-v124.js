@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProPortableBackup) return;
 
-  const VERSION = '1.28.0';
+  const VERSION = '1.30.0';
   const FORMAT = 'pcbpro0045-portable-project';
   const MAX_BYTES = 8 * 1024 * 1024;
   const MAX_COMPONENTS = 5000;
@@ -15,6 +15,7 @@
     manufacturing: 'pcbpro0045-manufacturing-v120',
     electrical: 'pcbpro0045-electrical-v126',
     academy: 'pcbpro0045-academy-progress-v128',
+    blueprint: 'pcbpro0045-system-blueprint-v130',
     active: 'pcbpro0045-cloud-active-project',
     newCloud: 'pcbpro0045-cloud-create-new',
     name: 'pcbpro0045-cloud-project-name'
@@ -94,6 +95,10 @@
       const v=window.PCBProAcademy?.validate?.(bundle.academyProgress);
       if(!v?.ok)throw new Error('Invalid Academy learning progress: '+(v?.error||'validator missing'));
     }
+    if(bundle.systemBlueprint!=null){
+      const v=window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint);
+      if(!v?.ok)throw new Error('Invalid system blueprint: '+(v?.errors||[]).map(x=>x.field).join(', '));
+    }
     validateTree(bundle);
   }
 
@@ -169,6 +174,7 @@
       [KEY.professional, bundle.professional ? JSON.stringify(bundle.professional) : null],
       [KEY.manufacturing, bundle.manufacturing ? JSON.stringify(bundle.manufacturing) : null],
       [KEY.electrical, bundle.electrical ? JSON.stringify(bundle.electrical) : null],
+      [KEY.blueprint, bundle.systemBlueprint ? JSON.stringify(bundle.systemBlueprint) : null],
       ...(mergedAcademy?[[KEY.academy,JSON.stringify(mergedAcademy)]]:[]),
       [KEY.active, null],
       [KEY.newCloud, '1'],

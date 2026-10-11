@@ -15,6 +15,7 @@
   const MANUFACTURING_KEY='pcbpro0045-manufacturing-v120';
   const ELECTRICAL_KEY='pcbpro0045-electrical-v126';
   const ACADEMY_KEY='pcbpro0045-academy-progress-v128';
+  const BLUEPRINT_KEY='pcbpro0045-system-blueprint-v130';
 
   let secret=null;
   let status='boot';
@@ -133,6 +134,7 @@
       manufacturing:localJson(MANUFACTURING_KEY,null),
       electrical:window.PCBProElectrical?.snapshot?.()??localJson(ELECTRICAL_KEY,null),
       academyProgress:window.PCBProAcademy?.snapshot?.()??localJson(ACADEMY_KEY,null),
+      systemBlueprint:window.PCBProSystemArchitect?.snapshot?.()??localJson(BLUEPRINT_KEY,null),
       workflow:window.PCBProWorkflow?.snapshot?.()||null
     };
   }
@@ -209,6 +211,12 @@
       const bundle=await decryptJson(row.encrypted_payload,row.payload_iv);
       const name=await decryptText(row.encrypted_name,row.name_iv);
       if(!Array.isArray(bundle?.core?.components))throw new Error('Encrypted project payload is invalid');
+      if(bundle.systemBlueprint!=null&&!window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint)?.ok)
+        throw new Error('Encrypted project contains an invalid system blueprint.');
+      if(bundle.electrical!=null&&!window.PCBProElectrical?.validate?.(bundle.electrical)?.ok)
+        throw new Error('Encrypted project contains invalid electrical calculations data.');
+      if(bundle.academyProgress!=null&&!window.PCBProAcademy?.validate?.(bundle.academyProgress)?.ok)
+        throw new Error('Encrypted project contains invalid Academy data.');
 
       localStorage.setItem(PROJECT_KEY,JSON.stringify({
         version:VERSION,
@@ -234,6 +242,11 @@
         if(safePrevious){merge.selected=safePrevious.selected;merge.track=safePrevious.track;}
         localStorage.setItem(ACADEMY_KEY,JSON.stringify(merge));
       }
+      if(bundle.systemBlueprint){
+        const valid=window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint);
+        if(!valid?.ok)throw new Error('Cloud blueprint invalid.');
+        localStorage.setItem(BLUEPRINT_KEY,JSON.stringify(bundle.systemBlueprint));
+      }else localStorage.removeItem(BLUEPRINT_KEY);
       if(bundle.electrical)localStorage.setItem(ELECTRICAL_KEY,JSON.stringify(bundle.electrical));
       else localStorage.removeItem(ELECTRICAL_KEY);
       activeId=row.id;localStorage.setItem(ACTIVE_KEY,row.id);
@@ -372,6 +385,7 @@
     window.addEventListener('pcbpro:board-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:electrical-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:academy-changed',()=>scheduleSave(550));
+    window.addEventListener('pcbpro:system-builder-changed',()=>scheduleSave(400));
     window.addEventListener('pcbpro:professional-rules-changed',()=>scheduleSave(350));
     window.addEventListener('pcbpro:manufacturing-preflight',()=>scheduleSave(450));
     window.addEventListener('pcbpro:manufacturing-calibration-changed',()=>scheduleSave(450));
