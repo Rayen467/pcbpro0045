@@ -94,6 +94,7 @@
     await load('/portable-backup-v124.js?v=1.30.0');
     await load('/electrical-ui-v126.js?v=1.27.0');
     await load('/system-studio-v130.js?v=1.30.0');
+    await load('/quick-actions-v130.js?v=1.30.0');
     await load('/professional-engine-v118.js?v=1.21.0');
     await load('/physical-drc-v121.js?v=1.25.0');
     await load('/spice-netlist-v125.js?v=1.25.0');
