@@ -48,6 +48,7 @@
     '.sb-pill{background:var(--sl-surface-alt,#f8fafc);border:1px solid var(--sl-border,#e0e6ed);color:var(--sl-muted,#586b7f);border-radius:7px;padding:6px 9px;font-size:11px}',
     '.sb-note{font-size:11px!important;line-height:1.65!important}',
     '.sb-root details{background:var(--sl-surface-alt,#f8fafc);border:1px solid var(--sl-border,#e0e6ed);border-radius:8px;padding:9px}',
+    '.sb-tree{overflow:auto;border:1px solid var(--sl-border,#e0e6ed);background:var(--sl-surface-alt,#f8fafc);border-radius:10px}.sb-tree svg{display:block;width:100%;min-width:625px;height:auto}',
     '.sb-root summary{cursor:pointer;font-weight:700}.sb-empty{text-align:center;padding:28px!important;color:var(--sl-muted,#586b7f)}',
     '@media(max-width:1100px){.sb-layout{grid-template-columns:1fr}.sb-templates{grid-template-columns:repeat(2,minmax(0,1fr))}}',
     '@media(max-width:600px){.sb-root{padding:10px}.sb-head h2{font-size:20px}.sb-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}'
@@ -68,6 +69,28 @@
  function nav(view){
   const tab=[...document.querySelectorAll('.tabs button')].find(x=>x.textContent?.trim()===view);
   if(tab)tab.click();
+ }
+ function powerTree(p){
+  const devices=p.devices.slice(0,12),height=Math.max(220,90+devices.length*55);
+  const nodes=devices.map((d,i)=>{
+   const y=55+i*55,mid=y+22;
+   const label=d.name.length>35?d.name.slice(0,34)+'…':d.name;
+   const meta=(d.railV===null?'tegangan belum diisi':String(d.railV)+' V')+' · '+d.interface.toUpperCase();
+   return '<path d="M270 '+mid+' H334" stroke="var(--sl-accent,#087d80)" stroke-width="2" stroke-dasharray="6 5" fill="none"/>'+
+    '<rect x="335" y="'+y+'" width="585" height="44" rx="8" fill="var(--sl-surface-alt,#f8fafc)" stroke="var(--sl-border,#e0e6ed)"/>'+
+    '<text x="352" y="'+(y+18)+'" fill="var(--sl-ink,#172332)" font-size="13" font-family="system-ui">'+esc(d.id+' · '+label)+'</text>'+
+    '<text x="352" y="'+(y+34)+'" fill="var(--sl-muted,#586b7f)" font-size="10" font-family="system-ui">'+esc(meta)+'</text>';
+  }).join('');
+  const end=devices.length?55+(devices.length-1)*55+22:115;
+  return '<div class="sb-tree"><svg viewBox="0 0 950 '+height+'" role="img" aria-label="Power tree konseptual, bukan PCB routing">'+
+   '<rect x="18" y="75" width="185" height="85" rx="12" fill="var(--sl-accent-soft,#e6f6f4)" stroke="var(--sl-accent,#087d80)"/>'+
+   '<text x="34" y="99" fill="var(--sl-accent-text,#086d71)" font-size="14" font-family="system-ui" font-weight="700">SOURCE / SUPPLY</text>'+
+   '<text x="34" y="121" fill="var(--sl-ink,#172332)" font-size="16" font-family="system-ui">'+esc(p.supply.voltageV===null?'Tegangan belum diisi':p.supply.voltageV+' V')+'</text>'+
+   '<text x="34" y="141" fill="var(--sl-muted,#586b7f)" font-size="11" font-family="system-ui">Konverter belum dimodelkan</text>'+
+   '<path d="M203 115 H270 V'+end+'" stroke="var(--sl-accent,#087d80)" stroke-dasharray="6 5" stroke-width="2" fill="none"/>'+
+   nodes+'<text x="20" y="'+(height-15)+'" fill="var(--sl-muted,#586b7f)" font-size="11" font-family="system-ui">Dependensi konseptual, bukan koneksi listrik/pin.</text>'+
+   '</svg></div><p class="sb-note">'+(p.devices.length>12?'12 dari '+p.devices.length+' modul ditampilkan. ':'')+
+   'Ini hanya arsitektur; koneksi skematik dan PCB routing harus dibuat serta diuji secara terpisah.</p>';
  }
  function csv(){
   const p=api().snapshot();
@@ -112,7 +135,8 @@
     '<tr><td colspan="13" class="sb-empty">Belum ada modul. Pilih template atau klik + Modul.</td></tr>')+
    '</tbody></table></div>'+
    '<p class="sb-note">I²C boleh berbagi dua GPIO pada bus yang sama, asalkan alamat 7-bit berbeda. Pin ganda pada protokol lain ditandai konflik; ini belum memvalidasi pinout ESP32 tertentu.</p></section>'+
-   '<section class="sb-card"><h3>03 / Buka editor untuk implementasi</h3><p>Blueprint sengaja tidak membuat wiring/PCB otomatis yang bisa salah. Cocokkan datasheet dan bentuk netlist di editor asli.</p>'+
+   '<section class="sb-card"><h3>03 / Power tree konseptual</h3>'+powerTree(project)+'</section>'+
+   '<section class="sb-card"><h3>04 / Buka editor untuk implementasi</h3><p>Blueprint sengaja tidak membuat wiring/PCB otomatis yang bisa salah. Cocokkan datasheet dan bentuk netlist di editor asli.</p>'+
    '<div class="sb-actions">'+['Learning','Schematic','PCB','Electrical','Rules','Fabrication'].map(x=>'<button data-view="'+x+'">'+x+' →</button>').join('')+'</div></section>'+
    '</main><aside><section class="sb-card"><h3>Power budget awal</h3><div class="sb-metrics">'+
    '<div class="sb-metric"><b>'+fmt(p.nominalLoadW)+' W</b><span>Beban nominal</span></div>'+
