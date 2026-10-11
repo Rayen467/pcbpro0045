@@ -211,6 +211,12 @@
       const bundle=await decryptJson(row.encrypted_payload,row.payload_iv);
       const name=await decryptText(row.encrypted_name,row.name_iv);
       if(!Array.isArray(bundle?.core?.components))throw new Error('Encrypted project payload is invalid');
+      if(bundle.systemBlueprint!=null&&!window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint)?.ok)
+        throw new Error('Encrypted project contains an invalid system blueprint.');
+      if(bundle.electrical!=null&&!window.PCBProElectrical?.validate?.(bundle.electrical)?.ok)
+        throw new Error('Encrypted project contains invalid electrical calculations data.');
+      if(bundle.academyProgress!=null&&!window.PCBProAcademy?.validate?.(bundle.academyProgress)?.ok)
+        throw new Error('Encrypted project contains invalid Academy data.');
 
       localStorage.setItem(PROJECT_KEY,JSON.stringify({
         version:VERSION,
