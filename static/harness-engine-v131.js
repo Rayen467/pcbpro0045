@@ -130,7 +130,7 @@
     if(!safeDeviceIds(window.PCBProSystemArchitect?.snapshot?.()).has(deviceId))
       throw Error('Choose an existing Builder module first');
     return mutate(p=>p.terminals.push({id:idFor('T',p.terminals),deviceId,
-      name:'PIN_'+String(p.terminals.length+1),role:'passive',nominalV:null,notes:''}));
+      name:'PIN_'+idFor('T',p.terminals),role:'passive',nominalV:null,notes:''}));
   }
   function updateTerminal(id,key,value){
     if(!['deviceId','name','role','nominalV','notes'].includes(key))throw Error('Unknown terminal field');
