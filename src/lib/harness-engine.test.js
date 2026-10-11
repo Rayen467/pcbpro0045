@@ -165,3 +165,29 @@ test('UI and persistence contract: Builder mount, local/cloud/backup, no 230V de
  assert.match(verify,/HARNESS_/);
  assert.match(verify,/harnessIndependentPhysicalTestVerified:false/);
 });
+
+test('shared net groups catch indirect source-to-ground short and two drivers',()=>{
+ const h=boot(),a=h.api;
+ for(const module of ['MCU','SENSOR','DRIVER','GROUND'])a.addTerminal(module);
+ a.updateTerminal('T1','role','power_out');
+ a.updateTerminal('T2','role','passive');
+ a.updateTerminal('T3','role','passive');
+ a.updateTerminal('T4','role','ground');
+ a.addWire('T1','T2');a.updateWire('W1','net','VCC');
+ a.addWire('T3','T4');a.updateWire('W2','net','VCC');
+ let r=getIssues(h);
+ assert.ok(r.blockers.some(x=>x.code==='NET_POWER_TO_GROUND'));
+ a.updateTerminal('T4','role','power_out');
+ r=getIssues(h);
+ assert.ok(r.blockers.some(x=>x.code==='NET_MULTIPLE_POWER_SOURCES'));
+ a.updateTerminal('T1','role','signal_out');
+ a.updateTerminal('T4','role','signal_out');
+ assert.ok(getIssues(h).blockers.some(x=>x.code==='NET_MULTIPLE_SIGNAL_DRIVERS'));
+});
+test('SDA/SCL labels are reviewed without claiming automated I2C hardware validation',()=>{
+ const h=basic(),a=h.api;
+ a.updateTerminal('T2','name','SCL');
+ const review=getIssues(h);
+ assert.ok(review.warnings.some(x=>x.code==='I2C_LABEL_MISMATCH'));
+ assert.equal(review.coverage.pcbNetlistLinked,false);
+});
