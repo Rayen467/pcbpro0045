@@ -27,6 +27,9 @@ declare global {
     PCBProProfessionalLearning?: any;
     PCBProAutoRouter?: any;
     PCBProHelp?: any;
+    PCBProQuickActions?: any;
+    PCBProSystemArchitect?: any;
+    PCBProSystemStudio?: any;
     PCBProTheme?: {
       version: string;
       getMode(): 'light' | 'dark' | 'system';
