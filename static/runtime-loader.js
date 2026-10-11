@@ -96,14 +96,14 @@
     await load('/electrical-ui-v126.js?v=1.27.0');
     await load('/harness-ui-v131.js?v=1.31.0');
     await load('/system-studio-v130.js?v=1.31.0');
-    await load('/quick-actions-v130.js?v=1.30.0');
+    await load('/quick-actions-v130.js?v=1.31.0');
     await load('/professional-engine-v118.js?v=1.21.0');
     await load('/physical-drc-v121.js?v=1.25.0');
     await load('/spice-netlist-v125.js?v=1.25.0');
     await load('/autorouter-v123.js?v=1.23.0');
     await load('/project-command-bus-v115.js?v=1.23.0');
     await load('/domain-integrity-v121.js?v=1.21.0');
-    await load('/engineering-verification-v125.js?v=1.25.0');
+    await load('/engineering-verification-v125.js?v=1.31.0');
     await load('/stability-engine-v123.js?v=1.23.0');
     window.PCBProWireEngine?.refresh?.(0);
     window.PCBProKiCadBehavior?.repair?.();
