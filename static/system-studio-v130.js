@@ -135,7 +135,7 @@
    const view=e.target.closest?.('[data-view]');if(view){nav(view.dataset.view);return;}
    const tmpl=e.target.closest?.('[data-template]');
    if(tmpl){
-    if(project.devices.length&&!confirm('Ganti blueprint dan hapus modul blueprint saat ini? Ekspor JSON dahulu jika ingin mengarsipkan.'))return;
+    if(arch.snapshot().devices.length&&!confirm('Ganti blueprint dan hapus modul blueprint saat ini? Ekspor JSON dahulu jika ingin mengarsipkan.'))return;
     try{arch.useTemplate(tmpl.dataset.template);evidence=null;render();}catch(err){alert(err.message)}
     return;
    }
