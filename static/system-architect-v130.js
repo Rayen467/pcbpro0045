@@ -148,6 +148,9 @@
         if(d.pins.length!==2)add('blocker','I2C_PIN_COUNT',d.id,'I²C memerlukan urutan dua pin MCU: SDA, SCL.');
         if(!d.i2cAddress)add('blocker','I2C_ADDRESS_MISSING',d.id,'Alamat I²C 7-bit belum diisi.');
         if(d.i2cAddress){
+          const numericAddress=Number.parseInt(d.i2cAddress.slice(2),16);
+          if(numericAddress<=0x07||numericAddress>=0x78)
+            add('blocker','I2C_RESERVED_ADDRESS',d.id,'Alamat 7-bit ini termasuk rentang reserved menurut NXP UM10204; pilih alamat perangkat berdasarkan datasheet.');
           const addressKey=key+'@'+d.i2cAddress.toLowerCase();
           if(i2cAddress.has(addressKey))add('blocker','I2C_ADDRESS_COLLISION',d.id,'Alamat I²C sama di bus yang sama dengan '+i2cAddress.get(addressKey)+'.');
           i2cAddress.set(addressKey,d.id);
@@ -164,6 +167,8 @@
         pinOwners.set(pin,owners);
       }
     }
+    if(assignments.length)
+      add('review','CONTROLLER_PINOUT_UNVERIFIED','controller','Pin controller belum dicek terhadap varian ESP32/MCU: strapping, input-only, flash/PSRAM, level logika dan fungsi mux. Datasheet perangkat tetap wajib.');
     if(p.devices.some(x=>x.kind==='actuator')&&!p.devices.some(x=>x.kind==='safety'))
       add('review','SAFETY_INTERLOCK_MISSING','devices','Ada aktuator tanpa modul keselamatan/interlock yang didefinisikan.');
     if(p.devices.some(x=>!x.tested))add('review','UNTESTED_HARDWARE','devices','Setidaknya satu perangkat belum memiliki pengujian fisik yang ditandai.');
