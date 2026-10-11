@@ -198,6 +198,6 @@
    if(tab?.textContent?.trim()==='Builder')setTimeout(render,0);
   },{passive:true});
  }
- window.PCBProSystemStudio={version:VERSION,render,mount:render,csv,saveCsv,get evidence(){return evidence}};
+ window.PCBProSystemStudio={version:VERSION,render,mount:render,powerTree,csv,saveCsv,get evidence(){return evidence}};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
