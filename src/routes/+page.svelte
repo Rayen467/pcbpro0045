@@ -57,7 +57,7 @@
    * @property {string} [selectedId]
    */
 
-  const version = '1.30.0';
+  const version = '1.31.0';
   let themeMode = 'light';
   /** @param {string} next */
   function changeTheme(next) {
@@ -637,6 +637,7 @@
       localStorage.setItem('pcbpro0045-project-v11', JSON.stringify({ version, components:[], savedAt:'New project', leftWidth, rightWidth }));
       localStorage.removeItem('pcbpro0045-electrical-v126');
       localStorage.removeItem('pcbpro0045-system-blueprint-v130');
+      localStorage.removeItem('pcbpro0045-harness-v131');
       localStorage.setItem('pcbpro0045-cloud-create-new', '1');
       localStorage.setItem('pcbpro0045-cloud-project-name', 'Untitled PCB');
       window.dispatchEvent(new CustomEvent('pcbpro:reset-layout', { cancelable:true }));
@@ -849,7 +850,7 @@
         {:else if activeView === 'Rules'}
           <section class="panel"><div class="panel-title"><div><span>DESIGN RULES</span><h2>Professional board constraints</h2><p>Deterministic geometry checks plus calibrated physical DRC in millimeters.</p></div><button class="primary" onclick={() => window.PCBProProfessional?.open?.('constraints')}>Open Rules</button></div><div class="cards"><article><b>GEOMETRY DRC</b><h3>Logical + board checks</h3><p>Connectivity, routing, outline, via/zone/keepout and implemented geometry rules.</p></article><article><b>PHYSICAL DRC</b><h3>mm-calibrated clearance</h3><p>Track width, copper clearance, via diameter/drill, annular ring and copper-to-edge checks using the physical board dimensions.</p></article><article><b>DOMAIN INTEGRITY</b><h3>Cross-engine source of truth</h3><p>Audits components, wires, nets, PCB tracks, placements, vias, zones, rules and manufacturing state for stale references.</p></article></div><div class="pp-actions"><button onclick={runDrc}>Run DRC</button><button onclick={() => window.PCBProPhysicalDRC?.show?.()}>Physical DRC</button><button class="primary" onclick={() => window.PCBProIntegrity?.show?.()}>Integrity Audit</button></div></section>
         {:else}
-          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>SirkuitLab v{version}</h2><p>Engineering Academy, System Blueprint Builder, verified design checks, PCB routing, Electrical, and manufacturing evidence in one connected workspace.</p></div></div><div class="release"><article><b>v1.30.0</b><h3>System Builder + Ctrl K Search</h3><p>Blueprint robot, smart home, hidroponik dan GPS; power budget, pin collision, full-project backup, serta pencarian cepat workspace dan pemeriksaan.</p></article><article><b>v1.29.0</b><h3>Modern Light / Dark / System</h3><p>Clean white engineering theme, dashboard dan Academy yang lebih nyaman dibaca, serta preferensi tema tersimpan.</p></article><article><b>v1.23.0</b><h3>Explain + Auto Route + AI Status + Pro Syllabus</h3><p>Immediate feature/error help, preview-first draft autorouter up to two copper layers, visible AI Gateway health/test, and 2026–2027 professional curriculum overlay.</p></article><article><b>v1.22.0</b><h3>PCB Workspace Layout Repair</h3><p>Non-overlapping PCB command dock and a single source of truth for route/via/zone/keepout controls.</p></article></div></section>
+          <section class="panel"><div class="panel-title"><div><span>RELEASE CENTER</span><h2>SirkuitLab v{version}</h2><p>Engineering Academy, System Blueprint Builder, verified design checks, PCB routing, Electrical, and manufacturing evidence in one connected workspace.</p></div></div><div class="release"><article><b>v1.31.0</b><h3>Wiring Harness Planner + Test Evidence</h3><p>Rute terminal DC manual, preflight net/tegangan/short, wire schedule CSV, hasil kontinuitas yang dicatat pengguna, dan sinkronisasi backup/cloud.</p></article><article><b>v1.30.0</b><h3>System Builder + Ctrl K Search</h3><p>Blueprint robot, smart home, hidroponik dan GPS; power budget, pin collision, full-project backup, serta pencarian cepat workspace dan pemeriksaan.</p></article><article><b>v1.29.0</b><h3>Modern Light / Dark / System</h3><p>Clean white engineering theme, dashboard dan Academy yang lebih nyaman dibaca, serta preferensi tema tersimpan.</p></article><article><b>v1.23.0</b><h3>Explain + Auto Route + AI Status + Pro Syllabus</h3><p>Immediate feature/error help, preview-first draft autorouter up to two copper layers, visible AI Gateway health/test, and 2026–2027 professional curriculum overlay.</p></article><article><b>v1.22.0</b><h3>PCB Workspace Layout Repair</h3><p>Non-overlapping PCB command dock and a single source of truth for route/via/zone/keepout controls.</p></article></div></section>
         {/if}
       </div>
 

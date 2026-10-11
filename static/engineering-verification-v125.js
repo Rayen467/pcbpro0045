@@ -31,6 +31,12 @@
     const electrical=testEngine('Electrical load schedule',()=>window.PCBProElectrical?.calculate?.());
     const electricalAdvanced=testEngine('Electrical energy and protection',()=>window.PCBProElectricalAdvanced?.analyze?.());
     const electricalCircuits=window.PCBProElectrical?.snapshot?.()?.circuits?.length||0;
+    const harnessState=window.PCBProHarnessV131?.snapshot?.();
+    const harnessHasData=Boolean(harnessState?.wires?.length||harnessState?.terminals?.length);
+    const harness=harnessHasData
+      ?testEngine('Harness connectivity and manual continuity records',
+        ()=>window.PCBProHarnessV131?.validateForBlueprint?.(harnessState,window.PCBProSystemArchitect?.snapshot?.()))
+      :{name:'Harness',available:false,result:null};
     const findings=[];
     function add(code,severity,details){
       findings.push({code,severity,details});
@@ -68,6 +74,16 @@
       else for(const f of electricalAdvanced.result.issues||[])
         add('ELEC_ADV_'+f.code,f.severity==='blocker'?'blocker':'warning',(f.ref?f.ref+': ':'')+f.message);
     }
+    if(harnessHasData){
+      if(!harness.available||!harness.result?.ok)
+        add('HARNESS_UNAVAILABLE','blocker',harness.error||'Harness validator unavailable or contains invalid data.');
+      else{
+        for(const issue of harness.result.blockers||[])
+          add('HARNESS_'+issue.code,'blocker',(issue.ref?issue.ref+': ':'')+issue.message);
+        for(const issue of harness.result.warnings||[])
+          add('HARNESS_'+issue.code,'warning',(issue.ref?issue.ref+': ':'')+issue.message);
+      }
+    }
     const blockers=findings.filter(x=>x.severity==='blocker').length, warnings=findings.filter(x=>x.severity==='warning').length;
     const report={
       version:VERSION,
@@ -83,6 +99,9 @@
         electricalAdvanced:electricalAdvanced.available,
         hourlyEnergyEvidence:electricalAdvanced.result?.analysisAvailable===true,
         electricalStandardComplianceCertified:false,
+        harnessReview:harnessHasData&&harness.available,
+        harnessTestRecordsUserEntered:harness.result?.summary?.passed||0,
+        harnessIndependentPhysicalTestVerified:false,
         spice:spice.available,
         physicalDrc:physical.available && physical.result.calibrated===true,
         manufacturing:fabrication.available,

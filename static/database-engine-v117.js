@@ -16,6 +16,7 @@
   const ELECTRICAL_KEY='pcbpro0045-electrical-v126';
   const ACADEMY_KEY='pcbpro0045-academy-progress-v128';
   const BLUEPRINT_KEY='pcbpro0045-system-blueprint-v130';
+  const HARNESS_KEY='pcbpro0045-harness-v131';
 
   let secret=null;
   let status='boot';
@@ -135,6 +136,7 @@
       electrical:window.PCBProElectrical?.snapshot?.()??localJson(ELECTRICAL_KEY,null),
       academyProgress:window.PCBProAcademy?.snapshot?.()??localJson(ACADEMY_KEY,null),
       systemBlueprint:window.PCBProSystemArchitect?.snapshot?.()??localJson(BLUEPRINT_KEY,null),
+      harnessPlan:window.PCBProHarnessV131?.snapshot?.()??localJson(HARNESS_KEY,null),
       workflow:window.PCBProWorkflow?.snapshot?.()||null
     };
   }
@@ -211,6 +213,8 @@
       const bundle=await decryptJson(row.encrypted_payload,row.payload_iv);
       const name=await decryptText(row.encrypted_name,row.name_iv);
       if(!Array.isArray(bundle?.core?.components))throw new Error('Encrypted project payload is invalid');
+      if(bundle.harnessPlan!=null&&!window.PCBProHarnessV131?.validate?.(bundle.harnessPlan)?.ok)
+        throw new Error('Encrypted project contains invalid low-voltage harness data.');
       if(bundle.systemBlueprint!=null&&!window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint)?.ok)
         throw new Error('Encrypted project contains an invalid system blueprint.');
       if(bundle.electrical!=null&&!window.PCBProElectrical?.validate?.(bundle.electrical)?.ok)
@@ -242,6 +246,9 @@
         if(safePrevious){merge.selected=safePrevious.selected;merge.track=safePrevious.track;}
         localStorage.setItem(ACADEMY_KEY,JSON.stringify(merge));
       }
+      if(bundle.harnessPlan){
+        localStorage.setItem(HARNESS_KEY,JSON.stringify(bundle.harnessPlan));
+      }else localStorage.removeItem(HARNESS_KEY);
       if(bundle.systemBlueprint){
         const valid=window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint);
         if(!valid?.ok)throw new Error('Cloud blueprint invalid.');
@@ -386,6 +393,7 @@
     window.addEventListener('pcbpro:electrical-changed',()=>scheduleSave());
     window.addEventListener('pcbpro:academy-changed',()=>scheduleSave(550));
     window.addEventListener('pcbpro:system-builder-changed',()=>scheduleSave(400));
+    window.addEventListener('pcbpro:harness-changed',()=>scheduleSave(450));
     window.addEventListener('pcbpro:professional-rules-changed',()=>scheduleSave(350));
     window.addEventListener('pcbpro:manufacturing-preflight',()=>scheduleSave(450));
     window.addEventListener('pcbpro:manufacturing-calibration-changed',()=>scheduleSave(450));

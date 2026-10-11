@@ -30,6 +30,8 @@ declare global {
     PCBProQuickActions?: any;
     PCBProSystemArchitect?: any;
     PCBProSystemStudio?: any;
+    PCBProHarnessV131?: any;
+    PCBProHarnessUIV131?: any;
     PCBProTheme?: {
       version: string;
       getMode(): 'light' | 'dark' | 'system';

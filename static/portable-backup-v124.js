@@ -2,7 +2,7 @@
   'use strict';
   if (window.PCBProPortableBackup) return;
 
-  const VERSION = '1.30.0';
+  const VERSION = '1.31.0';
   const FORMAT = 'pcbpro0045-portable-project';
   const MAX_BYTES = 8 * 1024 * 1024;
   const MAX_COMPONENTS = 5000;
@@ -16,6 +16,7 @@
     electrical: 'pcbpro0045-electrical-v126',
     academy: 'pcbpro0045-academy-progress-v128',
     blueprint: 'pcbpro0045-system-blueprint-v130',
+    harness: 'pcbpro0045-harness-v131',
     active: 'pcbpro0045-cloud-active-project',
     newCloud: 'pcbpro0045-cloud-create-new',
     name: 'pcbpro0045-cloud-project-name'
@@ -94,6 +95,10 @@
     if(bundle.academyProgress!=null){
       const v=window.PCBProAcademy?.validate?.(bundle.academyProgress);
       if(!v?.ok)throw new Error('Invalid Academy learning progress: '+(v?.error||'validator missing'));
+    }
+    if(bundle.harnessPlan!=null){
+      const v=window.PCBProHarnessV131?.validate?.(bundle.harnessPlan);
+      if(!v?.ok)throw new Error('Invalid harness plan: '+(v?.errors||[]).map(x=>x.field).join(', '));
     }
     if(bundle.systemBlueprint!=null){
       const v=window.PCBProSystemArchitect?.validate?.(bundle.systemBlueprint);
@@ -175,6 +180,7 @@
       [KEY.manufacturing, bundle.manufacturing ? JSON.stringify(bundle.manufacturing) : null],
       [KEY.electrical, bundle.electrical ? JSON.stringify(bundle.electrical) : null],
       [KEY.blueprint, bundle.systemBlueprint ? JSON.stringify(bundle.systemBlueprint) : null],
+      [KEY.harness, bundle.harnessPlan ? JSON.stringify(bundle.harnessPlan) : null],
       ...(mergedAcademy?[[KEY.academy,JSON.stringify(mergedAcademy)]]:[]),
       [KEY.active, null],
       [KEY.newCloud, '1'],

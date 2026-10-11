@@ -1,7 +1,7 @@
 (() => {
  'use strict';
  if(window.PCBProQuickActions)return;
- const VERSION='1.30.0';
+ const VERSION='1.31.0';
  let open=false,selected=0,filtered=[],previousFocus=null;
  const commands=[
   {key:'schematic',label:'Buka Schematic',category:'Workspace',desc:'Buka editor rangkaian & netlist',view:'Schematic'},
@@ -9,6 +9,7 @@
   {key:'sim',label:'Buka Simulator',category:'Workspace',desc:'Simulasi dari komponen nyata',view:'Simulator'},
   {key:'electrical',label:'Buka Electrical',category:'Workspace',desc:'Load schedule, panel dan sistem daya',view:'Electrical'},
   {key:'academy',label:'Buka Learning Academy',category:'Belajar',desc:'42 materi & routing lab',view:'Learning'},
+  {key:'harness',label:'Buka Wiring & Harness Planner',category:'Rancang',desc:'Rencana terminal, koneksi dan tes kontinuitas manual',view:'Builder'},
   {key:'builder',label:'Buka System Builder',category:'Rancang',desc:'Robot, smart home, hidroponik, GPS & power tree',view:'Builder'},
   {key:'bom',label:'Buka Bill of Materials',category:'Workspace',desc:'Data komponen PCB',view:'BOM'},
   {key:'fab',label:'Buka Fabrication',category:'Workspace',desc:'Preflight dan CAM (cakupan terbatas)',view:'Fabrication'},
@@ -88,8 +89,11 @@
   close();
   if(command.view){
     const button=[...document.querySelectorAll('.tabs button')].find(b=>b.textContent?.trim()===command.view);
-    if(button)button.click();
-    else window.alert('Workspace '+command.view+' belum tersedia.');
+    if(button){
+      button.click();
+      if(command.key==='harness')
+        setTimeout(()=>document.getElementById('sl-harness-v131')?.scrollIntoView?.({behavior:'smooth',block:'start'}),120);
+    }else window.alert('Workspace '+command.view+' belum tersedia.');
     return;
   }
   if(command.action){
