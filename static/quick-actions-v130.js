@@ -1,7 +1,7 @@
 (() => {
  'use strict';
  if(window.PCBProQuickActions)return;
- const VERSION='1.30.0';
+ const VERSION='1.31.0';
  let open=false,selected=0,filtered=[],previousFocus=null;
  const commands=[
   {key:'schematic',label:'Buka Schematic',category:'Workspace',desc:'Buka editor rangkaian & netlist',view:'Schematic'},
@@ -89,8 +89,11 @@
   close();
   if(command.view){
     const button=[...document.querySelectorAll('.tabs button')].find(b=>b.textContent?.trim()===command.view);
-    if(button)button.click();
-    else window.alert('Workspace '+command.view+' belum tersedia.');
+    if(button){
+      button.click();
+      if(command.key==='harness')
+        setTimeout(()=>document.getElementById('sl-harness-v131')?.scrollIntoView?.({behavior:'smooth',block:'start'}),120);
+    }else window.alert('Workspace '+command.view+' belum tersedia.');
     return;
   }
   if(command.action){
