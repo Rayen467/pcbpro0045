@@ -159,3 +159,18 @@ test('reserved I2C 7-bit addresses are surfaced using NXP UM10204, normal 0x40 i
  assert.ok(!a.analyze().issues.some(x=>x.code==='I2C_RESERVED_ADDRESS'));
  assert.ok(a.analyze().issues.some(x=>x.code==='CONTROLLER_PINOUT_UNVERIFIED'));
 });
+
+test('conceptual power tree reflects project modules and safely escapes user input',()=>{
+ const h=boot(),a=h.api;a.addDevice();
+ a.updateDevice('MOD1','name','<script>alert(1)</script>');
+ const win={PCBProSystemArchitect:a};
+ const doc={readyState:'loading',addEventListener(){}};
+ vm.runInNewContext(readFileSync(new URL('../../static/system-studio-v130.js',import.meta.url),'utf8'),
+  {window:win,document:doc},{filename:'system-studio-v130.js'});
+ const svg=win.PCBProSystemStudio.powerTree(a.snapshot());
+ assert.match(svg,/SOURCE \/ SUPPLY/);
+ assert.match(svg,/MOD1/);
+ assert.match(svg,/&lt;script&gt;/);
+ assert.doesNotMatch(svg,/<script>/);
+ assert.match(svg,/bukan koneksi listrik\/pin/);
+});
