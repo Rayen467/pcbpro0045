@@ -9,6 +9,7 @@
   {key:'sim',label:'Buka Simulator',category:'Workspace',desc:'Simulasi dari komponen nyata',view:'Simulator'},
   {key:'electrical',label:'Buka Electrical',category:'Workspace',desc:'Load schedule, panel dan sistem daya',view:'Electrical'},
   {key:'academy',label:'Buka Learning Academy',category:'Belajar',desc:'42 materi & routing lab',view:'Learning'},
+  {key:'harness',label:'Buka Wiring & Harness Planner',category:'Rancang',desc:'Rencana terminal, koneksi dan tes kontinuitas manual',view:'Builder'},
   {key:'builder',label:'Buka System Builder',category:'Rancang',desc:'Robot, smart home, hidroponik, GPS & power tree',view:'Builder'},
   {key:'bom',label:'Buka Bill of Materials',category:'Workspace',desc:'Data komponen PCB',view:'BOM'},
   {key:'fab',label:'Buka Fabrication',category:'Workspace',desc:'Preflight dan CAM (cakupan terbatas)',view:'Fabrication'},
