@@ -1,7 +1,7 @@
 (() => {
  'use strict';
  if(window.PCBProSystemStudio)return;
- const VERSION='1.30.0';
+ const VERSION='1.31.0';
  const esc=s=>String(s??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
  const fmt=(n,d=2)=>typeof n==='number'&&Number.isFinite(n)?n.toLocaleString('id-ID',{maximumFractionDigits:d}):'—';
  const api=()=>window.PCBProSystemArchitect;
@@ -116,7 +116,7 @@
   const project=arch.snapshot(),report=arch.analyze(project),p=report.power||{},
     bad=report.issues.filter(x=>x.severity==='blocker').length;
   const columns=['name','kind','interface','railV','nominalA','peakA','hoursPerDay','pins','i2cAddress','powerRequired','tested'];
-  root.innerHTML='<div class="sb-wrap"><header class="sb-head"><div><span class="sb-tag">SIRKUITLAB / SYSTEM BLUEPRINT · 1.30</span>'+
+  root.innerHTML='<div class="sb-wrap"><header class="sb-head"><div><span class="sb-tag">SIRKUITLAB / SYSTEM BLUEPRINT · 1.31</span>'+
    '<h2>Dari ide menjadi rancangan sistem yang bisa diuji.</h2><p>Pilih contoh proyek, isi kebutuhan daya dan jalur sinyal berdasarkan data komponen, lalu lanjutkan ke schematic dan routing PCB asli.</p></div>'+
    '<div class="sb-actions"><button data-action="json">Export JSON</button><button data-action="csv">BOM CSV</button><button class="primary" data-action="verify">Cek proyek aktual</button></div></header>'+
    '<div class="sb-warn"><b>BLUEPRINT ≠ RANGKAIAN SIAP DIPASANG.</b> Semua rating komponen kosong sampai lu mengisinya. Pemeriksaan power tree ini belum menghitung rugi converter, inrush, proteksi, EMI atau keselamatan instalasi. Hasilnya tidak boleh dipakai untuk menyetujui instalasi AC.</div>'+
@@ -136,7 +136,7 @@
    '</tbody></table></div>'+
    '<p class="sb-note">I²C boleh berbagi dua GPIO pada bus yang sama, asalkan alamat 7-bit berbeda. Pin ganda pada protokol lain ditandai konflik; ini belum memvalidasi pinout ESP32 tertentu.</p></section>'+
    '<section class="sb-card"><h3>03 / Power tree konseptual</h3>'+powerTree(project)+'</section>'+
-   '<section class="sb-card"><h3>04 / Buka editor untuk implementasi</h3><p>Blueprint sengaja tidak membuat wiring/PCB otomatis yang bisa salah. Cocokkan datasheet dan bentuk netlist di editor asli.</p>'+
+   '<section class="sb-card"><div id="sl-harness-v131"></div></section>'+'<section class="sb-card"><h3>06 / Buka editor untuk implementasi</h3><p>Blueprint sengaja tidak membuat wiring/PCB otomatis yang bisa salah. Cocokkan datasheet dan bentuk netlist di editor asli.</p>'+
    '<div class="sb-actions">'+['Learning','Schematic','PCB','Electrical','Rules','Fabrication'].map(x=>'<button data-view="'+x+'">'+x+' →</button>').join('')+'</div></section>'+
    '</main><aside><section class="sb-card"><h3>Power budget awal</h3><div class="sb-metrics">'+
    '<div class="sb-metric"><b>'+fmt(p.nominalLoadW)+' W</b><span>Beban nominal</span></div>'+
@@ -153,6 +153,7 @@
    '<details><summary>Lihat '+evidence.findings.length+' temuan</summary><div class="sb-issues">'+evidence.findings.slice(0,25).map(x=>'<div class="sb-issue '+(x.severity==='blocker'?'blocker':'review')+'"><b>'+esc(x.code)+'</b><p>'+esc(x.details)+'</p></div>').join('')+'</div></details>':
    '<p>Belum diperiksa sesi ini. Tombol Cek proyek aktual memanggil integrity, SPICE coverage, physical DRC dan manufacturing preflight dari proyek yang aktif.</p>')+
    '</section></aside></div></div>';
+  window.PCBProHarnessUIV131?.mount?.();
   if(root.dataset.boundBuilder==='1')return;
   root.dataset.boundBuilder='1';
   root.addEventListener('click',e=>{
