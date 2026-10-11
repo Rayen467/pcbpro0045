@@ -146,3 +146,16 @@ test('new Blueprint is integrated with builder view, encrypted cloud and full-pr
  assert.match(ui,/data-template/);
  assert.match(ui,/PCBProVerificationV125\.inspect/);
 });
+
+test('reserved I2C 7-bit addresses are surfaced using NXP UM10204, normal 0x40 is accepted',()=>{
+ const h=boot(),a=h.api;
+ a.addDevice();a.updateDevice('MOD1','interface','i2c');
+ a.updateDevice('MOD1','pins',['GPIO21','GPIO22']);
+ for(const address of ['0x00','0x03','0x07','0x78','0x7F']){
+  a.updateDevice('MOD1','i2cAddress',address);
+  assert.ok(a.analyze().issues.some(x=>x.code==='I2C_RESERVED_ADDRESS'),address);
+ }
+ a.updateDevice('MOD1','i2cAddress','0x40');
+ assert.ok(!a.analyze().issues.some(x=>x.code==='I2C_RESERVED_ADDRESS'));
+ assert.ok(a.analyze().issues.some(x=>x.code==='CONTROLLER_PINOUT_UNVERIFIED'));
+});
