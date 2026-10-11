@@ -66,6 +66,7 @@
       if(!modules.has(t.deviceId))err('ORPHAN_MODULE',t.id,'Terminal refers to module removed from Builder: '+t.deviceId);
     }
     const netForTerminal=new Map(),pairs=new Map();
+    const netMembers=new Map();
     for(const w of plan.wires){
       const a=terminalById.get(w.from),b=terminalById.get(w.to);
       if(!a||!b){err('MISSING_TERMINAL',w.id,'Wire points to a missing terminal');continue;}
@@ -93,6 +94,10 @@
         !roles.includes('ground')&&
         (w.mode==='power'||w.mode==='signal'||w.mode==='data'))
         err('VOLTAGE_MISMATCH',w.id,'Declared terminal voltages differ ('+a.nominalV+' V vs '+b.nominalV+' V); verify level shifting/regulator');
+      const groupName=w.net.trim().toUpperCase();
+      const existingGroup=netMembers.get(groupName)||new Map();
+      existingGroup.set(a.id,a);existingGroup.set(b.id,b);
+      netMembers.set(groupName,existingGroup);
       for(const t of [a,b]){
         const existing=netForTerminal.get(t.id)||new Set();existing.add(w.net.trim().toUpperCase());
         netForTerminal.set(t.id,existing);
@@ -105,6 +110,22 @@
     }
     for(const [id,names] of netForTerminal)
       if(names.size>1)err('TERMINAL_ON_MULTIPLE_NETS',id,'Same physical terminal assigned to different nets: '+[...names].join(', '));
+    for(const [net,terminals] of netMembers){
+      const members=[...terminals.values()];
+      const ground=members.filter(x=>x.role==='ground');
+      const sources=members.filter(x=>x.role==='power_out');
+      const drivers=members.filter(x=>x.role==='signal_out');
+      if(ground.length&&sources.length)
+        err('NET_POWER_TO_GROUND',net,'Named net contains both a power output and ground; inspect all branches before powering equipment.');
+      if(sources.length>1)
+        err('NET_MULTIPLE_POWER_SOURCES',net,'Named net combines multiple power output terminals; no isolation/OR-ing was modeled.');
+      if(drivers.length>1)
+        err('NET_MULTIPLE_SIGNAL_DRIVERS',net,'Named net contains multiple signal output drivers.');
+      if(/^SDA$/i.test(net)&&members.some(x=>/^SCL$/i.test(x.name)))
+        warn('I2C_LABEL_MISMATCH',net,'Net named SDA includes a terminal named SCL; confirm datasheet naming.');
+      if(/^SCL$/i.test(net)&&members.some(x=>/^SDA$/i.test(x.name)))
+        warn('I2C_LABEL_MISMATCH',net,'Net named SCL includes a terminal named SDA; confirm datasheet naming.');
+    }
     if(plan.wires.length===0)warn('NO_WIRING','project','No logical wires entered yet');
     warn('ELECTRICAL_SIGNOFF_NOT_PROVEN','project','No automatic calculation of ampacity, voltage drop, crimp/connector rating, insulation, fusing, EMC, IEC/PUIL/IPC compliance or physical workmanship');
     const counts={wires:plan.wires.length,passed:plan.wires.filter(x=>x.testStatus==='pass').length,
